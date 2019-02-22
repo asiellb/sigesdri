@@ -1,0 +1,152 @@
+{% extends '::base.html.twig' %}
+
+{% trans_default_domain 'FOSUserBundle' %}
+
+{% block page_level_plugins_css %}
+    <link href="{{ asset('assets/global/plugins/bootstrap-select/css/bootstrap-select.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/select2/css/select2.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/select2/css/select2-bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/icheck/skins/all.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/bootstrap-datepicker/css/bootstrap-datepicker.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/cropper/dist/cropper.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/bundles/prestaimage/css/cropper.css') }}" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block page_level_style %}
+    <link href="{{ asset('assets/pages/css/old/profile.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/pages/css/init-form-plugins.css') }}" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block page_level_plugins_js %}
+    <script src="{{ asset('assets/global/plugins/jquery.sparkline.min.js') }}" type="text/javascript"></script>
+
+    <script src="{{ asset('assets/global/plugins/bootstrap-select/js/bootstrap-select.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/select2/js/select2.full.min.js') }}" type="text/javascript"></script>
+
+    <script src="{{ asset('assets/global/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/bootstrap-datepicker/locales/bootstrap-datepicker.es.min.js') }}" type="text/javascript"></script>
+
+    <script src="{{ asset('assets/global/plugins/icheck/icheck.min.js') }}" type="text/javascript"></script>
+
+    <script src="{{ asset('assets/global/plugins/jquery-validation/js/jquery.validate.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/jquery-validation/js/localization/messages_es.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/jquery-validation/js/additional-methods.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/pages/scripts/plugins/jquery-validation/additional-methods.js') }}" type="text/javascript"></script>
+
+    {#<script src="{{ asset('assets/global/plugins/bootstrap-wizard/jquery.bootstrap.wizard.min.js') }}" type="text/javascript"></script>#}
+
+    <script src="{{ asset('assets/global/plugins/cropper/dist/cropper.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/bundles/prestaimage/js/cropper.js') }}" type="text/javascript"></script>
+
+    <script src="{{ asset('assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.js') }}" type="text/javascript"></script>
+
+    <script src="{{ asset('assets/global/plugins/jquery-inputmask/jquery.inputmask.bundle.js') }}" type="text/javascript"></script>
+    {#<script src="{{ asset('assets/global/plugins/jquery-inputmask/inputmask/phone-codes/phone.js') }}" type="text/javascript"></script>#}
+    <script src="{{ asset('assets/pages/scripts/plugins/jquery-inputmask/inputmask/additional-methods.js') }}" type="text/javascript"></script>
+{% endblock %}
+
+{% block page_level_scrpt %}
+    <script src="{{ asset('assets/pages/scripts/init-form-plugins.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/pages/scripts/client-show.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/pages/scripts/client-edit-form.js') }}" type="text/javascript"></script>
+{% endblock %}
+
+{% block title %}{{ parent() }} | Perfil | {{ app.user.firstName ~ ' ' ~ app.user.lastName }}{% endblock %}
+
+{% block body_class %}page-container-bg-solid{% endblock %}
+
+{% block  page_breadcrumb %}
+    {{ parent() }}
+    <li>
+        <span>Perfil de Usuario</span> <i class="fa fa-circle"></i> <span>{{ app.user.firstName ~ ' ' ~ app.user.lastName }}</span>
+    </li>
+{% endblock %}
+
+{% block page_title %}
+{% endblock %}
+
+{% block page_dashboard %}
+
+    {% if app.request.hasPreviousSession %}
+        {% for type, messages in app.session.flashbag.all() %}
+            {% for message in messages %}
+                <div class="flash-{{ type }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endfor %}
+    {% endif %}
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="profile-sidebar">
+                <div class="portlet light profile-sidebar-portlet ">
+                    <!-- SIDEBAR USERPIC -->
+                    <div class="profile-userpic">
+                        {#{% if app.user.userImage | length() > 0 %}
+                            {% set picture = {{ app.request.scheme }}://{{ app.request.httpHost ~ app.request.basePath ~ vich_uploader_asset(app.user, 'userImageFile') }} %}
+                            #}{##}{#
+                        {% endif %}#}
+                        <img src="{{ asset(vich_uploader_asset(app.user, 'userImageFile')) }}" class="img-responsive" alt=""> </div>
+                    <!-- END SIDEBAR USERPIC -->
+                    <!-- SIDEBAR USER TITLE -->
+                    <div class="profile-usertitle">
+                        <div class="profile-usertitle-name"> {{ user.firstName ~ ' ' ~ user.lastName }} </div>
+                        <div class="profile-usertitle-job"> {{ user.position }}</div>
+                    </div>
+                    <!-- END SIDEBAR USER TITLE -->
+                    <!-- SIDEBAR MENU -->
+                    <div class="profile-usermenu">
+                        <ul class="nav">
+                            <li class="{% if '/profile/index' in app.request.getPathInfo() %}active{% endif %}">
+                                <a href="{{ path('fos_user_profile_show') }}">
+                                    <i class="icon-home"></i> Perfil </a>
+                            </li>
+                            <li class="{% if '/profile/edit' in app.request.getPathInfo() %}active{% endif %}">
+                                <a href="{{ path('fos_user_profile_edit') }}">
+                                    <i class="icon-settings"></i> Información General </a>
+                            </li>
+                            <li class="{% if '/profile/change-password' in app.request.getPathInfo() %}active{% endif %}">
+                                <a href="{{ path('fos_user_change_password') }}">
+                                    <i class="icon-key"></i> Cambiar contraseña </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- END MENU -->
+                </div>
+
+                <div class="portlet light ">
+                    <!-- STAT -->
+                    <div>
+                        <h4 class="profile-desc-title">Sobre {{ user.firstName ~ ' ' ~ user.lastName }}</h4>
+                        <span class="profile-desc-text"> {{ user.about }}. </span>
+                        <div class="margin-top-20 profile-desc-link">
+                            <i class="fa fa-building"></i>
+                            <span>{{ user.workDepartment }}</span>
+                        </div>
+                        <div class="margin-top-20 profile-desc-link">
+                            <i class="fa fa-phone"></i>
+                            <span>{{ user.workPhone }}</span>
+                        </div>
+                        <div class="margin-top-20 profile-desc-link">
+                            <i class="fa fa-envelope"></i>
+                            <a href="mailto:{{ user.email }}">{{ user.email }}</a>
+                        </div>
+                    </div>
+                    <!-- END STAT -->
+                </div>
+            </div>
+
+            <div class="profile-content">
+                <div class="portlet light ">
+                    {% block fos_user_content %}
+
+                    {% endblock fos_user_content %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+

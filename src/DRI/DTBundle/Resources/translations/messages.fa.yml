@@ -1,0 +1,12 @@
+sg:
+    datatables:
+        confirmMessage: "آیا مطمئن هستید؟"
+        selectError: "شما می‌بایست حداقل یک سطر را انتخاب کنید."
+        actions:
+            title: "Actions"
+            show: "Show"
+            edit: "Edit"
+        daterange:
+            apply: "Apply"
+            cancel: "Cancel"
+            format: "YYYY-MM-DD"

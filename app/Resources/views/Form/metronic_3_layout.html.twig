@@ -1,0 +1,477 @@
+{% use 'form_div_layout.html.twig' %}
+
+{% block form_start -%}
+    {% if 'easyadmin' == block_prefixes|slice(-2)|first %}
+        {% set attr = attr|merge({
+            'class': [
+                _easyadmin_form_type|default('') == 'horizontal' ? 'form-horizontal' : 'form-vertical',
+                attr.class|default(''),
+                easyadmin.view ~ '-form'
+            ]|join(' '),
+            'data-view': easyadmin.view,
+            'data-entity': easyadmin.entity.name,
+            'data-entity-id': attribute(value, easyadmin.entity.primary_key_field_name),
+        }) %}
+    {% endif %}
+
+    {{- parent() -}}
+{%- endblock form_start %}
+
+{# Widgets #}
+
+{#{% block form_widget %}
+    {{- parent() -}}
+
+    {% if form.parent.vars.allow_delete|default(false) %}
+        {% set remove_item_javascript %}
+            $(function() {
+            if (event.preventDefault) event.preventDefault(); else event.returnValue = false;
+
+            var containerDiv = $('#{{ id }}').parents('.form-group:first');
+            var parentDiv = containerDiv.parents('[data-prototype]:first');
+            containerDiv.remove();
+            parentDiv.trigger('easyadmin.collection.item-deleted');
+
+            if (0 == parentDiv.children().length && 'undefined' !== parentDiv.attr('data-empty-collection')) {
+                $(parentDiv.attr('data-empty-collection')).insertBefore(parentDiv);
+            }
+            });
+        {% endset %}
+
+        <div class="field-collection-item-action">
+            <a href="#" onclick="{{ remove_item_javascript|raw }}" class="text-danger">
+                <i class="fa fa-remove"></i>
+                {{ 'action.remove_item'|trans({}, 'EasyAdminBundle') }}
+            </a>
+        </div>
+    {% endif %}
+{% endblock form_widget %}#}
+
+{% block form_widget_simple -%}
+    {% if type is not defined or type not in ['file', 'hidden'] %}
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ ' form-control')|trim}) -%}
+    {% endif %}
+    {{- parent() -}}
+{%- endblock form_widget_simple %}
+
+{% block textarea_widget -%}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-control')|trim}) %}
+    {{- parent() -}}
+{%- endblock textarea_widget %}
+
+{% block button_widget -%}
+    {% set attr = attr|merge({class: (attr.class|default('btn-default') ~ ' btn')|trim}) %}
+    {{- parent() -}}
+{%- endblock %}
+
+{% block money_widget -%}
+    <div class="input-group">
+        {% set prepend = '{{' == money_pattern[0:2] %}
+        {% if not prepend %}
+            <span class="input-group-addon">{{ money_pattern|replace({ '{{ widget }}':''}) }}</span>
+        {% endif %}
+        {{- block('form_widget_simple') -}}
+        {% if prepend %}
+            <span class="input-group-addon">{{ money_pattern|replace({ '{{ widget }}':''}) }}</span>
+        {% endif %}
+    </div>
+{%- endblock money_widget %}
+
+{% block percent_widget -%}
+    <div class="input-group">
+        {{- block('form_widget_simple') -}}
+        <span class="input-group-addon">%</span>
+    </div>
+{%- endblock percent_widget %}
+
+{% block datetime_widget -%}
+    {% if widget == 'single_text' %}
+        {{- block('form_widget_simple') -}}
+    {% else -%}
+        {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-inline')|trim}) -%}
+        <div {{ block('widget_container_attributes') }}>
+            {{- form_errors(form.date) -}}
+            {{- form_errors(form.time) -}}
+            {{- form_widget(form.date, { datetime: true } ) -}}
+            {{- form_widget(form.time, { datetime: true } ) -}}
+        </div>
+    {%- endif %}
+{%- endblock datetime_widget %}
+
+{% block date_widget -%}
+    {% if widget == 'single_text' %}
+        {{- block('form_widget_simple') -}}
+    {% else -%}
+        {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-inline')|trim}) -%}
+        {% if datetime is not defined or not datetime -%}
+            <div {{ block('widget_container_attributes') -}}>
+        {%- endif %}
+            {{- date_pattern|replace({
+                '{{ year }}': form_widget(form.year),
+                '{{ month }}': form_widget(form.month),
+                '{{ day }}': form_widget(form.day),
+            })|raw -}}
+        {% if datetime is not defined or not datetime -%}
+            </div>
+        {%- endif -%}
+    {% endif %}
+{%- endblock date_widget %}
+
+{% block time_widget -%}
+    {% if widget == 'single_text' %}
+        {{- block('form_widget_simple') -}}
+    {% else -%}
+        {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-inline')|trim}) -%}
+        {% if datetime is not defined or false == datetime -%}
+            <div {{ block('widget_container_attributes') -}}>
+        {%- endif -%}
+        {{- form_widget(form.hour) }}:{{ form_widget(form.minute) }}{% if with_seconds %}:{{ form_widget(form.second) }}{% endif %}
+        {% if datetime is not defined or false == datetime -%}
+            </div>
+        {%- endif -%}
+    {% endif %}
+{%- endblock time_widget %}
+
+{% block choice_widget_collapsed -%}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-control')|trim}) %}
+    {{- parent() -}}
+{%- endblock %}
+
+{% block choice_widget_expanded -%}
+    {% if '-inline' in label_attr.class|default('') -%}
+        <div {{ block('widget_container_attributes') }}>
+            {%- for child in form %}
+                {{- form_widget(child, {
+                    parent_label_class: label_attr.class|default(''),
+                }) -}}
+            {% endfor -%}
+        </div>
+    {%- elseif 'icheck-label' in label_attr.class|default('') -%}
+        <div {{ block('widget_container_attributes') }}>
+            <div class="icheck-inline">
+                {%- for child in form %}
+                    {{- form_widget(child, {
+                        parent_label_class: label_attr.class|default(''),
+                    }) -}}
+                {% endfor -%}
+            </div>
+        </div>
+    {%- else -%}
+        <div {{ block('widget_container_attributes') }}>
+
+                {%- for child in form %}
+                    {{- form_widget(child, {
+                        parent_label_class: label_attr.class|default(''),
+                    }) -}}
+                {% endfor -%}
+        </div>
+    {%- endif %}
+{%- endblock choice_widget_expanded %}
+
+{%- block choice_widget_options -%}
+    {% for group_label, choice in options %}
+        {%- if choice is iterable -%}
+            <optgroup label="{{ choice_translation_domain is same as(false) ? group_label : group_label|trans({}, choice_translation_domain) }}">
+                {% set options = choice %}
+                {{- block('choice_widget_options') -}}
+            </optgroup>
+        {%- else -%}
+            <option value="{{ choice.value }}"{% if choice.attr %} {% set attr = choice.attr %}{{ block('attributes') }}{% endif %}{% if choice is selectedchoice(value) %} selected="selected"{% endif %}>{{ choice_translation_domain is same as(false) ? choice.label : choice.label|trans({}, choice_translation_domain) }}</option>
+        {%- endif -%}
+    {% endfor %}
+{%- endblock choice_widget_options -%}
+
+{% block checkbox_widget -%}
+    {%- set parent_label_class = parent_label_class|default(label_attr.class|default('')) -%}
+    {% if 'checkbox-inline' in parent_label_class %}
+        {{- form_label(form, null, { widget: parent() }) -}}
+    {% else -%}
+        <div class="checkbox">
+            {{- form_label(form, null, { widget: parent() }) -}}
+        </div>
+    {%- endif %}
+{%- endblock checkbox_widget %}
+
+{% block radio_widget -%}
+    {%- set parent_label_class = parent_label_class|default(label_attr.class|default('')) -%}
+    {% if 'radio-list' in parent_label_class %}
+
+            {{- form_label(form, null, { widget: parent() }) -}}
+
+    {% else -%}
+
+            {{- form_label(form, null, { widget: parent() }) -}}
+
+    {%- endif %}
+{%- endblock radio_widget %}
+
+{# Labels #}
+
+{% block form_label -%}
+    {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' control-label')|trim}) -%}
+    {% if label is not same as(false) -%}
+        {% if not compound -%}
+            {% set label_attr = label_attr|merge({'for': id}) %}
+        {%- endif -%}
+        {% if required -%}
+            {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' required')|trim}) %}
+        {%- endif -%}
+        {% if label is empty -%}
+            {%- if label_format is not empty -%}
+                {% set label = label_format|replace({
+                    '%name%': name,
+                    '%id%': id,
+                }) %}
+            {%- else -%}
+                {% set label = name|humanize %}
+            {%- endif -%}
+        {%- endif -%}
+        <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
+            {{ translation_domain is same as(false) ? label : label|trans({}, translation_domain) }}
+            {% if required %}
+                <span class="required" title="This field is required">*</span>
+            {% endif %}
+        </label>
+    {%- endif -%}
+
+{%- endblock form_label %}
+
+{% block choice_label -%}
+    {# remove the checkbox-inline and radio-inline class, it's only useful for embed labels #}
+    {%- set label_attr = label_attr|merge({class: label_attr.class|default('')|replace({'checkbox-inline': '', 'radio-inline': ''})|trim}) -%}
+    {{- block('form_label') -}}
+{% endblock %}
+
+{% block checkbox_label -%}
+    {{- block('checkbox_radio_label') -}}
+{%- endblock checkbox_label %}
+
+{% block radio_label -%}
+    {{- block('checkbox_radio_label') -}}
+{%- endblock radio_label %}
+
+{% block checkbox_radio_label %}
+    {# Do no display the label if widget is not defined in order to prevent double label rendering #}
+    {% if widget is defined %}
+        {% if required %}
+            {% set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' required')|trim}) %}
+        {% endif %}
+        {% if parent_label_class is defined %}
+            {% set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' ' ~ parent_label_class)|trim}) %}
+        {% endif %}
+        {% if label is not same as(false) and label is empty %}
+            {% set label = name|humanize %}
+        {% endif %}
+
+            <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
+                {{- widget|raw -}}
+                {{- label is not same as(false) ? label|trans({}, 'messages') -}}
+            </label>
+    {% endif %}
+{% endblock checkbox_radio_label %}
+
+{# Rows #}
+
+{% block form_row -%}
+    {% set _field_type = easyadmin.field.fieldType|default('default') %}
+    <div class="form-group {% if (not compound or force_error|default(false)) and not valid %}has-error{% endif %} field-{{ block_prefixes|slice(-2)|first }}">
+        {% set _field_label = easyadmin.field['label']|default(null) %}
+        {{- form_label(form, _field_label, { translation_domain: 'messages' }) -}}
+        {{- form_widget(form) -}}
+
+        {% if _field_type in ['datetime', 'date', 'time', 'birthday'] %}
+            <div class="nullable-control">
+                <label>
+                    <input type="checkbox" {% if data is null %}checked="checked"{% endif %}>
+                    {{ 'label.nullable_field'|trans({}, 'EasyAdminBundle')}}
+                </label>
+            </div>
+        {% endif %}
+
+        {{- form_errors(form) -}}
+
+    </div>
+{%- endblock form_row %}
+
+{#{% block collection_row %}
+    {{ block('form_row') }}
+
+    {% if allow_add|default(false) %}
+        {% set js_add_item %}
+            $(function() {
+                if (event.preventDefault) event.preventDefault(); else event.returnValue = false;
+
+                var collection = $('#{{ id }}');
+                // Use a counter to avoid having the same index more than once
+                var numItems = collection.data('count') || collection.children('div.form-group').length;
+
+                collection.prev('.collection-empty').remove();
+
+                var newItem = collection.attr('data-prototype')
+                    .replace(/\>__name__label__\</g, '>' + numItems + '<')
+                    .replace(/_{{ name }}___name__/g, '_{{ name }}_' + numItems)
+                    .replace(/{{ name }}\]\[__name__\]/g, '{{ name }}][' + numItems + ']')
+                ;
+
+                // Increment the counter and store it in the collection
+                collection.data('count', ++numItems);
+
+                collection.append(newItem).trigger('easyadmin.collection.item-added');
+            });
+        {% endset %}
+
+        <div class="field-collection-action">
+            <a href="#" onclick="{{ js_add_item|raw }}" class="text-primary">
+                <i class="fa fa-plus-square"></i>
+                {{ (form|length == 0 ? 'action.add_new_item' : 'action.add_another_item')|trans({}, 'EasyAdminBundle') }}
+            </a>
+        </div>
+    {% endif %}
+{% endblock collection_row %}#}
+
+{% block button_row -%}
+    <div class="form-group field-{{ block_prefixes|slice(-2)|first }} {{ easyadmin.field.css_class|default('') }}">
+        {{- form_widget(form) -}}
+    </div>
+{%- endblock button_row %}
+
+{% block choice_row -%}
+    {% set force_error = true %}
+    {{- block('form_row') }}
+{%- endblock choice_row %}
+
+{% block date_row -%}
+    {% set force_error = true %}
+    {{- block('form_row') }}
+{%- endblock date_row %}
+
+{% block time_row -%}
+    {% set force_error = true %}
+    {{- block('form_row') }}
+{%- endblock time_row %}
+
+{% block datetime_row -%}
+    {% set force_error = true %}
+    {{- block('form_row') }}
+{%- endblock datetime_row %}
+
+{% block checkbox_row -%}
+    <div class="form-group {% if not valid %}has-error{% endif %} field-{{ block_prefixes|slice(-2)|first }}">
+        {{- form_widget(form) -}}
+        {{- form_errors(form) -}}
+    </div>
+{%- endblock checkbox_row %}
+
+{% block radio_row -%}
+    <div class="form-group {% if not valid %}has-error{% endif %} field-{{ block_prefixes|slice(-2)|first }}">
+        {{- form_widget(form) -}}
+        {{- form_errors(form) -}}
+    </div>
+{%- endblock radio_row %}
+
+{# Errors #}
+{% block form_errors %}
+    {% set error_count = errors|length %}
+    {% if error_count >= 1 %}
+        <div class="error-block">
+            <span class="label label-danger">{{ 'errors'|transchoice(count = error_count, domain = 'EasyAdminBundle') }}</span>
+            {% if error_count == 1 %}
+                {{ errors|first.message }}
+            {% else %}
+                <ul>
+                    {% for error in errors %}
+                        <li>{{ error.message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    {% endif %}
+{% endblock form_errors %}
+
+{#{%- block form_widget_compound -%}
+    {% if value is empty %}
+        {{ block('empty_collection') }}
+    {% endif %}
+    {% if value is empty or form.vars.prototype is defined %}
+        {% set attr = attr|merge({'data-empty-collection': block('empty_collection') }) %}
+    {% endif %}
+
+    {{ parent() }}
+{%- endblock form_widget_compound -%}#}
+
+
+{% block vich_file_row %}
+    {% set force_error = true %}
+    {{ block('form_row') }}
+{% endblock %}
+
+{% block vich_file_widget %}
+{% spaceless %}
+    <div class="easyadmin-vich-file">
+        {% if download_uri|default('') is not empty %}
+            {% set download_title = download_uri|split('/')|last ?: 'download'|trans({}, 'VichUploaderBundle') %}
+            <a href="{{ asset(download_uri) }}">{{ download_title }}</a>
+        {% endif %}
+
+        <div class="fileinput fileinput-new" data-provides="fileinput">
+            <span class="btn green btn-file">
+                <span class="fileinput-new"> Seleccionar Archivo </span>
+                <span class="fileinput-exists"> Cambiar </span>
+
+                {{ form_widget(form.file) }}
+            </span>
+            &nbsp;
+            <span class="fileinput-filename"> </span> &nbsp;
+            <a href="javascript:;" class="close fileinput-exists" data-dismiss="fileinput"> </a>
+            {% if form.delete is defined %}
+                {{ form_row(form.delete, { label: 'action.delete' }) }}
+            {% endif %}
+        </div>
+    </div>
+{% endspaceless %}
+{% endblock %}
+
+{% block vich_image_row %}
+    {% set force_error = true %}
+    {{ block('form_row') }}
+{% endblock %}
+
+{% block vich_image_widget %}
+{% spaceless %}
+    <div class="fileinput {{ download_uri|default('') is not empty ? 'fileinput-exists' : 'fileinput-new' }}" data-provides="fileinput" style="text-align: left">
+        <div>{{- form_label(form) -}}</div>
+        <div class="fileinput-new thumbnail" style="width: 150px; height: 150px;">
+            <img  alt="" /> </div>
+        <div class="fileinput-preview fileinput-exists thumbnail" data-trigger="fileinput" style="max-width: 150px; max-height: 150px; width: 150px; height: 150px;">
+            {% if download_uri|default('') is not empty %}
+                {% set download_title = download_uri|split('/')|last ?: 'download'|trans({}, 'VichUploaderBundle') %}
+                <img src="{{ asset(download_uri) }}" title="{{ download_title }}">
+            {% endif %}
+        </div>
+
+        <div>
+            <span class="btn blue-dark btn-outline btn-file">
+                <span class="fileinput-new"> Seleccionar Imagen</span>
+                <span class="fileinput-exists"> Cambiar </span>
+                {{ form_widget(form.file) }}
+            </span>
+            <a href="javascript:;" class="btn red fileinput-exists" data-dismiss="fileinput"> Borrar </a>
+            {% if form.delete is defined %}
+                {{ form_row(form.delete, { label: 'action.delete' }) }}
+            {% endif %}
+        </div>
+        {#
+        <div class="row">
+            {% if form.delete is defined %}
+            <div class="col-sm-3 col-md-2">
+                {{ form_row(form.delete, { label: 'action.delete' }) }}
+            </div>
+            {% endif %}
+            <div class="{{ form.delete is defined ? 'col-sm-9 col-md-10' : 'col-sm-12' }}">
+
+            </div>
+        </div>
+        #}
+    </div>
+{% endspaceless %}
+{% endblock %}

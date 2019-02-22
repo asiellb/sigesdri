@@ -1,0 +1,22 @@
+services:
+#    dri_util.example:
+#        class: DRI\UsefulBundle\Example
+#        arguments: ["@service_id", "plain_value", %parameter%]
+
+    namer.countries_flags_images:
+        class: DRI\UsefulBundle\Service\CountriesFlagsNamer
+        tags:
+            - { name: namer }
+
+    twig.extension.fechas:
+        class: DRI\UsefulBundle\Twig\Extension\DRIExtension
+        tags:
+            - { name: twig.extension }
+
+    datatable.server_side:
+        class: DRI\UsefulBundle\Handler\DatatableServerSide
+        arguments: ["@doctrine.orm.entity_manager"]
+
+    datatable.handler_request:
+        class: DRI\UsefulBundle\Handler\RequestHandler
+        arguments: ["@doctrine.orm.entity_manager"]

@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ parent() }} | Acceso denegado {% endblock %}
+
+{% block page_level_style %}
+    <link href="{{ asset('assets/pages/css/old/error.min.css') }}" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block page_content %}
+    <div class="row">
+        <div class="col-md-12 page-500">
+            <div class="number font-red"> 403 </div>
+            <div class="details">
+                <h3>¡Lo sentimos! No tienes acceso.</h3>
+                <p> Culquier duda, ponte en contacto con el administrador.<br></p>
+                <p>
+                    <a href="{{ path('homepage') }}" class="btn red btn-outline"> Volver a inicio </a>
+                    <br>
+                </p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends 'DRIExitBundle::layout.exit.html.twig' %}
+
+{% block title %}{{ parent() }} | Listado {% endblock %}
+
+{% block  page_breadcrumb %}
+    {{ parent() }}
+    <li>
+        <span>Listado </span>
+    </li>
+{% endblock %}
+
+{% block page_title %}
+    {{ parent() }}
+    <small>Listado </small>
+{% endblock %}
+
+{% block page_dashboard %}
+    <h1>Departure</h1>
+
+    <table>
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ departure.id }}</td>
+            </tr>
+            <tr>
+                <th>Passportdelivery</th>
+                <td>{% if departure.passportDelivery %}{{ departure.passportDelivery|date('Y-m-d') }}{% endif %}</td>
+            </tr>
+            <tr>
+                <th>Departuredate</th>
+                <td>{% if departure.departureDate %}{{ departure.departureDate|date('Y-m-d') }}{% endif %}</td>
+            </tr>
+            <tr>
+                <th>Returndate</th>
+                <td>{% if departure.returnDate %}{{ departure.returnDate|date('Y-m-d') }}{% endif %}</td>
+            </tr>
+            <tr>
+                <th>Passportcollection</th>
+                <td>{% if departure.passportCollection %}{{ departure.passportCollection|date('Y-m-d') }}{% endif %}</td>
+            </tr>
+            <tr>
+                <th>Observations</th>
+                <td>{{ departure.observations }}</td>
+            </tr>
+            <tr>
+                <th>Results</th>
+                <td>{{ departure.results }}</td>
+            </tr>
+            <tr>
+                <th>Createdat</th>
+                <td>{% if departure.createdAt %}{{ departure.createdAt|date('Y-m-d H:i:s') }}{% endif %}</td>
+            </tr>
+            <tr>
+                <th>Updatedat</th>
+                <td>{% if departure.updatedAt %}{{ departure.updatedAt|date('Y-m-d H:i:s') }}{% endif %}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('departure_index') }}">Back to the list</a>
+        </li>
+        <li>
+            <a href="{{ path('departure_edit', { 'id': departure.id }) }}">Edit</a>
+        </li>
+        <li>
+            {{ form_start(delete_form) }}
+                <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+{% endblock %}

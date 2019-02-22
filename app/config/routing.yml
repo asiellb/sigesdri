@@ -1,0 +1,55 @@
+dri_exit_departure:
+    resource: "@DRIExitBundle/Controller/DepartureController.php"
+    type:     annotation
+
+dri_user_user:
+    resource: "@DRIUserBundle/Controller/UserController.php"
+    type:     annotation
+
+_homepage:
+    path: /
+    defaults: { _controller: FrameworkBundle:Redirect:redirect, route: homepage }
+
+dri_exit:
+    resource: "@DRIExitBundle/Controller/"
+    type:     annotation
+    prefix:   /exit
+
+dri_passport:
+    resource: "@DRIPassportBundle/Controller/"
+    type:     annotation
+    prefix:   /passport
+
+dri_system:
+    resource: "@DRISystemBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
+dri_client:
+    resource: "@DRIClientBundle/Controller/"
+    type:     annotation
+    prefix:   /client
+
+dri_useful:
+    resource: "@DRIUsefulBundle/Controller/"
+    type:     annotation
+    prefix:   /useful
+
+fos_user:
+    resource: "@FOSUserBundle/Resources/config/routing/all.xml"
+
+fos_js_routing:
+    resource: "@FOSJsRoutingBundle/Resources/config/routing/routing.xml"
+
+_liip_imagine:
+    resource: "@LiipImagineBundle/Resources/config/routing.xml"
+
+sg_datatables_bundle:
+    resource: "@SgDatatablesBundle/Controller/"
+    type:     annotation
+
+_imagecrop_bundle:
+    resource: "@ImageCropBundle/Resources/config/routing.yml"
+
+presta_image:
+    resource: "@PrestaImageBundle/Resources/config/routing.yml"

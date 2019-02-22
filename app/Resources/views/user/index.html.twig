@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block page_dashboard %}
+    <h1>Lista de Usuarios</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Firstname</th>
+                <th>Lastname</th>
+                <th>Sciencecategory</th>
+                <th>Position</th>
+                <th>Employee</th>
+                <th>Workdepartment</th>
+                <th>Workphone</th>
+                <th>Homephone</th>
+                <th>Celphone</th>
+                <th>Userimage</th>
+                <th>Lastupdateimage</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+            <tr>
+                <td><a href="{{ path('user_show', { 'id': user.id }) }}">{{ user.id }}</a></td>
+                <td>{{ user.firstName }}</td>
+                <td>{{ user.lastName }}</td>
+                <td>{{ user.scienceCategory }}</td>
+                <td>{{ user.position }}</td>
+                <td>{% if user.employee %}Yes{% else %}No{% endif %}</td>
+                <td>{{ user.workDepartment }}</td>
+                <td>{{ user.workPhone }}</td>
+                <td>{{ user.homePhone }}</td>
+                <td>{{ user.celPhone }}</td>
+                <td>{{ user.userImage }}</td>
+                <td>{% if user.lastUpdateImage %}{{ user.lastUpdateImage|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('user_show', { 'id': user.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('user_edit', { 'id': user.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('user_new') }}">Create a new entry</a>
+        </li>
+    </ul>
+{% endblock %}

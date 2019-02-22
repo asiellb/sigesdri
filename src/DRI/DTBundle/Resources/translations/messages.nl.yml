@@ -1,0 +1,12 @@
+sg:
+    datatables:
+        confirmMessage: "Weet u het zeker?"
+        selectError: "U moet tenminste één element selecteren."
+        actions:
+            title: "Acties"
+            show: "Bekijken"
+            edit: "Bewerken"
+        daterange:
+            apply: "Toepassen"
+            cancel: "Annuleren"
+            format: "YYYY-MM-DD"

@@ -1,0 +1,12 @@
+sg:
+    datatables:
+        confirmMessage: "Sind sie sicher?"
+        selectError: "Sie müssen mindestens ein Element auswählen."
+        actions:
+            title: "Aktionen"
+            show: "Anzeigen"
+            edit: "Ändern"
+        daterange:
+            apply: "Übernehmen"
+            cancel: "Löschen"
+            format: "DD.MM.YYYY"

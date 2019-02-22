@@ -1,0 +1,16 @@
+resize_image: "Crop Image"
+image_dist_placeholder: "Remote URL"
+btn_validate: "Crop"
+btn_cancel: "Cancel"
+btn_import_image_local: "Local Image"
+btn_import_image_remote: "Import Remote"
+btn_change_image: "Change"
+btn_clear_image: "Delete"
+
+aspect_ratio:
+    16_9: "16:9"
+    4_3: "4:3"
+    1: "1"
+    2_3: "2:3"
+    nan: "Libre"
+btn_delete: "Delete Image"

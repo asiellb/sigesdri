@@ -1,0 +1,13 @@
+{% extends "FOSUserBundle::layout.html.twig" %}
+
+{% trans_default_domain 'FOSUserBundle' %}
+
+{% block fos_user_content %}
+    <div id="bootstrap_alerts_demo">
+        <div class="custom-alerts alert alert-success fade in">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true"></button>
+            <i class="fa-lg fa fa-check"></i>
+            {{ 'resetting.check_email'|trans({'%tokenLifetime%': tokenLifetime}) }}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,104 @@
+{% trans_default_domain 'FOSUserBundle' %}
+
+
+<div class="portlet-title tabbable-line">
+    <div class="caption caption-md">
+        <span class="caption-subject font-blue-madison bold uppercase">Información General</span>
+    </div>
+</div>
+
+<div class="portlet-body form">
+    <div class="tab-content">
+        <div class="tab-pane active" id="tab_1_1">
+            {{ form_start(form, { 'action': path('fos_user_profile_edit'), 'attr': { 'class': 'fos_user_profile_edit' } }) }}
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="control-label">Nombre</label>
+                            {{ form_widget(form.firstName) }}
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Apellidos</label>
+                            {{ form_widget(form.lastName) }}
+                        </div>
+                        {#<div class="form-group">
+                            <label class="control-label">Departamento</label>
+                            {{ form_widget(form.workDepartment) }}
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Posición</label>
+                            {{ form_widget(form.position) }}
+                        </div>#}
+                        <div class="form-group">
+                            <label class="control-label">Sobre mi</label>
+                            {{ form_widget(form.about) }}
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Teléfono laboral</label>
+                            {{ form_widget(form.workPhone) }}
+                        </div>
+                        {#<div class="form-group">
+                            <label class="control-label">Dirección particular</label>
+                            {{ form_widget(form.home) }}
+                        </div>#}
+                        <div class="form-group">
+                            <label class="control-label">Teléfono particular</label>
+                            {{ form_widget(form.homePhone) }}
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Celular</label>
+                            {{ form_widget(form.celPhone) }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="control-label">Foto</label>
+                            {{ form_widget(form.userImageFile) }}
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Nombre de Usuario</label>
+                            {{ form_widget(form.username) }}
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Email</label>
+                            {{ form_widget(form.email) }}
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Contraseña Actual</label>
+                            {{ form_widget(form.current_password) }}
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <div class="row">
+                        <div class="col-md-9">
+                            <button type="submit" class="btn green button-submit">
+                                Guardar
+                                <i class="fa fa-check"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+
+{% block page_custom_scrpt %}
+    <script type="text/javascript">
+        (function(w, $) {
+
+            'use strict';
+
+            $(function() {
+                $('.cropper').each(function() {
+                    new Cropper($(this));
+                });
+            });
+
+        })(window, jQuery);
+
+    </script>
+{% endblock %}

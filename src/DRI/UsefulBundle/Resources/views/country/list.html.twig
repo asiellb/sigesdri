@@ -1,0 +1,98 @@
+{% extends '::base.html.twig' %}
+
+{% block title %}{{ parent() }} | Paises{% endblock %}
+
+{% block  page_breadcrumb %}
+    {{ parent() }}
+    <li>
+        <span>Paises</span>
+        <i class="fa fa-circle"></i>
+    </li>
+{% endblock %}
+
+{% block page_title %}
+    Paises
+{% endblock %}
+
+{% block page_dashboard %}
+    <div class="row">
+        <div class="col-md-12">
+            {% for type, flashMessages in app.session.flashbag.all() %}
+                {% for flashMessage in flashMessages %}
+                    <div class="alert alert-{{ type }}">
+                        {{ flashMessage|raw }}
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <!-- Begin: life time stats -->
+            <div class="portlet light portlet-fit portlet-datatable bordered">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <i class="icon-settings"></i>
+                        <span class="caption-subject sbold uppercase">Listado de Paises</span>
+                    </div>
+                    <div class="actions">
+
+                        <a class="btn btn-success btn-circle" href="">
+                            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Nuevo País
+                        </a>
+
+                        <div class="btn-group">
+                            <a class="btn red btn-outline btn-circle" href="javascript:;" data-toggle="dropdown" aria-expanded="false">
+                                <i class="fa fa-share"></i>
+                                <span class="hidden-xs"> Herramientas </span>
+                                <i class="fa fa-angle-down"></i>
+                            </a>
+                            <ul class="dropdown-menu pull-right" id="pass_list_tools">
+                                <li>
+                                    <a href="javascript:;" data-action="0" class="tool-action">
+                                        <i class="icon-printer"></i> Imprimir</a>
+                                </li>
+                                <li>
+                                    <a href="javascript:;" data-action="1" class="tool-action">
+                                        <i class="icon-check"></i> Copiar</a>
+                                </li>
+                                <li>
+                                    <a href="javascript:;" data-action="2" class="tool-action">
+                                        <i class="icon-doc"></i> PDF</a>
+                                </li>
+                                <li>
+                                    <a href="javascript:;" data-action="3" class="tool-action">
+                                        <i class="icon-paper-clip"></i> Excel</a>
+                                </li>
+                                <li>
+                                    <a href="javascript:;" data-action="4" class="tool-action">
+                                        <i class="icon-cloud-upload"></i> CSV</a>
+                                </li>
+                                <li class="divider"> </li>
+                                <li>
+                                    <a href="javascript:;" data-action="5" class="tool-action">
+                                        <i class="icon-refresh"></i> Recargar</a>
+                                </li>
+
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <div class="table-container">
+                        <ul>
+                        {% for country in countries %}
+                            <li>
+                                <img src="{{ vich_uploader_asset(country, 'flagFile') | imagine_filter('flag_28_x_14') }}">
+                                {{ country.spName }}
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!-- End: life time stats -->
+        </div>
+    </div>
+{% endblock %}

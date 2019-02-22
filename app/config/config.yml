@@ -1,0 +1,251 @@
+imports:
+    - { resource: parameters.yml }
+    - { resource: security.yml }
+    - { resource: services.yml }
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# http://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
+parameters:
+    locale: es
+
+    app.path.users_images:              images/users
+    app.path.clients_images:            images/clients
+    app.path.passports_images:          images/passports
+    app.path.countries_flags_images:    images/countries_flags
+    app.path.images_images:             images/images
+
+    app.path.exit_wps_files:            files/exit_wps
+    app.path.departure_results_files:   files/departure_results
+
+
+
+framework:
+    #esi:             ~
+    translator:      { fallbacks: es }
+    secret:          "%secret%"
+    router:
+        resource: "%kernel.root_dir%/config/routing.yml"
+        strict_requirements: ~
+    form:            ~
+    csrf_protection: ~
+    validation:      { enable_annotations: true }
+    #serializer:      { enable_annotations: true }
+    templating:
+        engines: ['twig']
+    default_locale:  "%locale%"
+    trusted_hosts:   ~
+    session:
+        # http://symfony.com/doc/current/reference/configuration/framework.html#handler-id
+        handler_id:  session.handler.native_file
+        save_path:   "%kernel.root_dir%/../var/sessions/%kernel.environment%"
+    fragments:       ~
+    http_method_override: true
+    assets: ~
+
+# Twig Configuration
+twig:
+    debug:            "%kernel.debug%"
+    strict_variables: "%kernel.debug%"
+    form_themes:
+        #- 'form/comurimage.html.twig'
+        - 'form/metronic_3_layout.html.twig'
+        - 'form/metronic_3_horizontal_layout.html.twig'
+        - 'form/image_widget.html.twig'
+        #- 'form/jquery.collection.html.twig'
+
+        #- 'form_div_layout.html.twig'
+        #- 'EasyAdminBundle:form:bootstrap_3_layout.html.twig'
+        #- 'bootstrap_3_layout.html.twig'
+
+# Doctrine Configuration
+doctrine:
+    dbal:
+        driver:   pdo_mysql
+        host:     "%database_host%"
+        port:     "%database_port%"
+        dbname:   "%database_name%"
+        user:     "%database_user%"
+        password: "%database_password%"
+        charset:  UTF8
+        # if using pdo_sqlite as your database driver:
+        #   1. add the path in parameters.yml
+        #     e.g. database_path: "%kernel.root_dir%/data/data.db3"
+        #   2. Uncomment database_path in parameters.yml.dist
+        #   3. Uncomment next line:
+        #     path:     "%database_path%"
+
+    orm:
+        auto_generate_proxy_classes: true
+        naming_strategy: doctrine.orm.naming_strategy.underscore
+        auto_mapping: true
+
+# Assetic Configuration
+assetic:
+    debug: '%kernel.debug%'
+    use_controller: '%kernel.debug%'
+    filters:
+        cssrewrite: ~
+
+# Fos_User Configuration
+fos_user:
+    db_driver: orm
+    firewall_name: main
+    user_class: DRI\UserBundle\Entity\User
+
+    ## To solve the problem
+    from_email:
+        address: "noreply@reduc.edu.cu"
+        sender_name: "No Reply"
+    registration:
+        form:
+            type: DRI\UserBundle\Form\RegistrationType
+            # if you are using Symfony < 2.8 you should use the type name instead
+            # type: app_user_registration
+    resetting:
+        form:
+            type: DRI\UserBundle\Form\ResettingType
+            # if you are using Symfony < 2.8 you should use the type name instead
+            # type: app_user_registration
+    profile:
+        form:
+            type: DRI\UserBundle\Form\ProfileType
+            # if you are using Symfony < 2.8 you should use the type name instead
+            # type: app_user_registration
+
+# KNP Menu Configuration
+knp_menu:
+    # use "twig: false" to disable the Twig extension and the TwigRenderer
+    twig:
+        template: KnpMenuBundle::menu.html.twig
+    #  if true, enables the helper for PHP templates
+    templating: false
+    # the renderer to use, list is also available by default
+    default_renderer: twig
+
+# Vich_Uploader Configuration
+vich_uploader:
+    db_driver:            orm
+    storage:              file_system
+    twig:                 true
+    mappings:
+        users_images:
+            uri_prefix:           '%app.path.users_images%'
+            upload_destination:   '%kernel.root_dir%/../web/images/users'
+            namer:                namer.users_images
+            delete_on_remove:     true
+            delete_on_update:     true
+            inject_on_load:       false
+        clients_images:
+            uri_prefix:           '%app.path.clients_images%'
+            upload_destination:   '%kernel.root_dir%/../web/images/clients'
+            namer:                namer.clients_images
+            delete_on_remove:     true
+            delete_on_update:     true
+            inject_on_load:       false
+        passports_images:
+            uri_prefix:           '%app.path.passports_images%'
+            upload_destination:   '%kernel.root_dir%/../web/images/passports'
+            namer:                namer.passports_images
+            delete_on_remove:     true
+            delete_on_update:     true
+            inject_on_load:       false
+        countries_flags_images:
+            uri_prefix:           '%app.path.countries_flags_images%'
+            upload_destination:   '%kernel.root_dir%/../web/images/countries_flags'
+            namer:                namer.countries_flags_images
+            delete_on_remove:     true
+            delete_on_update:     true
+            inject_on_load:       false
+        images_images:
+            uri_prefix:           '%app.path.images_images%'
+            upload_destination:   '%kernel.root_dir%/../web/images/images'
+            #namer:                namer.exit_wps_files
+            delete_on_remove:     true
+            delete_on_update:     true
+            inject_on_load:       false
+
+        exit_wps_files:
+            uri_prefix:           '%app.path.exit_wps_files%'
+            upload_destination:   '%kernel.root_dir%/../web/files/exit_wps'
+            namer:                namer.exit_wps_files
+            delete_on_remove:     true
+            delete_on_update:     true
+            inject_on_load:       false
+        departure_results_files:
+            uri_prefix:           '%app.path.departure_results_files%'
+            upload_destination:   '%kernel.root_dir%/../web/files/departure_results'
+            namer:                namer.departure_results_files
+            delete_on_remove:     true
+            delete_on_update:     true
+            inject_on_load:       false
+
+
+# Liip_Imagine Configuration
+liip_imagine:
+    resolvers:
+        #default:
+            #web_path: ~
+    filter_sets:
+        cache: ~
+
+        _imagecrop_temp: ~
+
+        thumbnail_50_x_50:
+            quality: 100
+            filters:
+                thumbnail: { size: [50, 50], mode: outbound }
+                background : { size : [54, 54], position : center, color : '#ddd' }
+
+        thumbnail_250_x_250:
+            quality: 100
+            filters:
+                thumbnail: { size: [250, 250], mode: outbound }
+                background : { size : [254, 254], position : center, color : '#ddd' }
+
+        flag_28_x_14:
+            filters:
+                thumbnail: { size: [28, 14], mode: outbound }
+
+        post_image:
+            filters:
+                crop:      { size:  [ 150, 150 ], start: [ 040, 160 ] }
+
+# Image_Crop Configuration
+image_crop:
+    window: bootstrap
+
+    mappings:
+        DRI\ClientBundle\Entity\Client:
+            filters:
+                - post_image
+                - thumbnail_50_x_50
+                - thumbnail_250_x_250
+
+# Swiftmailer Configuration
+swiftmailer:
+    transport: "%mailer_transport%"
+    host:      "%mailer_host%"
+    username:  "%mailer_user%"
+    password:  "%mailer_password%"
+    spool:     { type: memory }
+
+# app/config/config.yml
+knp_snappy:
+    pdf:
+            enabled: true
+            binary: "%kernel.root_dir%/../vendor/wemersonjanuario/wkhtmltopdf-windows/bin/64bit/wkhtmltopdf.exe"
+            options:
+               page-size: A4
+               dpi: 300
+               image-quality: 80
+               margin-left: 15mm
+               margin-right: 15mm
+               margin-top: 15mm
+               margin-bottom: 15mm
+               user-style-sheet: "%kernel.root_dir%/../web/assets/css/pdf.css"
+    image:
+        enabled:    true
+        binary:     "%kernel.root_dir%/../vendor/wemersonjanuario/wkhtmltopdf-windows/bin/64bit/wkhtmltopdf.exe"
+        options:    []
+
+

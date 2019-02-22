@@ -1,0 +1,45 @@
+# To get started with security, check out the documentation:
+# http://symfony.com/doc/current/book/security.html
+security:
+    encoders:
+        FOS\UserBundle\Model\UserInterface: bcrypt
+
+    role_hierarchy:
+        ROLE_EMPLOYEE:            ROLE_USER
+        ROLE_PUBLISHER:           ROLE_EMPLOYEE
+        ROLE_SECRETARY:           ROLE_EMPLOYEE
+        ROLE_MANAGE_SPECIALIST:   ROLE_EMPLOYEE
+        ROLE_REQUIRE_SPECIALIST:  ROLE_EMPLOYEE
+        ROLE_INFO_SPECIALIST:     ROLE_EMPLOYEE
+        ROLE_METH_ADVISORY:       ROLE_PUBLISHER, ROLE_SECRETARY, ROLE_MANAGE_SPECIALIST, ROLE_REQUIRE_SPECIALIST, ROLE_PUBLISHER
+        ROLE_MANAGER:             ROLE_METH_ADVISORY, ROLE_INFO_SPECIALIST
+        ROLE_ADMIN:               ROLE_MANAGER
+        ROLE_SUPER_ADMIN:         ROLE_ADMIN
+
+    providers:
+        fos_userbundle:
+            id: fos_user.user_provider.username
+
+    firewalls:
+        main:
+            pattern: ^/
+            anonymous:      true
+            form_login:
+                provider:   fos_userbundle
+                #csrf_token_generator: security.csrf.token_manager
+                login_path: fos_user_security_login
+                check_path: fos_user_security_check
+                use_referer: true
+            logout_on_user_change: true
+            logout:
+                path:       fos_user_security_logout
+
+
+    access_control:
+        #- { path: ^/, role: ROLE_ADMIN }
+        - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/register, role: ROLE_ADMIN }
+        - { path: ^/resetting, role: ROLE_ADMIN }
+        - { path: ^/, role: ROLE_USER }
+        #- { path: ^/, role: ROLE_ADMIN }
+

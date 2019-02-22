@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ parent() }} | Dirección no encontrada {% endblock %}
+
+{% block page_level_style %}
+    <link href="{{ asset('assets/pages/css/old/error.min.css') }}" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-md-12 page-500">
+            <div class="number font-red"> 500 </div>
+            <div class="details">
+                <h3>¡Lo sentimos! Algo salió mal.</h3>
+                <p> ¡Estamos trabajando en ello! Por favor vuelva en un rato.<br></p>
+                <p> <a href="{{ path('homepage') }}" class="btn red btn-outline"> Volver a Inicio </a><br></p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% trans_default_domain 'FOSUserBundle' %}
+
+{% if error %}
+    <div id="bootstrap_alerts_demo">
+        <div class="custom-alerts alert alert-danger fade in">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true"></button>
+            <i class="fa-lg fa fa-warning"></i>
+            {{ error.messageKey|trans(error.messageData, 'security') }}
+        </div>
+    </div>
+{% endif %}
+
+<form class="login-form" action="{{ path("fos_user_security_check") }}" method="post">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />
+
+    <h3 class="form-title font-green"></h3>
+
+    <div class="form-title">
+        <span class="form-title">Bienvenido.</span>
+        <span class="form-subtitle">Por favor accede a tu cuenta.</span>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label visible-ie8 visible-ie9" for="username">{{ 'security.login.username'|trans }}</label>
+        <div class="input-icon">
+            <i class="fa fa-user"></i>
+            <input class="form-control form-control-solid placeholder-no-fix" type="text" autocomplete="off" placeholder="{{ 'security.login.username'|trans }}" id="username" name="_username" value="{{ last_username }}" required="required" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label visible-ie8 visible-ie9" for="password">{{ 'security.login.password'|trans }}</label>
+
+        <div class="input-icon">
+            <i class="fa fa-lock"></i>
+            <input class="form-control placeholder-no-fix" type="password" autocomplete="off" placeholder="{{ 'security.login.password'|trans }}" id="password" name="_password" required="required" />
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <input class="btn red btn-block uppercase" type="submit" id="_submit" name="_submit" value="{{ 'security.login.submit'|trans }}" />
+    </div>
+    <div class="form-actions">
+        <div class="pull-left">
+            <label class="rememberme check" for="remember_me" >
+                <input type="checkbox" id="remember_me" name="_remember_me" value="on" />
+                {{ 'security.login.remember_me'|trans }}
+            </label>
+        </div>
+        <div class="pull-right forget-password-block">
+            <a href="javascript:;" id="forget-password" class="forget-password">Olvidaste la contraseña?</a>
+        </div>
+    </div>
+</form>
+
+<!-- BEGIN FORGOT PASSWORD FORM -->
+<form class="forget-form fos_user_resetting_request" action="{{ path("fos_user_resetting_send_email") }}" method="POST" novalidate="novalidate">
+    <div class="form-title">
+        <span class="form-title">Olvidaste la contraseña?</span><br>
+        <span class="form-subtitle">Introduce tu email para restaurarla.</span>
+    </div>
+    <div class="form-group">
+        <div class="input-icon primary">
+            <i class="fa fa-envelope"></i>
+            <input class="form-control placeholder-no-fix" autocomplete="off" placeholder="Email" id="username" name="username" type="text"> </div>
+    </div>
+    <div class="form-actions">
+        <button type="button" id="back-btn" class="btn btn-default">Atras</button>
+        <button type="submit" class="btn btn-primary uppercase pull-right">{{ 'resetting.request.submit'|trans }}</button>
+    </div>
+</form>
+<!-- END FORGOT PASSWORD FORM -->

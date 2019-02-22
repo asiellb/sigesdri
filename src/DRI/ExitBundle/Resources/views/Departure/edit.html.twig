@@ -1,0 +1,35 @@
+{% extends 'DRIExitBundle::layout.exit.html.twig' %}
+
+{% block title %}{{ parent() }} | Editar {% endblock %}
+
+{% block  page_breadcrumb %}
+    {{ parent() }}
+    <li>
+        <span>Editar </span>
+    </li>
+{% endblock %}
+
+{% block page_title %}
+    {{ parent() }}
+    <small>Editar </small>
+{% endblock %}
+
+{% block page_dashboard %}
+    <h1>Departure edit</h1>
+
+    {{ form_start(edit_form) }}
+        {{ form_widget(edit_form) }}
+        <input type="submit" value="Edit" />
+    {{ form_end(edit_form) }}
+
+    <ul>
+        <li>
+            <a href="{{ path('departure_index') }}">Back to the list</a>
+        </li>
+        <li>
+            {{ form_start(delete_form) }}
+                <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+{% endblock %}

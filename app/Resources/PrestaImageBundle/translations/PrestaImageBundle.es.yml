@@ -1,0 +1,16 @@
+resize_image: "Redimencionar Imangen"
+image_dist_placeholder: "URL Remota"
+btn_validate: "Recortar"
+btn_cancel: "Cancelar"
+btn_import_image_local: "Imagen Local"
+btn_import_image_remote: "Imagen Remota"
+btn_change_image: "Cambiar"
+btn_clear_image: "Borrar"
+
+aspect_ratio:
+    16_9: "Horizontal 16:9"
+    4_3: "Horizontal 4:3"
+    1: "Cuadrado 1:1"
+    2_3: "Vertical 2:3"
+    nan: "Libre"
+btn_delete: "Borrar"

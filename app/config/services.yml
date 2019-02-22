@@ -1,0 +1,20 @@
+# Learn more about services, parameters and containers at
+# http://symfony.com/doc/current/book/service_container.html
+parameters:
+#    parameter_name: value
+
+services:
+
+    twig.extension.text:
+        class: Twig_Extensions_Extension_Text
+        tags:
+            - { name: twig.extension }
+
+    intl.twig.extension:
+        class: Twig_Extensions_Extension_Intl
+        tags:
+            - { name: twig.extension }
+
+    app.datatable.country:
+        class: DRI\UsefulBundle\Datatables\CountryDatatable
+        parent: sg_datatables.datatable.abstract

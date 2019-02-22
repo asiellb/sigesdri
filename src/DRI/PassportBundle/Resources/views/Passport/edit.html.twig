@@ -1,0 +1,165 @@
+{% extends 'DRIPassportBundle::layout.passport.html.twig' %}
+
+{% block title %}{{ parent() }} | Nuevo {% endblock %}
+
+{% block page_level_plugins_css %}
+    <link href="{{ asset('assets/global/plugins/bootstrap-select/css/bootstrap-select.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/select2/css/select2.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/select2/css/select2-bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/icheck/skins/all.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/bootstrap-datepicker/css/bootstrap-datepicker.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/cropper/dist/cropper.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/bundles/prestaimage/css/cropper.css') }}" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block page_level_plugins_js %}
+    <script src="{{ asset('assets/global/plugins/bootstrap-select/js/bootstrap-select.min.js') }}" type="text/javascript"></script>
+
+    <script src="{{ asset('assets/global/plugins/select2/js/select2.full.min.js') }}" type="text/javascript"></script>
+
+    <script src="{{ asset('assets/global/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/bootstrap-datepicker/locales/bootstrap-datepicker.es.min.js') }}" type="text/javascript"></script>
+
+    <script src="{{ asset('assets/global/plugins/icheck/icheck.min.js') }}" type="text/javascript"></script>
+
+    <script src="{{ asset('assets/global/plugins/jquery-validation/js/jquery.validate.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/jquery-validation/js/localization/messages_es.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/jquery-validation/js/additional-methods.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/pages/scripts/plugins/jquery-validation/additional-methods.js') }}" type="text/javascript"></script>
+
+    <script src="{{ asset('assets/global/plugins/bootstrap-wizard/jquery.bootstrap.wizard.min.js') }}" type="text/javascript"></script>
+
+    <script src="{{ asset('assets/global/plugins/cropper/dist/cropper.min.js') }}" type="text/javascript"></script>
+
+    <script src="{{ asset('assets/bundles/prestaimage/js/cropper.js') }}" type="text/javascript"></script>
+{% endblock %}
+
+{% block page_level_scrpt %}
+    <script src="{{ asset('assets/pages/scripts/init-form-plugins.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/pages/scripts/passport-edit-form.js') }}" type="text/javascript"></script>
+{% endblock %}
+
+{% block body_class %}page-container-bg-solid{% endblock %}
+
+{% block  page_breadcrumb %}
+    {{ parent() }}
+    <li>
+        <span>Editar </span>
+        <i class="fa fa-circle"></i>
+        <span>{{ passport.number }} </span>
+    </li>
+{% endblock %}
+
+{% block page_title %}
+    Editar Pasaporte {{ passport.number }}
+{% endblock %}
+
+{% block page_dashboard %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="portlet light bordered">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <i class="fa fa-cogs font-blue-dark"></i>
+                        <span class="caption-subject font-blue-dark bold uppercase"> Editar Pasaporte {{ passport.number }}
+                        </span>
+                    </div>
+                </div>
+                <div class="portlet-body form">
+                    {{ form_start(edit_form, {'attr': {'id':'submit_passport_form','class': '', 'role':'form'}}) }}
+                    <div class="form-wizard">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label class="control-label">Primera Página</label>
+                                        {{ form_widget(edit_form.firstPageFile) }}
+                                    </div>
+                                </div>
+                                <div class="others-cols col-md-4">
+                                    <div class="form-group">
+                                        <label class="control-label">Titular</label>
+                                        <input type="text" class="form-control" value="{{ passport.holder.fullName }}" disabled>
+                                        <div id="form_holder_error"> </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label">Número</label>
+                                        {{ form_widget(edit_form.number) }}
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label">Tipo</label>
+                                        {{ form_widget(edit_form.type) }}
+                                        <div id="form_type_error"> </div>
+                                    </div>
+                                </div>
+                                <div class="others-cols col-md-4">
+                                    <div class="form-group">
+                                        <label class="control-label">Fecha de Emisión</label>
+                                        {{ form_widget(edit_form.issueDate) }}
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="control-label">Fecha de Vencimiento</label>
+                                        {{ form_widget(edit_form.expiryDate) }}
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="control-label">Estado</label>
+                                        {{ form_widget(edit_form.state) }}
+                                        <div id="form_state_error"> </div>
+                                    </div>
+                                </div>
+
+                                <div class="drop-issues col-md-4" style="display: none;">
+                                    <div class="form-group">
+                                        <label class="control-label">Fecha de Baja</label>
+                                        {{ form_widget(edit_form.dropDate) }}
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="control-label">Motivo de Baja</label>
+                                        {{ form_widget(edit_form.dropReason) }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <div class="row">
+                                <div class="col-md-offset-3 col-md-9">
+                                    <button type="submit" class="btn green button-submit">
+                                        Guardar
+                                        <i class="fa fa-check"></i>
+                                    </button>
+                                    <a class="btn btn-default" href="{{ path('passport_dt_index') }}">
+                                        Ir al listado
+                                        <i class="fa fa-list"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {{ form_end(edit_form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block page_custom_scrpt %}
+    <script type="text/javascript">
+        (function(w, $) {
+
+            'use strict';
+
+            $(function() {
+                $('.cropper').each(function() {
+                    new Cropper($(this));
+                });
+            });
+
+        })(window, jQuery);
+
+        $("#passport_holder").attr('readonly', 'readonly');
+    </script>
+{% endblock %}

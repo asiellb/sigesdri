@@ -1,0 +1,8 @@
+services:
+#    dri_passport.example:
+#        class: DRI\PassportBundle\Example
+#        arguments: ["@service_id", "plain_value", %parameter%]
+    namer.passports_images:
+        class: DRI\PassportBundle\Service\PassportNamer
+        tags:
+            - { name: namer }

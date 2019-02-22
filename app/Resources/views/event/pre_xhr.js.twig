@@ -1,0 +1,9 @@
+function preXhrEvent(e, settings, json, xhr) {
+    $(selector).find('tbody > tr').addClass('disappear')
+    App.blockUI({
+        message: 'Procesando...',
+        target: $(selector).find('tbody'),
+        overlayColor: '#000',
+        cenrerY: true
+    });
+}

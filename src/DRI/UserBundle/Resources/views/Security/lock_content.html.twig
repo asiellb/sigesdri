@@ -1,0 +1,38 @@
+{% trans_default_domain 'FOSUserBundle' %}
+
+{% if error %}
+    <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+{% endif %}
+<div class="page-lock">
+    <div class="page-body">
+        <div class="lock-head"> Pantalla bloqueada </div>
+        <div class="lock-body">
+            <div class="pull-left lock-avatar-block">
+                <img src="{{ asset(vich_uploader_asset(app.user, 'fotoFile'))}}" class="lock-avatar"> </div>
+
+            <form class="lock-form pull-left" action="{{ path("fos_user_security_lock_check") }}" method="post">
+                <h4>{{ app.user.nombres ~ ' ' ~ app.user.apellidos }}</h4>
+
+                <input class="form-control form-control-solid placeholder-no-fix" type="hidden" autocomplete="off" placeholder="{{ 'security.login.username'|trans }}" id="username" name="_username" value="{{ last_username }}" required="required" />
+
+                <div class="form-group">
+                    <label class="control-label visible-ie8 visible-ie9" for="password">{{ 'security.login.password'|trans }}</label>
+
+                    <div class="input-icon">
+                        <i class="fa fa-lock"></i>
+                        <input class="form-control placeholder-no-fix" type="password" autocomplete="off" placeholder="{{ 'security.login.password'|trans }}" id="password" name="_password" required="required" />
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <input class="btn red uppercase" type="submit" id="_submit" name="_submit" value="{{ 'security.login.submit'|trans }}" />
+                </div>
+
+            </form>
+        </div>
+        <div class="lock-bottom">
+            <a href="{{ path('fos_user_security_logout') }}">No es {{ app.user.nombres ~ ' ' ~ app.user.apellidos }}?</a>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% block page_dashboard %}
+    <h1>User</h1>
+
+    <table>
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ user.id }}</td>
+            </tr>
+            <tr>
+                <th>Firstname</th>
+                <td>{{ user.firstName }}</td>
+            </tr>
+            <tr>
+                <th>Lastname</th>
+                <td>{{ user.lastName }}</td>
+            </tr>
+            <tr>
+                <th>Sciencecategory</th>
+                <td>{{ user.scienceCategory }}</td>
+            </tr>
+            <tr>
+                <th>Position</th>
+                <td>{{ user.position }}</td>
+            </tr>
+            <tr>
+                <th>Employee</th>
+                <td>{% if user.employee %}Yes{% else %}No{% endif %}</td>
+            </tr>
+            <tr>
+                <th>Workdepartment</th>
+                <td>{{ user.workDepartment }}</td>
+            </tr>
+            <tr>
+                <th>Workphone</th>
+                <td>{{ user.workPhone }}</td>
+            </tr>
+            <tr>
+                <th>Homephone</th>
+                <td>{{ user.homePhone }}</td>
+            </tr>
+            <tr>
+                <th>Celphone</th>
+                <td>{{ user.celPhone }}</td>
+            </tr>
+            <tr>
+                <th>Userimage</th>
+                <td>{{ user.userImage }}</td>
+            </tr>
+            <tr>
+                <th>Lastupdateimage</th>
+                <td>{% if user.lastUpdateImage %}{{ user.lastUpdateImage|date('Y-m-d H:i:s') }}{% endif %}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('user_index') }}">Back to the list</a>
+        </li>
+        <li>
+            <a href="{{ path('user_edit', { 'id': user.id }) }}">Edit</a>
+        </li>
+        <li>
+            {{ form_start(delete_form) }}
+                <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+{% endblock %}

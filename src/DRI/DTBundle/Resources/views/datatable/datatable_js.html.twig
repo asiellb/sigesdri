@@ -1,0 +1,133 @@
+{##
+ # This file is part of the SgDatatablesBundle package.
+ #
+ # (c) stwe <https://github.com/stwe/DatatablesBundle>
+ #
+ # For the full copyright and license information, please view the LICENSE
+ # file that was distributed with this source code.
+ #}
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        var selector = "#sg-datatables-{{ sg_datatables_view.name }}";
+        var tableContainer; // actual table container object
+        var tableWrapper;   // actual table wrapper jquery object
+        var oTable;         // datatable object
+
+        function countSelectedRecords() {
+            var selected = $('tbody > tr > td:nth-child(1) input[type="checkbox"]:checked', selector).size();
+            var text = "_TOTAL_ registros seleccionados:  ";
+            if (selected > 0) {
+                $('.table-group-actions > span', tableWrapper).text(text.replace("_TOTAL_", selected));
+            } else {
+                $('.table-group-actions > span', tableWrapper).text("");
+            }
+        }
+
+        var defaults = {
+        };
+
+        var language = {
+            {% include 'SgDatatablesBundle:datatable:language.html.twig' %}
+        };
+
+        var ajax = {
+            {% include 'SgDatatablesBundle:datatable:ajax.html.twig' %}
+        };
+
+        var options = {
+            {% include 'SgDatatablesBundle:datatable:options.html.twig' %}
+        };
+
+        var features = {
+            {% include 'SgDatatablesBundle:datatable:features.html.twig' %}
+        };
+
+        var callbacks = {
+            {% include 'SgDatatablesBundle:datatable:callbacks.html.twig' %}
+        };
+
+        var extensions = {
+            {% include 'SgDatatablesBundle:datatable:extensions.html.twig' %}
+        };
+
+        var columns = {
+            {% include 'SgDatatablesBundle:datatable:columns.html.twig' %}
+        };
+
+        var initialSearch = {
+            {% include 'SgDatatablesBundle:datatable:initial_search.html.twig' %}
+        };
+
+        function postCreateDatatable(pipeline) {
+            {% for column in sg_datatables_view.columnBuilder.columns %}
+                {% if column.renderPostCreateDatatableJsContent is not null %}
+                    {{ column.renderPostCreateDatatableJsContent|raw }}
+                {% endif %}
+            {% endfor %}
+        }
+
+        function createDatatable() {
+            // apply the special class that used to restyle the default datatable
+            var tmp = $.fn.dataTableExt.oStdClasses;
+
+            $.fn.dataTableExt.oStdClasses.sWrapper = $.fn.dataTableExt.oStdClasses.sWrapper + " dataTables_extended_wrapper";
+            $.fn.dataTableExt.oStdClasses.sFilterInput = "form-control input-xs input-sm input-inline";
+            $.fn.dataTableExt.oStdClasses.sLengthSelect = "form-control input-xs input-sm input-inline";
+
+            $.extend(defaults, language);
+            $.extend(defaults, ajax);
+            $.extend(defaults, options);
+            $.extend(defaults, features);
+            $.extend(defaults, callbacks);
+            $.extend(defaults, extensions);
+            $.extend(defaults, columns);
+            $.extend(defaults, initialSearch);
+
+            if (!$.fn.dataTable.isDataTable(selector)) {
+                $(selector)
+                    {% include 'SgDatatablesBundle:datatable:events.html.twig' %}
+                ;
+                oTable = $(selector)
+                    .DataTable(defaults)
+                        .on('draw.dt', function() { postCreateDatatable({{ sg_datatables_view.ajax.pipeline}}) })
+                    ;
+
+                {% if true == sg_datatables_view.options.individualFiltering %}
+                    {% include 'SgDatatablesBundle:datatable:search.js.twig' %}
+                {% endif %}
+            }
+
+        }
+
+
+        createDatatable();
+
+        {% if sg_datatables_view.columnBuilder.uniqueColumn('multiselect') is not null %}
+            {{ sg_datatables_render_multiselect_actions( sg_datatables_view.columnBuilder.uniqueColumn('multiselect'), sg_datatables_view.ajax.pipeline) }}
+        {% endif %}
+
+        // handle datatable custom tools
+        $('#sg_datatable_tools > li > a.tool-action').on('click', function() {
+            var action = $(this).attr('data-action');
+            oTable.button(action).trigger();
+        });
+
+        tableContainer = $(selector).parents(".table-container");
+        tableWrapper = $(selector).parents('.dataTables_wrapper');
+
+        // build table group actions panel
+        if ($('#sg-datatables-{{ sg_datatables_view.name }}-multiselect-actions', tableContainer).size() === 1) {
+            $('.table-group-actions', tableWrapper).html($('#sg-datatables-{{ sg_datatables_view.name }}-multiselect-actions', tableContainer).html()); // place the panel inside the wrapper
+            $('.table-actions-wrapper', tableContainer).remove(); // remove the template container
+            $('#sg-datatables-{{ sg_datatables_view.name }}-multiselect-actions', tableContainer).remove(); // remove the template container
+        }
+
+        // handle row's checkbox click
+        $(selector).on('change', 'tbody > tr > td:nth-child(1) input[type="checkbox"]', function() {
+            countSelectedRecords();
+        });
+    });
+
+</script>

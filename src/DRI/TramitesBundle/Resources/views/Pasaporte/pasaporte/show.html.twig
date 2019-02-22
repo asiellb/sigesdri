@@ -1,0 +1,271 @@
+{% extends 'DRITramitesBundle:Pasaporte:layout.Passport.html.twig' %}
+
+{% block title %}{{ parent() }} | Vista #{{ pasaporte.noPas }}{% endblock %}
+
+{% block  page_breadcrumb %}
+    {{ parent() }}
+    <li>
+        <span>Vista #{{ pasaporte.noPas }}</span>
+    </li>
+{% endblock %}
+
+{% block page_title %}
+    {{ parent() }}
+    <small>Vista</small>
+{% endblock %}
+
+{% block page_dashboard %}
+<div class="portlet light portlet-fit portlet-datatable bordered">
+    <div class="portlet-title">
+        <div class="caption">
+            <i class="icon-settings font-dark"></i>
+            <span class="caption-subject font-dark sbold uppercase"> Pasaporte <span class="font-grey-salsa">#{{ pasaporte.noPas }}</span>
+                <span class="hidden-xs">| Titular <span class="font-grey-salsa" style="text-transform: none">{{ pasaporte.titular.nombreCompleto }}</span> </span>
+            </span>
+        </div>
+        <div class="actions">
+            <div class="btn-group">
+                <a class="btn green btn-outline btn-circle" href="javascript:;" data-toggle="dropdown" aria-expanded="false">
+                    <i class="fa fa-share"></i>
+                    <span class="hidden-xs"> Acciones </span>
+                    <i class="fa fa-angle-down"></i>
+                </a>
+                <ul class="dropdown-menu pull-right">
+                    <li>
+                        <a class="" href="{{ path('pasaporte_new') }}">
+                            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                            Nuevo
+                        </a>
+                    </li>
+                    <li>
+                        <a class="" href="{{ path('pasaporte_edit', { 'id':  pasaporte.id }) }}">
+                            <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+
+                            Editar
+                        </a>
+                    </li>
+                    <li>
+                        <a  onclick="return confirm('Are you sure!');" title="Delete" class="" href="{{ path('pasaporte_by_id_delete', { 'id': pasaporte.id}) }}">
+                            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                            Borrar
+                        </a>
+                    </li>
+                    <li class="divider"></li>
+                    <li>
+                        <a class="" href="{{ path('trm_pass_index') }}">
+                            <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+                            Volver al listado
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="btn-group">
+                <a class="btn red btn-outline btn-circle" href="javascript:;" data-toggle="dropdown" aria-expanded="false">
+                    <i class="fa fa-share"></i>
+                    <span class="hidden-xs"> Herramientas </span>
+                    <i class="fa fa-angle-down"></i>
+                </a>
+                <ul class="dropdown-menu pull-right">
+                    <li>
+                        <a href="javascript:;"> Exportar a Excel </a>
+                    </li>
+                    <li>
+                        <a href="javascript:;"> Exportar a CSV </a>
+                    </li>
+                    <li>
+                        <a href="javascript:;"> Exportar a XML </a>
+                    </li>
+                    <li class="divider"> </li>
+                    <li>
+                        <a href="javascript:;"> Imprimir </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="portlet-body">
+        <div class="row">
+            <div class="col-md-6 col-sm-12">
+                <div class="portlet green-seagreen box">
+                    <div class="portlet-title">
+                        <div class="caption">
+                            <i class="fa fa-cogs"></i>Detalles del Pasaporte </div>
+                        <div class="actions">
+                            <a href="{{ path('pasaporte_edit', { 'id': pasaporte.id }) }}" class="btn btn-default btn-sm">
+                                <i class="fa fa-pencil"></i> Editar </a>
+                        </div>
+                    </div>
+                    <div class="portlet-body">
+                        <div class="row static-info">
+                            <div class="col-md-5 name"> Número #: </div>
+                            <div class="col-md-7 value"> {{ pasaporte.noPas }}
+                            </div>
+                        </div>
+                        <div class="row static-info">
+                            <div class="col-md-5 name"> Tipo: </div>
+                            <div class="col-md-7 value">
+                                {% if pasaporte.tipoPas == 'OFI' %}
+                                    Oficial
+                                {% elseif pasaporte.tipoPas == 'ORD' %}
+                                    Ordinario
+                                {% else %}-{% endif %}
+                            </div>
+                        </div>
+                        <div class="row static-info">
+                            <div class="col-md-5 name"> Expedido el: </div>
+                            <div class="col-md-7 value">
+                                {% if pasaporte.fechaExp %}{{ pasaporte.fechaExp|localizeddate('medium', 'none') }}{% endif %}
+                            </div>
+                        </div>
+                        <div class="row static-info">
+                            <div class="col-md-5 name"> Vence el: </div>
+                            <div class="col-md-7 value">
+                                {% if pasaporte.fechaVen %}{{ pasaporte.fechaVen|localizeddate('medium', 'none') }}{% endif %}
+                            </div>
+                        </div>
+                        <div class="row static-info">
+                            <div class="col-md-5 name"> Estado: </div>
+                            <div class="col-md-7 value">
+                                {% if pasaporte.estadoPas == 'ACT' %}
+                                    <span class="label label-success">Activo</span>
+                                {% elseif pasaporte.estadoPas == 'INA' %}
+                                    <span class="label label-warning">Inactivo</span>
+                                {% elseif pasaporte.estadoPas == 'BAJ' %}
+                                    <span class="label label-danger">Baja</span>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="row static-info">
+                            <div class="col-md-5 name"> Imagen: </div>
+                            <div class="col-md-7 value">
+                                {% if (pasaporte.primeraPagina|length == 0) or (not pasaporte.primeraPagina)%}
+                                    Sin imagen
+                                {% else %}
+                                    <figure class="" style="height: 200px; overflow: hidden; position: relative;">
+                                        <img class="img-fluid" src="{{ asset(vich_uploader_asset(pasaporte, 'primeraPaginaFile')) }}" alt="{{ pasaporte.noPas }}" style="height: 100%">
+                                    </figure>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-12">
+                <div class="portlet blue-hoki box">
+                    <div class="portlet-title">
+                        <div class="caption">
+                            <i class="fa fa-cogs"></i>Información del Titular </div>
+                        <div class="actions">
+                            <a href="{{ path('persona_edit', { 'id': pasaporte.titular.id }) }}" class="btn btn-default btn-sm">
+                                <i class="fa fa-pencil"></i> Editar </a>
+                        </div>
+                    </div>
+                    <div class="portlet-body">
+                        <div class="row static-info">
+                            <div class="col-md-5 name"> Nombre: </div>
+                            <div class="col-md-7 value"> {{ pasaporte.titular.nombreCompleto }} </div>
+                        </div>
+                        <div class="row static-info">
+                            <div class="col-md-5 name"> Email: </div>
+                            <div class="col-md-7 value"> {{ pasaporte.titular.email }} </div>
+                        </div>
+                        <div class="row static-info">
+                            <div class="col-md-5 name"> Telefono: </div>
+                            <div class="col-md-7 value"> {{ pasaporte.titular.telParticular }}</div>
+                        </div>
+                        <div class="row static-info">
+                            <div class="col-md-5 name"> Celular: </div>
+                            <div class="col-md-7 value"> {{ pasaporte.titular.telCelular }} </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12 col-sm-12">
+                <div class="portlet grey-cascade box">
+                    <div class="portlet-title">
+                        <div class="caption">
+                            <i class="fa fa-cogs"></i>Uso del Pasaporte </div>
+                        <div class="actions">
+                            <a href="javascript:;" class="btn btn-default btn-sm">
+                                <i class="fa fa-pencil"></i> Edit </a>
+                        </div>
+                    </div>
+                    <div class="portlet-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th> No. Ficha </th>
+                                        <th> Pais </th>
+                                        <th> Motivo </th>
+                                        <th> Entrega </th>
+                                        <th> Recogida </th>
+                                        <th> Especialista </th>
+                                        <th> Requerimiento </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <a href="javascript:;"> Product 1 </a>
+                                        </td>
+                                        <td>
+                                            <span class="label label-sm label-success"> Available </span></td>
+                                        <td> 345.50$ </td>
+                                        <td> 345.50$ </td>
+                                        <td> 2 </td>
+                                        <td> 2.00$ </td>
+                                        <td> 4% </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <a href="javascript:;"> Product 1 </a>
+                                        </td>
+                                        <td>
+                                            <span class="label label-sm label-success"> Available </span></td>
+                                        <td> 345.50$ </td>
+                                        <td> 345.50$ </td>
+                                        <td> 2 </td>
+                                        <td> 2.00$ </td>
+                                        <td> 4% </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <a href="javascript:;"> Product 1 </a>
+                                        </td>
+                                        <td>
+                                            <span class="label label-sm label-success"> Available </span></td>
+                                        <td> 345.50$ </td>
+                                        <td> 345.50$ </td>
+                                        <td> 2 </td>
+                                        <td> 2.00$ </td>
+                                        <td> 4% </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <a href="javascript:;"> Product 1 </a>
+                                        </td>
+                                        <td>
+                                            <span class="label label-sm label-success"> Available </span></td>
+                                        <td> 345.50$ </td>
+                                        <td> 345.50$ </td>
+                                        <td> 2 </td>
+                                        <td> 2.00$ </td>
+                                        <td> 4% </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

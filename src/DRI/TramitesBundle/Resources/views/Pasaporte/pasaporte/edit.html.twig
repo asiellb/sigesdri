@@ -1,0 +1,174 @@
+{% extends 'DRITramitesBundle:Pasaporte:layout.Passport.html.twig' %}
+
+{% block title %}{{ parent() }} | Modificar {% endblock %}
+
+
+
+{% block  page_breadcrumb %}
+    {{ parent() }}
+    <li>
+        <span>Modificar </span>
+    </li>
+{% endblock %}
+
+{% block page_title %}
+    {{ parent() }}
+    <small>Modificar </small>
+{% endblock %}
+
+{% block page_dashboard %}
+    {% if form_errors(edit_form) > 0 %}
+        <div class="custom-alerts alert alert-danger fade in">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true"></button>
+            <i class="fa-lg fa fa-fa fa-warning"></i>
+            errors{{ form_errors(edit_form) }}
+        </div>
+    {% endif %}
+    {% for flash_message in app.session.flashbag.get('error') %}
+        <div class="custom-alerts alert alert-danger fade in">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true"></button>
+            <i class="fa-lg fa fa-fa fa-warning"></i>
+            flash{{ flash_message }}
+        </div>
+    {% endfor %}
+    {% for flash_message in app.session.flashbag.get('success') %}
+        <div class="custom-alerts alert alert-success fade in">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true"></button>
+            <i class="fa-lg fa fa-fa fa-check"></i>
+            {{ flash_message }}
+        </div>
+    {% endfor %}
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="portlet box blue-ebonyclay">
+                <div class="portlet-title">
+                    <div class="caption">
+                        Modificar pasaporte #{{ pasaporte.noPas }}
+                        <i class="glyphicon glyphicon-pencil"></i>
+                    </div>
+                    <div class="tools">
+                        <a href="javascript:;" class="collapse" data-original-title="" title=""> </a>
+                        <a href="#portlet-config" data-toggle="modal" class="config" data-original-title="" title=""> </a>
+                        <a href="javascript:;" class="reload" data-original-title="" title=""> </a>
+                        <a href="javascript:;" class="remove" data-original-title="" title=""> </a>
+                    </div>
+                </div>
+                <div class="portlet-body form">
+                    {{ form_start(edit_form, {'attr': {'class': 'form-horizontal', 'role':'form'}}) }}
+                        <div class="form-body">
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">Titular</label>
+                                <div class="col-md-9">
+                                    <div class="input-icon">
+                                        <i class="fa fa-user"></i>
+                                        {{ form_widget(edit_form.titular) }}
+                                    </div>
+                                    {{ form_errors(edit_form.titular) }}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                {#{{ form_label(edit_form.noPas, 'Número', {
+                                    'label_attr': {'class': 'col-md-3'}
+                                }) }}#}
+                                <label class="col-md-3 control-label">Número:</label>
+                                <div class="col-md-9">
+                                    <div class="input-icon">
+                                        <i class="fa fa-slack"></i>
+                                        {{ form_widget(edit_form.noPas, {'attr': {'readonly': ''}}) }}
+                                    </div>
+                                    {{ form_errors(edit_form.noPas) }}
+                                </div>
+                            </div>
+
+                            {{ form_row(edit_form.tipoPas) }}
+
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">Emitido:</label>
+                                <div class="col-md-9">
+                                    <div class="input-icon">
+                                        <i class="fa fa-calendar"></i>
+                                        {{ form_widget(edit_form.fechaExp) }}
+                                    </div>
+                                    {{ form_errors(edit_form.fechaExp) }}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">Vence:</label>
+                                <div class="col-md-9">
+                                    <div class="input-icon">
+                                        <i class="fa fa-calendar"></i>
+                                        {{ form_widget(edit_form.fechaVen) }}
+                                    </div>
+                                    {{ form_errors(edit_form.fechaVen) }}
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">Imagen:</label>
+                                <div class="col-md-9">
+                                    <div class="input-icon">
+                                        <i class="fa fa-image"></i>
+                                        {{ form_widget(edit_form.primeraPaginaFile) }}
+                                    </div>
+                                    {{ form_errors(edit_form.primeraPaginaFile) }}
+                                </div>
+                            </div>
+
+                            {{ form_row(edit_form.estadoPas) }}
+                            <div id="is-baja" style="display: none">
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">Fecha de baja:</label>
+                                    <div class="col-md-9">
+                                        <div class="input-icon">
+                                            <i class="fa fa-thumbs-o-down"></i>
+                                            {{ form_widget(edit_form.fechaBaja) }}
+                                        </div>
+                                        {{ form_errors(edit_form.fechaBaja) }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">Causa de baja:</label>
+                                    <div class="col-md-9">
+                                        <div class="input-icon">
+                                            <i class="fa fa-thumbs-o-down"></i>
+                                            {{ form_widget(edit_form.causaBaja) }}
+                                        </div>
+                                        {{ form_errors(edit_form.causaBaja) }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <div class="row">
+                                <div class="col-md-offset-3 col-md-9">
+                                    <button type="submit" class="btn btn-success">
+                                        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                                        Modificar
+                                    </button>
+                    {{ form_end(edit_form) }}
+                                    <a class="btn btn-default" href="{{ path('trm_pass_index') }}">
+                                        <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+                                        Ir al listado
+                                    </a>
+                                    <a class="btn btn-info" href="{{ path('pasaporte_new') }}">
+                                        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                                        Nuevo
+                                    </a>
+                                    <form id="delete_form" action="{{ path('pasaporte_delete', { 'id': pasaporte.id }) }}" method="post" style="display: inline-block">
+                                        <input type="hidden" name="_method" value="DELETE" />
+                                        <button class="btn btn-danger" type="submit" onclick="return confirm('Are you sure');">
+                                            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                                            Borrar
+                                        </button>
+                                        {{ form_widget(delete_form ) }}
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

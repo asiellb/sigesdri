@@ -1,0 +1,24 @@
+{% extends 'DRIExitBundle::layout.exit.html.twig' %}
+
+{% block title %}{{ parent() }} | Solicitudes{% endblock %}
+
+{% block  page_breadcrumb %}
+    {{ parent() }}
+    <li>
+    {% if '/application/index' in app.request.getPathInfo() %}
+        <span>Solicitudes</span> <i class="fa fa-circle"></i>
+    {% else %}
+        <a href="{{ path('exit_application_index') }}" ><span>Solicitudes</span> </a> <i class="fa fa-circle"></i>
+    {% endif %}
+    </li>
+{% endblock %}
+
+{% block page_title %}
+    {{ parent() }}
+    | Solicitudes
+{% endblock %}
+
+{% block page_dashboard %}
+
+{% endblock %}
+

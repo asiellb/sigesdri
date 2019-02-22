@@ -1,0 +1,567 @@
+{% extends 'DRIClientBundle::layout.client.html.twig' %}
+
+{% block title %}{{ parent() }} | Editar Perfil {% endblock %}
+
+{% block page_level_plugins_css %}
+    <link href="{{ asset('assets/global/plugins/bootstrap-select/css/bootstrap-select.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/select2/css/select2.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/select2/css/select2-bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/icheck/skins/all.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/bootstrap-datepicker/css/bootstrap-datepicker.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/cropper/dist/cropper.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/bundles/prestaimage/css/cropper.css') }}" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block page_level_style %}
+    <link href="{{ asset('assets/pages/css/old/profile.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/pages/css/init-form-plugins.css') }}" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block page_level_plugins_js %}
+    <script src="{{ asset('assets/global/plugins/jquery.sparkline.min.js') }}" type="text/javascript"></script>
+
+    <script src="{{ asset('assets/global/plugins/bootstrap-select/js/bootstrap-select.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/select2/js/select2.full.min.js') }}" type="text/javascript"></script>
+
+    <script src="{{ asset('assets/global/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/bootstrap-datepicker/locales/bootstrap-datepicker.es.min.js') }}" type="text/javascript"></script>
+
+    <script src="{{ asset('assets/global/plugins/icheck/icheck.min.js') }}" type="text/javascript"></script>
+
+    <script src="{{ asset('assets/global/plugins/jquery-validation/js/jquery.validate.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/jquery-validation/js/localization/messages_es.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/jquery-validation/js/additional-methods.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/pages/scripts/plugins/jquery-validation/additional-methods.js') }}" type="text/javascript"></script>
+
+    {#<script src="{{ asset('assets/global/plugins/bootstrap-wizard/jquery.bootstrap.wizard.min.js') }}" type="text/javascript"></script>#}
+
+    <script src="{{ asset('assets/global/plugins/cropper/dist/cropper.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/bundles/prestaimage/js/cropper.js') }}" type="text/javascript"></script>
+
+    <script src="{{ asset('assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.js') }}" type="text/javascript"></script>
+
+    <script src="{{ asset('assets/global/plugins/jquery-inputmask/jquery.inputmask.bundle.js') }}" type="text/javascript"></script>
+    {#<script src="{{ asset('assets/global/plugins/jquery-inputmask/inputmask/phone-codes/phone.js') }}" type="text/javascript"></script>#}
+    <script src="{{ asset('assets/pages/scripts/plugins/jquery-inputmask/inputmask/additional-methods.js') }}" type="text/javascript"></script>
+
+
+{% endblock %}
+
+{% block page_level_scrpt %}
+    <script src="{{ asset('assets/pages/scripts/init-form-plugins.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/pages/scripts/client-edit-form.js') }}" type="text/javascript"></script>
+{% endblock %}
+
+{% block  page_breadcrumb %}
+    {{ parent() }}
+    <li>
+        <span>Configuración de Perfil</span>
+        <i class="fa fa-circle"></i>
+        <span>{{ client.fullName }} </span>
+    </li>
+{% endblock %}
+
+{% block page_title %}
+    Editar Perfil del Cliente
+{% endblock %}
+
+{% block page_dashboard %}
+    <div class="row">
+        <div class="col-md-12">
+            <a href="{{ path('client_new') }}" class="btn btn-primary btn-circle btn-sm active pull-right">
+                <i class="fa fa-plus"></i>
+                Nuevo Cliente
+            </a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="profile-sidebar">
+                <div class="portlet light profile-sidebar-portlet ">
+                    <!-- SIDEBAR USERPIC -->
+                    <div class="profile-userpic">
+                        {% if client.clientPicture | length() > 0 %}
+                            {% set picture = asset(vich_uploader_asset(client, 'clientPictureFile')) %}
+                        {% else %}
+                            {% if client.gender == "F" %}
+                                {% set picture = asset('assets/pages/media/profile/profile-female.png') %}
+                            {% elseif client.gender == "M" %}
+                                {% set picture = asset('assets/pages/media/profile/profile-male.png') %}
+                            {% endif %}
+                        {% endif %}
+                        <img src="{{ picture }}" class="img-responsive" alt=""> </div>
+                    <!-- END SIDEBAR USERPIC -->
+                    <!-- SIDEBAR USER TITLE -->
+                    <div class="profile-usertitle">
+                        <div class="profile-usertitle-name"> {{ client.fullName }} </div>
+                        <div class="profile-usertitle-job"> {% if client.clientType == 'DOC' %}{{ 'Docente' }}{% elseif client.clientType == 'EST' %} {{ 'Estudiante' }}{% else %}{{ 'No Docente' }}{% endif %}</div>
+                    </div>
+                    <!-- END SIDEBAR USER TITLE -->
+                    <!-- SIDEBAR BUTTONS -->
+                    <div class="profile-userbuttons">
+                        <button type="button" class="btn btn-circle green btn-sm">Seguir</button>
+                        <button type="button" class="btn btn-circle red btn-sm">Mensaje</button>
+                    </div>
+                    <!-- END SIDEBAR BUTTONS -->
+                    <!-- SIDEBAR MENU -->
+                    <div class="profile-usermenu">
+                        <ul class="nav">
+                            <li>
+                                <a href="{{ path('client_show', {'fullNameSlug': client.fullNameSlug}) }}">
+                                    <i class="icon-home"></i> Perfil </a>
+                            </li>
+                            <li class="active">
+                                <a href="#">
+                                    <i class="icon-settings"></i> Configuración </a>
+                            </li>
+                            <li>
+                                <a href="page_user_profile_1_help.html">
+                                    <i class="icon-info"></i> Ayuda </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- END MENU -->
+                </div>
+
+                <div class="portlet light ">
+                    <!-- STAT -->
+                    <div class="row list-separated profile-stat">
+                        <div class="col-md-4 col-sm-4 col-xs-6">
+                            <div class="uppercase profile-stat-title"> 1 </div>
+                            <div class="uppercase profile-stat-text"> Pasaportes </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-xs-6">
+                            <div class="uppercase profile-stat-title"> 1 </div>
+                            <div class="uppercase profile-stat-text"> Salidas </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-xs-6">
+                            <div class="uppercase profile-stat-title"> {{ client.exitApplications | length }} </div>
+                            <div class="uppercase profile-stat-text"> Trámites </div>
+                        </div>
+                    </div>
+                    <!-- END STAT -->
+                </div>
+            </div>
+
+            <div class="profile-content">
+                <div class="portlet light ">
+                    <div class="portlet-title tabbable-line">
+                        <div class="caption caption-md">
+                            <span class="caption-subject font-blue-madison bold uppercase">Perfil del Cliente</span>
+                        </div>
+                        <ul class="nav nav-tabs">
+                            <li class="active">
+                                <a href="#tab_1_1" data-toggle="tab"><i class=" fa fa-user"></i> Información General</a>
+                            </li>
+                            <li>
+                                <a href="#tab_1_2" data-toggle="tab"><i class="fa fa-photo"></i> Cambiar Imagen</a>
+                            </li>
+                            <li>
+                                <a href="#tab_1_3" data-toggle="tab"><i class=" fa fa-book"></i> Datos de Pasaporte</a>
+                            </li>
+                            <li>
+                                <a href="#tab_1_4" data-toggle="tab"><i class="fa fa-bank"></i> Datos Institucionales</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="portlet-body form">
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="tab_1_1">
+                                {{ form_start(gi_form, {'attr': {'id':'submit_client_gi_form','class': '', 'role':'form'}}) }}
+                                <div class="row">
+                                    <div class="form-group col-md-6">
+                                        <label class="control-label">CI</label>
+                                        {{ form_widget(gi_form.ci) }}
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label class="control-label">Fecha de Nacimiento</label>
+                                        {{ form_widget(gi_form.birthday) }}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-md-3">
+                                        <label class="control-label">Primer nombre</label>
+                                        {{ form_widget(gi_form.firstName) }}
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        <label class="control-label">Segundo nombre</label>
+                                        {{ form_widget(gi_form.secondName) }}
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        <label class="control-label">Primer apellido</label>
+                                        {{ form_widget(gi_form.firstLastName) }}
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        <label class="control-label">Segundo apellido</label>
+                                        {{ form_widget(gi_form.secondLastName) }}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-md-6">
+                                        <label class="control-label">Correo Institucional</label>
+                                        {{ form_widget(gi_form.email) }}
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label class="control-label">Correo Externo</label>
+                                        {{ form_widget(gi_form.foreignEmail) }}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-md-6">
+                                        <label class="control-label">Teléfono Particular</label>
+                                        {{ form_widget(gi_form.privatePhone) }}
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label class="control-label">Teléfono Celular</label>
+                                        {{ form_widget(gi_form.cellPhone) }}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-md-6">
+                                        <label class="control-label">Género</label>
+                                        {{ form_widget(gi_form.gender) }}
+                                        <div id="form_gender_error"> </div>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label class="control-label">Tipo de Cliente</label>
+                                        {{ form_widget(gi_form.clientType) }}
+                                        <div id="form_clientType_error"> </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-md-6">
+                                        <label class="control-label">Idiomas</label>
+                                        {{ form_widget(gi_form.languages) }}
+                                        <div id="form_languages_error"> </div>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label class="control-label">Organizaciones</label>
+                                        {{ form_widget(gi_form.organizations) }}
+                                        <div id="form_organizations_error"> </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-actions">
+                                    <div class="row">
+                                        <div class="col-md-9">
+                                            <button type="submit" class="btn green button-submit">
+                                                Guardar
+                                                <i class="fa fa-check"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                {{ form_end(gi_form) }}
+                            </div>
+
+                            <div class="tab-pane" id="tab_1_2">
+                                <div class="note note-info">
+                                    <p>Para una mejor visualización de la imágene, esta debe tener la mejor resolución posible y dimenciones de <span class="label label-info">150x150px</span>.</p>
+                                </div>
+                                {{ form_start(ci_form, {'attr': {'id':'submit_client_ci_form','class': '', 'role':'form'}}) }}
+                                <div class="row">
+                                    <div class="form-group col-md-12">
+                                        {{ form_widget(ci_form.clientPictureFile) }}
+                                    </div>
+                                </div>
+
+                                <div class="form-actions">
+                                    <div class="row">
+                                        <div class="col-md-9">
+                                            <button type="submit" class="btn green button-submit">
+                                                Guardar
+                                                <i class="fa fa-check"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                {{ form_end(ci_form) }}
+                            </div>
+
+                            <div class="tab-pane" id="tab_1_3">
+                                {{ form_start(dp_form, {'attr': {'id':'submit_client_dp_form','class': '', 'role':'form'}}) }}
+                                <div class="row">
+                                    <div class="form-group col-md-6">
+                                        <label class="control-label">Nombre de la madre</label>
+                                        {{ form_widget(dp_form.mothersName) }}
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label class="control-label">Nombre del padre</label>
+                                        {{ form_widget(dp_form.fathersName) }}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-md-4">
+                                        <label class="control-label">Estado civil</label>
+                                        {{ form_widget(dp_form.civilState) }}
+                                        <div id="form_civilState_error"> </div>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label class="control-label">Peso(Kg)</label>
+                                        {{ form_widget(dp_form.weight) }}
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label class="control-label">Estatura(m)</label>
+                                        {{ form_widget(dp_form.height) }}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-md-4">
+                                        <label class="control-label">Color de los Ojos</label>
+                                        {{ form_widget(dp_form.eyesColor) }}
+                                        <div id="form_eyesColor_error"> </div>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label class="control-label">Color de la piel</label>
+                                        {{ form_widget(dp_form.skinColor) }}
+                                        <div id="form_skinColor_error"> </div>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label class="control-label">Color del cabello</label>
+                                        {{ form_widget(dp_form.hairColor) }}
+                                        <div id="form_hairColor_error"> </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">Marcas Personales Visibles</label>
+                                    {{ form_widget(dp_form.pvs) }}
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-md-2">
+                                        <label class="control-label">Ciudadania</label>
+                                        {{ form_widget(dp_form.citizenship) }}
+                                    </div>
+                                    <div class="form-group col-md-2">
+                                        <label class="control-label">País de nacimiento</label>
+                                        {{ form_widget(dp_form.countryBirth) }}
+                                    </div>
+                                    <div class="form-group col-md-2">
+                                        <label class="control-label">Provincia de Nacimiento</label>
+                                        {{ form_widget(dp_form.stateBirth) }}
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        <label class="control-label">Ciudad de Nacimiento</label>
+                                        {{ form_widget(dp_form.cityBirth) }}
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        <label class="control-label">Ciudad Extrangera de Nacimiento</label>
+                                        {{ form_widget(dp_form.foreignCityBirth) }}
+                                    </div>
+                                </div>
+
+                                <h5 class="block control-label">Dirección actual</h5>
+                                <div class="row">
+                                    <div class="form-group col-md-3">
+                                        <label class="control-label">País</label>
+                                        {{ form_widget(dp_form.country) }}
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        <label class="control-label">Provincia</label>
+                                        {{ form_widget(dp_form.state) }}
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        <label class="control-label">Municipio/Ciudad</label>
+                                        {{ form_widget(dp_form.city) }}
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        <label class="control-label">Reparto</label>
+                                        {{ form_widget(dp_form.area) }}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-md-3">
+                                        <label class="control-label">Calle</label>
+                                        {{ form_widget(dp_form.street) }}
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        <label class="control-label">Carretera</label>
+                                        {{ form_widget(dp_form.highway) }}
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        <label class="control-label">Primera entrecalle</label>
+                                        {{ form_widget(dp_form.firstBetween) }}
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        <label class="control-label">Segunda entrecalle</label>
+                                        {{ form_widget(dp_form.secongBetween) }}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-md-3">
+                                        <label class="control-label">Número</label>
+                                        {{ form_widget(dp_form.number) }}
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        <label class="control-label">Km</label>
+                                        {{ form_widget(dp_form.km) }}
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        <label class="control-label">Edificio</label>
+                                        {{ form_widget(dp_form.building) }}
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        <label class="control-label">Apartamento</label>
+                                        {{ form_widget(dp_form.apartment) }}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-md-3">
+                                        <label class="control-label">CPA</label>
+                                        {{ form_widget(dp_form.cpa) }}
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        <label class="control-label">Finca</label>
+                                        {{ form_widget(dp_form.farm) }}
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        <label class="control-label">Localidad</label>
+                                        {{ form_widget(dp_form.town) }}
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        <label class="control-label">Circunscripción</label>
+                                        {{ form_widget(dp_form.district) }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">Código Postal</label>
+                                    {{ form_widget(dp_form.postCode) }}
+                                </div>
+
+
+                                <div class="form-actions">
+                                    <div class="row">
+                                        <div class="col-md-9">
+                                            <button type="submit" class="btn green button-submit">
+                                                Guardar
+                                                <i class="fa fa-check"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                {{ form_end(dp_form) }}
+                            </div>
+
+                            <div class="tab-pane" id="tab_1_4">
+                                {{ form_start(dc_form, {'attr': {'id':'submit_client_dc_form','class': '', 'role':'form'}}) }}
+                                <div class="tab-estudiante" style="display: none;">
+                                    <h5 class="block uppercase">Datos del Estudiante <span id="en_la _uc"></span></h5>
+                                    <div class="form-group">
+                                        <label class="control-label">Año que cursa
+                                        </label>
+                                            {{ form_widget(dc_form.studentsYear) }}
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label">Cargo
+                                        </label>
+                                            {{ form_widget(dc_form.studentsPosition) }}
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label">Carrera
+                                        </label>
+                                            {{ form_widget(dc_form.studentsCareer) }}
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label">Facultad
+                                        </label>
+                                            {{ form_widget(dc_form.studentsSchool) }}
+                                    </div>
+                                </div>
+                                <div class="tab-trabajador"  style="display: none;">
+                                    <h5 class="block uppercase">Datos del Trabajador <span id="en_la _uc"></span></h5>
+                                    <div class="row">
+                                        <div class="form-group col-md-6">
+                                            <label class="control-label">Ocupación
+                                            </label>
+                                                {{ form_widget(dc_form.workersOccupation) }}
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label class="control-label">Especialidad
+                                            </label>
+                                                {{ form_widget(dc_form.workersSpecialty) }}
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="form-group col-md-6">
+                                            <label class="control-label">Categoría Docente
+                                            </label>
+                                                {{ form_widget(dc_form.workersEduCategory) }}
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label class="control-label">Grado Científico
+                                            </label>
+                                                {{ form_widget(dc_form.workersSciGrade) }}
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="form-group col-md-4">
+                                            <label class="control-label">Facultad
+                                            </label>
+                                                {{ form_widget(dc_form.workersSchool) }}
+                                        </div><div class="form-group col-md-4">
+                                            <label class="control-label">Lugar de trabajo
+                                            </label>
+                                                {{ form_widget(dc_form.workersWorkPlace) }}
+                                        </div>
+                                        <div class="form-group col-md-4">
+                                            <label class="control-label">Teléfono del trabajo
+                                            </label>
+                                                {{ form_widget(dc_form.workersWorkPhone) }}
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="form-group col-md-4">
+                                            <label class="control-label">Cargo
+                                            </label>
+                                            {{ form_widget(dc_form.workersPosition) }}
+                                        </div>
+                                        <div class="form-group col-md-4">
+                                            <label class="control-label">Entrada al centro
+                                            </label>
+                                                {{ form_widget(dc_form.workersAdmissionDate) }}
+                                        </div>
+                                        <div class="form-group col-md-4">
+                                            <label class="control-label">Salario
+                                            </label>
+                                                {{ form_widget(dc_form.workersPay) }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <div class="row">
+                                        <div class="col-md-9">
+                                            <button type="submit" class="btn green button-submit">
+                                                Guardar
+                                                <i class="fa fa-check"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                {{ form_end(dc_form) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block page_custom_scrpt %}
+    <script type="text/javascript">
+        (function(w, $) {
+
+            'use strict';
+
+            $(function() {
+                $('.cropper').each(function() {
+                    new Cropper($(this));
+                });
+            });
+
+        })(window, jQuery);
+
+    </script>
+{% endblock %}
+

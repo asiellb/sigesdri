@@ -1,0 +1,28 @@
+{% trans_default_domain 'FOSUserBundle' %}
+
+<!-- BEGIN FORGOT PASSWORD FORM -->
+<form class="forget-form fos_user_resetting_request" action="{{ path("fos_user_resetting_send_email") }}" method="POST" novalidate="novalidate" style="display: block">
+    {% if invalid_username is defined %}
+        <div id="bootstrap_alerts_demo">
+            <div class="custom-alerts alert alert-danger fade in">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true"></button>
+                <i class="fa-lg fa fa-warning"></i>
+                {{ 'resetting.request.invalid_username'|trans({'%username%': invalid_username}) }}
+            </div>
+        </div>
+    {% endif %}
+    <div class="form-title">
+        <span class="form-title">Olvidaste la contraseña?</span><br>
+        <span class="form-subtitle">Introduce tu email para restaurarla.</span>
+    </div>
+    <div class="form-group">
+        <div class="input-icon primary">
+            <i class="fa fa-envelope"></i>
+            <input class="form-control placeholder-no-fix" autocomplete="off" placeholder="Email" id="username" name="username" type="text"> </div>
+    </div>
+    <div class="form-actions">
+        <a id="back-btn" href="{{ path('fos_user_security_login') }}" class="btn btn-default">Atras</a>
+        <button type="submit" class="btn btn-primary uppercase pull-right">{{ 'resetting.request.submit'|trans }}</button>
+    </div>
+</form>
+<!-- END FORGOT PASSWORD FORM -->

@@ -1,0 +1,25 @@
+{% extends '::base.html.twig' %}
+
+{% block title %}{{ parent() }} | Clientes{% endblock %}
+
+{% block body_class %}page-container-bg-solid{% endblock %}
+
+{% block  page_breadcrumb %}
+    {{ parent() }}
+    <li>
+    {% if '/client/index' in app.request.getPathInfo() %}
+        <span>Clientes</span> <i class="fa fa-circle"></i>
+    {% else %}
+        <a href="{{ path('client_index') }}" ><span>Clientes</span> </a> <i class="fa fa-circle"></i>
+    {% endif %}
+    </li>
+{% endblock %}
+
+{% block page_title %}
+    Clientes
+{% endblock %}
+
+{% block page_dashboard %}
+
+{% endblock %}
+
