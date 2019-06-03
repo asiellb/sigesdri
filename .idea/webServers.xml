@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="0c832b88-c351-4032-91f7-eb8649f3a826" name="ILUVATAR" url="http://iluvatar.arda.loc">
+        <fileTransfer port="0" mountedRoot="Z:\www" accessType="MOUNT" />
+      </webServer>
+      <webServer id="e41dc145-415c-4de4-a428-ffad87b02bf9" name="SIGESDRI" url="https://sigesdri.reduc.edu.cu">
+        <fileTransfer port="0" mountedRoot="S:\wamp64\www\sigesdri" accessType="MOUNT" />
+      </webServer>
+    </option>
+  </component>
+</project>

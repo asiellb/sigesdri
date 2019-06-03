@@ -2,31 +2,35 @@
 
 namespace DRI\PassportBundle\Controller;
 
-use DRI\PassportBundle\Form\PassportType;
-use Elastica\Exception\NotFoundException;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-
-use DRI\PassportBundle\Entity\Passport;
-use DRI\PassportBundle\Datatables\PassportDatatable;
-
-use PhpParser\Node\Scalar\String_;
-use Sg\DatatablesBundle\Datatable\DatatableInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Acl\Exception\Exception;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\HttpFoundation\JsonResponse;
-
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Validator\Constraints\Date;
+
+use Sg\DatatablesBundle\Datatable\DatatableInterface;
+use CMEN\GoogleChartsBundle\GoogleCharts\Charts\PieChart;
+use PhpParser\Node\Scalar\String_;
+use Elastica\Exception\NotFoundException;
+
+use DRI\PassportBundle\Entity\Passport;
+use DRI\PassportBundle\Datatables\PassportDatatable;
+use DRI\PassportBundle\Form\PassportType;
+use DRI\UsefulBundle\Useful\Useful;
 
 /**
  * Passport controller.
@@ -36,15 +40,36 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 class PassportController extends Controller
 {
     /**
+     * Estatistics for Passport entities.
+     *
+     * @param Request $request
+     *
+     * @Route("/index", name="passport_index")
+     *
+     * @return Response
+     */
+    public function indexAction(Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $passportRepo = $em->getRepository('DRIPassportBundle:Passport');
+
+        $chartData = $this->passportsChart();
+
+        return $this->render('DRIPassportBundle:Passport:index.html.twig', array(
+            'chartData'     => $chartData,
+        ));
+    }
+
+    /**
      * Lists all Application entities.
      * @param Request $request
      *
-     * @Route("/index", name="passport_dt_index")
+     * @Route("/list", name="passport_list")
      * @Method("GET")
      *
      * @return Response
      */
-    public function indexDTAction(Request $request)
+    public function listAction(Request $request)
     {
         $isAjax = $request->isXmlHttpRequest();
 
@@ -65,7 +90,7 @@ class PassportController extends Controller
             return $responseService->getResponse();
         }
 
-        return $this->render('DRIPassportBundle:Passport:index_dt.html.twig', array(
+        return $this->render('DRIPassportBundle:Passport:list.html.twig', array(
             'datatable' => $datatable,
         ));
     }
@@ -81,6 +106,7 @@ class PassportController extends Controller
     {
         $user = null;
         $holder = null;
+        $app = null;
 
         if($this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             $user = $this->getUser();  // get $user object
@@ -88,6 +114,7 @@ class PassportController extends Controller
 
         $em = $this->getDoctrine()->getManager();
         $clientRepo = $em->getRepository('DRIClientBundle:Client');
+        $appRepo = $em->getRepository('DRIPassportBundle:Application');
 
         $passport = new Passport();
 
@@ -105,15 +132,43 @@ class PassportController extends Controller
             $passport->setClientCi($holder->getCi());
         }
 
-        $form = $this->createForm(PassportType::class, $passport)
-                    ->handleRequest($request);
+        $form = $this->createForm(PassportType::class, $passport, [
+            'currentAction' => 'new'
+        ])->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            if (!$client && !($passport->getHolder() == null)){
+                $holder = $clientRepo->find($passport->getHolder());
+
+                if(!$holder){
+                    throw $this->createNotFoundException("El cliente al que se le intenta crear el pasaporte no existe.");
+                }
+                $passport->setClientCi($holder->getCi());
+            }
+
+            if (!$client && ($passport->getHolder() == null) && !($passport->getClientCi() == null)){
+                $holder = $clientRepo->findOneByCi($passport->getClientCi());
+
+                if($holder){
+                    $passport->setHolder($holder);
+                }
+            }
+
+            if (!($passport->getApplication() == null)){
+                $app = $appRepo->find($passport->getApplication());
+
+                if($app){
+                    $app->setUsed(true);
+                }
+            }
+
             $em->persist($passport);
             $em->flush();
 
-            return $this->redirectToRoute('passport_show', array('id' => $passport->getId()));
+            $editLink = $this->generateUrl('passport_edit', array('numberSlug' => $passport->getNumberSlug()));
+            $this->get('session')->getFlashBag()->add('success', "<a href='$editLink'>Se creó un nuevo Pasaporte.</a>" );
+
+            return $this->redirectToRoute('passport_show', array('numberSlug' => $passport->getNumberSlug()));
         }
 
         $lastVisited = $request->server->get('HTTP_REFERER');
@@ -121,6 +176,79 @@ class PassportController extends Controller
         return $this->render('@DRIPassport/Passport/new.html.twig', array(
             'lastPage' => $lastVisited,
             'holder' => $holder,
+            'application' => $app,
+            'Passport' => $passport,
+            'form' => $form->createView(),
+        ));
+    }
+
+    /**
+     * Creates a new Passport from Application entity.
+     *
+     * @Route("/new-from-application/{application}", name="passport_new_from_application")
+     * @Method({"GET", "POST"})
+     * @Security("has_role('ROLE_INFO_SPECIALIST')")
+     */
+    public function newFromApplicationAction(Request $request, $application = null)
+    {
+        $user = null;
+        $holder = null;
+        $app    = null;
+        $lastVisited = $request->server->get('HTTP_REFERER');
+
+        if($this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            $user = $this->getUser();  // get $user object
+        }
+
+        $em = $this->getDoctrine()->getManager();
+        $clientRepo = $em->getRepository('DRIClientBundle:Client');
+        $applicationRepo = $em->getRepository('DRIPassportBundle:Application');
+
+        $passport = new Passport();
+
+        if ($user){
+            $passport->setCreatedBy($user);
+        }
+        if($application){
+
+            $app    = $applicationRepo->find($application);
+            if(!$app){
+                throw $this->createNotFoundException("El cliente al que se le intenta crear el pasaporte no tiene Solicitudes.");
+            }
+
+            $holder = $clientRepo->find($app->getClient());
+            if(!$holder){
+                throw $this->createNotFoundException("El cliente al que se le intenta crear el pasaporte no existe.");
+            }
+
+            $passport->setHolder($holder);
+            $passport->setClientCi($holder->getCi());
+            $passport->setApplication($app);
+            $passport->setType($app->getPassportType());
+        }
+
+        $form = $this->createForm(PassportType::class, $passport, [
+            'currentAction' => 'new'
+        ])->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $app->setUsed(true);
+
+            $em->persist($passport);
+            $em->flush();
+
+            $editLink = $this->generateUrl('passport_edit', array('numberSlug' => $passport->getNumberSlug()));
+            $this->get('session')->getFlashBag()->add('success', "<a href='$editLink'>Se creó un nuevo Pasaporte.</a>" );
+
+            return $this->redirectToRoute('passport_show', array('numberSlug' => $passport->getNumberSlug()));
+        }
+
+
+        return $this->render('@DRIPassport/Passport/new.html.twig', array(
+            'lastPage' => $lastVisited,
+            'holder' => $holder,
+            'application' => $app,
             'Passport' => $passport,
             'form' => $form->createView(),
         ));
@@ -129,8 +257,12 @@ class PassportController extends Controller
     /**
      * Finds and displays a Passport entity.
      *
-     * @Route("/pass/{id}", name="passport_show")
+     * @param Passport $passport
+     *
+     * @Route("/view/{numberSlug}", name="passport_show", options = {"expose" = true})
      * @Method("GET")
+     *
+     * @return Response
      */
     public function showAction(Passport $passport)
     {
@@ -145,40 +277,71 @@ class PassportController extends Controller
     /**
      * Displays a form to edit an existing Passport entity.
      *
-     * @Route("/edit/{id}", name="passport_edit")
+     * @param Request $request
+     * @param Passport  $passport
+     *
+     * @Route("/edit/{numberSlug}", name="passport_edit", options = {"expose" = true})
      * @Method({"GET", "POST"})
      * @Security("has_role('ROLE_INFO_SPECIALIST')")
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function editAction(Request $request, Passport $passport)
     {
-        $user = null;
+        if (!$passport->isClosed()){
+            $user = null;
 
-        if($this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            $user = $this->getUser();  // get $user object
+            if($this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+                $user = $this->getUser();  // get $user object
+            }
+
+            if ($user){
+                $passport->setLastUpdateBy($user);
+            }
+
+            $deleteForm = $this->createDeleteForm($passport);
+            $editForm = $this->createForm('DRI\PassportBundle\Form\PassportType', $passport, [
+                'currentAction' => 'edit'
+            ])->handleRequest($request);
+
+            if ($editForm->isSubmitted() && $editForm->isValid()) {
+                $em = $this->getDoctrine()->getManager();
+                $appRepo = $em->getRepository('DRIPassportBundle:Application');
+
+                if (!($passport->getApplication() == null)){
+                    $app = $appRepo->find($passport->getApplication());
+
+                    if($app){
+                        $app->setUsed(true);
+                    }
+                }
+
+
+                $em->persist($passport);
+                $em->flush();
+
+                $this->get('session')->getFlashBag()->add('success', 'El Pasaporte se editó satisfactoriamente!');
+                return $this->redirectToRoute('passport_show', array('numberSlug' => $passport->getNumberSlug()));
+            }
+
+            $lastVisited = $request->server->get('HTTP_REFERER');
+
+
+            return $this->render('@DRIPassport/Passport/edit.html.twig', array(
+                'lastPage' => $lastVisited,
+                'passport' => $passport,
+                'edit_form' => $editForm->createView(),
+                'delete_form' => $deleteForm->createView(),
+            ));
+        }else{
+            $this->get('session')->getFlashBag()->add(
+                'error',
+                'El Pasaporte esta cerrado por lo que no se puede modificar.'
+            );
+
+            return $this->redirectToRoute('passport_show', array('numberSlug' => $passport->getNumberSlug()));
         }
 
-        if ($user){
-            $passport->setLastUpdateBy($user);
-        }
-
-        $deleteForm = $this->createDeleteForm($passport);
-        $editForm = $this->createForm('DRI\PassportBundle\Form\PassportType', $passport);
-        $editForm->remove('holder');
-        $editForm->handleRequest($request);
-
-        if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($passport);
-            $em->flush();
-
-            return $this->redirectToRoute('passport_show', array('id' => $passport->getId()));
-        }
-
-        return $this->render('@DRIPassport/Passport/edit.html.twig', array(
-            'passport' => $passport,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        ));
     }
 
     /**
@@ -199,7 +362,7 @@ class PassportController extends Controller
             $em->flush();
         }
 
-        return $this->redirectToRoute('_index');
+        return $this->redirectToRoute('passport_list');
     }
 
     /**
@@ -240,7 +403,7 @@ class PassportController extends Controller
             $this->get('session')->getFlashBag()->add('error', 'Exite un problema para borrar el pasaporte');
         }
 
-        return $this->redirect($this->generateUrl('passport_dt_index'));
+        return $this->redirect($this->generateUrl('passport_list'));
 
     }
 
@@ -288,9 +451,9 @@ class PassportController extends Controller
     }
 
     /**
-     * Bulk delete action.
+     * Assign Client entity for Passport entity.
      *
-     * @Route("/apk")
+     * @Route("/assign_passport")
      * @Security("has_role('ROLE_ADMIN')")
      *
      */
@@ -318,6 +481,52 @@ class PassportController extends Controller
     }
 
     /**
+     * Assign numberSlug for Passport entity.
+     *
+     * @Route("/assign_number_slug")
+     * @Security("has_role('ROLE_ADMIN')")
+     *
+     */
+    public function assignNumberSlug(){
+
+        $em = $this->getDoctrine()->getManager();
+        $passRepo   = $em->getRepository('DRIPassportBundle:Passport');
+
+        $passports = $passRepo->findByNumberSlug('');
+
+        foreach ($passports as $passport){
+            $passport->setNumberSlug(Useful::getSlug($passport->getNumber()));
+
+            $em->persist($passport);
+            $em->flush();
+        }
+        $dondeEstaba = $this->getRequest()->server->get('HTTP_REFERER');
+    }
+
+    /**
+     * Assign numberSlug for Passport entity.
+     *
+     * @Route("/assign_drop_false")
+     * @Security("has_role('ROLE_ADMIN')")
+     *
+     */
+    public function assignDropFalse(){
+
+        $em = $this->getDoctrine()->getManager();
+        $passRepo   = $em->getRepository('DRIPassportBundle:Passport');
+
+        $passports = $passRepo->findByInStore(null);
+
+        foreach ($passports as $passport){
+            $passport->setInStore(false);
+
+            $em->persist($passport);
+            $em->flush();
+        }
+        $dondeEstaba = $this->getRequest()->server->get('HTTP_REFERER');
+    }
+
+    /**
      * Bulk delete action.
      *
      * @Route("/cancel", name="passport_cancel")
@@ -329,6 +538,22 @@ class PassportController extends Controller
         return new RedirectResponse($lastVisited, 302);
     }
 
+    /**
+     * Bulk delete action.
+     *
+     * @Route("/asig-drop")
+     *
+     */
+    public function asignDropPassport(Request $request){
+        $em = $this->getDoctrine()->getManager();
+        $pass = $em->getRepository('DRIPassportBundle:Passport')->findAll();
+
+        foreach ($pass as $passport){
+            $passport->setDrop(false);
+        }
+
+        $em->flush();
+    }
 
     /**
      * Available PassNumber.
@@ -358,4 +583,111 @@ class PassportController extends Controller
         }
 
     }
+
+    /**
+     * Generate Application List.
+     *
+     * @param Request $request
+     *
+     * @Route("/list_applications", name="list_client_applications", options={"expose"=true})
+     * @Method({"POST"})
+     *
+     * @return JsonResponse|Response
+     */
+    public function listApplicationsOfClientAction(Request $request){
+        $isAjax = $request->isXmlHttpRequest();
+
+        if ($isAjax) {
+            $holder = $request->request->get('holder');
+            $holder = (int)$holder;
+
+            $em = $this->getDoctrine()->getManager();
+            $appRepository = $em->getRepository("DRIPassportBundle:Application");
+
+            // Search the applications that belongs to the client with the given id as GET parameter "clientid"
+            $applications = $appRepository->createQueryBuilder("q")
+                ->where("q.client = :holder")
+                ->andWhere("q.state = :state")
+                ->andWhere("q.used = :used")
+                ->setParameter("holder", $holder)
+                ->setParameter("state", "CNF")
+                ->setParameter("used", false)
+                ->getQuery()
+                ->getResult();
+
+            $applicationsList   = array();
+
+            foreach($applications as $application){
+                $applicationsList[] = array(
+                    "id" => $application->getId(),
+                    "number" => $application->getNumber()
+                );
+            }
+
+            // Return array with structure of the passports of the providen client id
+            return new JsonResponse(
+                array(
+                    'applications'  => $applicationsList
+                )
+            );
+        }
+
+    }
+
+    public function passportsChart(){
+
+        $serializer = $this->get('serializer');
+
+        $em = $this->getDoctrine()->getManager();
+        $passportRepo = $em->getRepository('DRIPassportBundle:Passport');
+
+        $oficiales  = $passportRepo->findByType('OFI');
+        $ofiActivos = [];
+        $ofiVencidos = [];
+        $ofiPorVencer = [];
+
+        foreach ($oficiales as $item){
+            if ($item->isActive())
+                $ofiActivos[] = $item;
+            if ($item->isExpired())
+                $ofiVencidos[] = $item;
+            if ($item->isForExpiring())
+                $ofiPorVencer[] = $item;
+        }
+
+        $ordinarios = $passportRepo->findByType('COR');
+        $ordActivos = [];
+        $ordVencidos = [];
+        $ordPorVencer = [];
+
+        foreach ($ordinarios as $item){
+            if ($item->isActive())
+                $ordActivos[] = $item;
+            if ($item->isExpired())
+                $ordVencidos[] = $item;
+            if ($item->isForExpiring())
+                $ordPorVencer[] = $item;
+        }
+
+        $chartData = [
+            [
+                'tipo' => 'Oficiales',
+                'cantidad' => count($oficiales),
+                'activos' => count($ofiActivos),
+                'vencidos' => count($ofiVencidos),
+                'porvencer' => count($ofiPorVencer),
+            ],[
+                'tipo' => 'Ordinarios',
+                'cantidad' => count($ordinarios),
+                'activos' => count($ordActivos),
+                'vencidos' => count($ordVencidos),
+                'porvencer' => count($ordPorVencer),
+            ]
+        ];
+
+        $jsonChart = $serializer->serialize($chartData, 'json');
+
+        return $chartData;
+    }
+
 }

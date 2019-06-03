@@ -1,133 +1,327 @@
 {% extends 'DRIPassportBundle:Application:layout.application.html.twig' %}
 
-{% block title %}{{ parent() }} | {{ application.applicationNumber }} {% endblock %}
+{% block title %}{{ parent() }} | Solicitud | {{ application.number }} {% endblock %}
 
 {% block  page_breadcrumb %}
     {{ parent() }}
     <li>
-        <span>Vista </span>
+        <span>Solicitud </span>
         <i class="fa fa-circle"></i>
-        <span>{{ application.applicationNumber }} </span>
+        <span># {{ application.number }} </span>
     </li>
 {% endblock %}
 
 {% block page_title %}
-    Solicitud de Pasaporte: {{ application.applicationNumber }}
 {% endblock %}
 
 {% block page_dashboard %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="portlet light bordered">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <i class="icon-layers font-blue-dark"></i>
+                        <span class="caption-subject font-blue-dark bold uppercase">
+                            Solicitud
+                            <span class="font-green-sharp">
+                                # {{ application.number }} |
+                                <small>
+                                    {% if application.applicationDate %}{{ application.applicationDate | localizeddate('long', 'none') }}{% endif %}
+                                </small>
+                            </span>
+                        </span>
+                    </div>
+                    <div class="actions btn-set">
+                        <a class="btn btn-transparent grey-cascade btn-outline btn-circle btn-sm" href="{{ path('passport_application_edit', {'numberSlug' : application.numberSlug}) }}">
+                            <span class="fa fa-pencil" aria-hidden="true"></span>
+                            Editar Solicitud
+                        </a>
+                        <a class="btn btn-transparent grey-cascade btn-outline btn-circle btn-sm" href="{{ path('passport_application_index') }}">
+                            <span class="fa fa-list" aria-hidden="true"></span>
+                            Ir al listado
+                        </a>
+                        <a class="btn green btn-circle btn-sm" href="{{ path('passport_application_new') }}">
+                            <span class="fa fa-plus" aria-hidden="true"></span>
+                            Crear Solicitud de Pasaporte
+                        </a>
+                        <div class="btn-group">
+                            <a class="btn red btn-outline btn-circle" href="javascript:;" data-toggle="dropdown">
+                                <i class="fa fa-share"></i>
+                                <span class="hidden-xs"> Herramientas </span>
+                                <i class="fa fa-angle-down"></i>
+                            </a>
+                            <ul class="dropdown-menu pull-right">
+                                <li>
+                                    <a href="{{ path('passport_application_to_word', {'numberSlug' : application.numberSlug}) }}" class="tool-action">
+                                        <i class="fa fa-file-word-o"></i> MS WORD</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <div class="tabbable-line">
+                        <ul class="nav nav-tabs nav-tabs-lg">
+                            <li class="active">
+                                <a href="#tab_1" data-toggle="tab"> Detalles </a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="tab_1">
+                                <div class="row">
+                                    <div class="col-md-6 col-sm-12">
+                                        <div class="portlet green-meadow box">
+                                            <div class="portlet-title">
+                                                <div class="caption">
+                                                    <i class="fa fa-book"></i>Detalles de la Solicitud de Pasaporte </div>
+                                                <div class="actions">
+                                                    <a href="{{ path('passport_new_from_application', { 'application':  application.id }) }}" class="btn btn-default btn-sm">
+                                                        <i class="fa fa-pencil"></i> Agregar Pasaporte </a>
+                                                </div>
+                                            </div>
+                                            <div class="portlet-body">
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Número #: </div>
+                                                    <div class="col-md-7 value"> {{ application.number }}</div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Motivo de Solicitud: </div>
+                                                    <div class="col-md-7 value">
+                                                        {{ application.reason == 'CON' ? 'Confección' : application.reason == 'PRO' ? 'Prórroga' : ''}}
+                                                    </div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Fecha de la Solicitud: </div>
+                                                    <div class="col-md-7 value">
+                                                        {{ application.applicationDate | date('d/m/Y')}}
+                                                    </div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Tipo de Pasaporte: </div>
+                                                    <div class="col-md-7 value">
+                                                        {{ application.passportType == 'OFI' ? 'Oficial' :
+                                                            application.passportType == 'COR' ? 'Corriente' :
+                                                            application.passportType == 'DIP' ? 'Diplomático'  }}
+                                                    </div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Tipo de Solicitud: </div>
+                                                    <div class="col-md-7 value">
+                                                        {{ application.applicationType == 'REG' ? 'Regular' : application.applicationType == 'INM' ? 'Inmediata' : ''}}
+                                                    </div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Organo Solicitante: </div>
+                                                    <div class="col-md-7 value">
+                                                        {{ application.organ }}
+                                                    </div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Motivos del Viaje: </div>
+                                                    <div class="col-md-7 value"> {{ application.travelReason }} </div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Estado: </div>
+                                                    <div class="col-md-7 value">
+                                                        <span class="label {{ application.state == 'CON' ? 'bg-blue-dark' : application.state == 'ENV' ? 'label-info' : application.state == 'CNF' ? 'label-success' : application.state == 'REC' ? 'label-danger' : ''}}">
+                                                            {{ application.state == 'CON' ? 'Confeccionada' : application.state == 'ENV' ? 'Enviada' : application.state == 'CNF' ? 'Confirmada' : application.state == 'REC' ? 'Rechazada' : ''}}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                {% if application.sendDate %}
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Envida el: </div>
+                                                        <div class="col-md-7 value">
+                                                            {{ application.sendDate | localizeddate('long', 'none') }}
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                                {% if application.confirmDate %}
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Confirmada el: </div>
+                                                        <div class="col-md-7 value">
+                                                            {{ application.confirmDate | localizeddate('long', 'none') }}
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                                {% if application.rejectDate %}
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Rechazada el: </div>
+                                                        <div class="col-md-7 value">
+                                                            {{ application.rejectDate | localizeddate('long', 'none') }}
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                                {% if application.rejectReasons %}
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Rechazada el: </div>
+                                                        <div class="col-md-7 value">
+                                                            {{ application.rejectReasons }}
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% if application.client is not empty  %}
+                                        <div class="col-md-6 col-sm-12">
+                                            <div class="portlet blue-hoki box">
+                                                <div class="portlet-title">
+                                                    <div class="caption">
+                                                        <i class="fa fa-user"></i>Información del Solicitante </div>
+                                                    <div class="actions">
+                                                        <a href="{{ path('client_profile', { 'fullNameSlug':  application.client.fullNameSlug }) }}" class="btn btn-default btn-sm">
+                                                            <i class="fa fa-eye"></i> Ver </a>
+                                                        <a href="{{ path('client_config', { 'fullNameSlug':  application.client.fullNameSlug }) }}" class="btn btn-default btn-sm">
+                                                            <i class="fa fa-pencil"></i> Editar </a>
+                                                    </div>
+                                                </div>
+                                                <div class="portlet-body">
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> CI: </div>
+                                                        <div class="col-md-7 value"> {{ application.client.ci }} </div>
+                                                    </div>
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Nombre del Solicitante: </div>
+                                                        <div class="col-md-7 value"> {{ application.client.fullName }} </div>
+                                                    </div>
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Fecha de Nacimiento: </div>
+                                                        <div class="col-md-7 value"> {{ application.client.birthday | date('d/m/Y') }} </div>
+                                                    </div>
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Género: </div>
+                                                        <div class="col-md-7 value"> {{ application.client.gender == 'F' ? 'Femenino' : 'Masculino'  }} </div>
+                                                    </div>
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Hijo de: </div>
+                                                        <div class="col-md-7 value">
+                                                            {{ application.client.mothersName }} y {{ application.client.fathersName }}
+                                                        </div>
+                                                    </div>
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Estatura: </div>
+                                                        <div class="col-md-7 value"> {{ application.client.height }}cm </div>
+                                                    </div>
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Características Especiales: </div>
+                                                        <div class="col-md-7 value"> {{ application.client.pvs }} </div>
+                                                    </div>
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Color de los Ojos: </div>
+                                                        <div class="col-md-7 value"> {{ application.client.eyesColor }} </div>
+                                                    </div>
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Color de la Piel: </div>
+                                                        <div class="col-md-7 value"> {{ application.client.skinColor }} </div>
+                                                    </div>
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Color del Cabello: </div>
+                                                        <div class="col-md-7 value"> {{ application.client.hairColor }} </div>
+                                                    </div>
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Lugar de Nacimiento: </div>
+                                                        <div class="col-md-7 value">
+                                                            {{ application.client.cityBirth }}{{ application.client.foreignCityBirth }},
+                                                            {{ application.client.stateBirth }},
+                                                            {{ application.client.countryBirth }}
+                                                        </div>
+                                                    </div>
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Ciudadanía: </div>
+                                                        <div class="col-md-7 value">{{ application.client.citizenship }}</div>
+                                                    </div>
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Profeción: </div>
+                                                        <div class="col-md-7 value">{{ application.client.workersOccupation }}</div>
+                                                    </div>
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Dirección Actual: </div>
+                                                        <div class="col-md-7 value">
+                                                            {{ application.client.street }}
+                                                            {{ application.client.highway }}
+                                                            #{{ application.client.number }}
+                                                            {{ application.client.building }}
+                                                            {{ application.client.apartment }}
+                                                            {{ application.client.km }}
+                                                            entre {{ application.client.firstBetween }}
+                                                            y {{ application.client.secongBetween }},
+                                                            {{ application.client.cpa }},
+                                                            {{ application.client.farm }},
+                                                            {{ application.client.town }},
+                                                            {{ application.client.circunscription }},
+                                                            {{ application.client.city }},
+                                                            {{ application.client.state }},
+                                                            {{ application.client.country }}
+                                                        </div>
+                                                    </div>
 
-<div class="row">
-    <div class="col-md-6">
-        <p><strong>Id</strong></p>
-        <p>
-            {{ application.id }}        </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                    {% if application.passport is not empty  %}
+                                        <div class="col-md-6 col-sm-12">
+                                            <div class="portlet blue-hoki box">
+                                                <div class="portlet-title">
+                                                    <div class="caption">
+                                                        <i class="fa fa-user"></i>Pasaporte Asociado </div>
+                                                    <div class="actions">
+                                                        <a href="{{ path('passport_show', { 'numberSlug':  application.passport.numberSlug }) }}" class="btn btn-default btn-sm">
+                                                            <i class="fa fa-pencil"></i> Ver </a>
+                                                        <a href="{{ path('passport_edit', { 'numberSlug':  application.passport.numberSlug }) }}" class="btn btn-default btn-sm">
+                                                            <i class="fa fa-pencil"></i> Editar </a>
+                                                    </div>
+                                                </div>
+                                                <div class="portlet-body">
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Número del Pasaporte: </div>
+                                                        <div class="col-md-7 value"> {{ application.passport.number }} </div>
+                                                    </div>
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Tipo de Pasaporte: </div>
+                                                        <div class="col-md-7 value"> {{ fn_passport_type(application.passport.type) }} </div>
+                                                    </div>
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Emitido el: </div>
+                                                        <div class="col-md-7 value">
+                                                            {{ application.passport.issueDate | localizeddate('long', 'none') }}
+                                                        </div>
+                                                    </div>
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Vence el: </div>
+                                                        <div class="col-md-7 value">
+                                                            {{ application.passport.expiryDate | localizeddate('long', 'none') }}
+                                                        </div>
+                                                    </div>
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Estado: </div>
+                                                        <div class="col-md-7 value">
+                                                            <span class="label
+                                                                {{ application.passport.active ? 'label-success' :
+                                                                    application.passport.expired ? 'label-danger' :
+                                                                    application.passport.forExpiring ? 'label-warning' :
+                                                                    application.passport.drop ? 'label-info' }}">
+                                                                {{ application.passport.active ? 'Activo' :
+                                                                    application.passport.expired ? 'Vencido' :
+                                                                    application.passport.forExpiring ? 'Por vencer' :
+                                                                    application.passport.drop ? 'Baja' }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
+                </div>
+            </div>
+
+        </div>
     </div>
-    <div class="col-md-6">
-        <p><strong>Applicationreason</strong></p>
-        <p>
-            {{ application.applicationReason }}        </p>
-
-    </div>
-    <div class="col-md-6">
-        <p><strong>Applicationdate</strong></p>
-        <p>
-            {% if application.applicationDate %}{{ application.applicationDate|date('Y-m-d H:i:s') }}{% endif %}        </p>
-
-    </div>
-    <div class="col-md-6">
-        <p><strong>Passporttype</strong></p>
-        <p>
-            {{ application.passportType }}        </p>
-
-    </div>
-    <div class="col-md-6">
-        <p><strong>Applicationtype</strong></p>
-        <p>
-            {{ application.applicationType }}        </p>
-
-    </div>
-    <div class="col-md-6">
-        <p><strong>Applicantorgan</strong></p>
-        <p>
-            {{ application.applicantOrgan }}        </p>
-
-    </div>
-    <div class="col-md-6">
-        <p><strong>Travelreason</strong></p>
-        <p>
-            {{ application.travelReason }}        </p>
-
-    </div>
-    <div class="col-md-6">
-        <p><strong>State</strong></p>
-        <p>
-            {{ application.state }}        </p>
-
-    </div>
-    <div class="col-md-6">
-        <p><strong>Senddate</strong></p>
-        <p>
-            {% if application.sendDate %}{{ application.sendDate|date('Y-m-d H:i:s') }}{% endif %}        </p>
-
-    </div>
-    <div class="col-md-6">
-        <p><strong>Confirmdate</strong></p>
-        <p>
-            {% if application.confirmDate %}{{ application.confirmDate|date('Y-m-d H:i:s') }}{% endif %}        </p>
-
-    </div>
-    <div class="col-md-6">
-        <p><strong>Rejectdate</strong></p>
-        <p>
-            {% if application.rejectDate %}{{ application.rejectDate|date('Y-m-d H:i:s') }}{% endif %}        </p>
-
-    </div>
-    <div class="col-md-6">
-        <p><strong>Rejectreasons</strong></p>
-        <p>
-            {{ application.rejectReasons }}        </p>
-
-    </div>
-    <div class="col-md-6">
-        <p><strong>Createdat</strong></p>
-        <p>
-            {% if application.createdAt %}{{ application.createdAt|date('Y-m-d H:i:s') }}{% endif %}        </p>
-
-    </div>
-    <div class="col-md-6">
-        <p><strong>Updatedat</strong></p>
-        <p>
-            {% if application.updatedAt %}{{ application.updatedAt|date('Y-m-d H:i:s') }}{% endif %}        </p>
-
-    </div></div>
-
-<hr/>
-
-<div class="form-group">
-    <a class="btn btn-default" href="{{ path('passport_application_index') }}">
-        <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
-        Back to list
-    </a>
-            <a class="btn btn-primary" href="{{ path('passport_application_edit', { 'id':  application.id }) }}">
-            <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-
-            Edit
-        </a>
-                <a class="btn btn-info" href="{{ path('passport_application_new') }}">
-            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-            New
-        </a>
-                <form action="{{ path('passport_application_delete', { 'id': application.id }) }}" method="post" style="display: inline-block">
-            <input type="hidden" name="_method" value="DELETE" />
-            {{ form_widget(delete_form) }}
-            <button class="btn btn-danger" type="submit" onclick="return confirm('Are you sure');">
-                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                Delete</button>
-        </form>
-    </div>
-
-
 {% endblock %}
 

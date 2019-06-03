@@ -9,15 +9,18 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use DRI\UsefulBundle\Useful\Useful;
 
+
 /**
  * Country
  *
- * @ORM\Table(name="country")
+ * @ORM\Table(name="usf_country")
  * @ORM\Entity(repositoryClass="DRI\UsefulBundle\Repository\CountryRepository")
+ *
  * @UniqueEntity("spName")
  * @UniqueEntity("iso2")
  * @UniqueEntity("iso3")
  * @UniqueEntity("phoneCode")
+ *
  * @Vich\Uploadable
  */
 class Country
@@ -25,7 +28,7 @@ class Country
     /**
      * @var int
      *
-     * @ORM\Column(name="id", type="integer")
+     * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
@@ -34,7 +37,7 @@ class Country
     /**
      * @var string
      *
-     * @ORM\Column(name="name", type="string", length=50, unique=true, nullable=false)
+     * @ORM\Column(type="string", length=50, unique=true, nullable=false)
      * @Assert\NotBlank()
      * @Assert\Length(min=1,max=50)
      */
@@ -43,7 +46,7 @@ class Country
     /**
      * @var string
      *
-     * @ORM\Column(name="spName", type="string", length=50, unique=true, nullable=false)
+     * @ORM\Column(type="string", length=50, unique=true, nullable=false)
      * @Assert\NotBlank()
      * @Assert\Length(min=1,max=50)
      */
@@ -52,7 +55,7 @@ class Country
     /**
      * @var string
      *
-     * @ORM\Column(name="continent", type="string", length=30)
+     * @ORM\Column(type="string", length=30)
      * @Assert\NotBlank()
      * @Assert\Length(min=1,max=30)
      * @Assert\Choice(
@@ -71,7 +74,7 @@ class Country
     /**
      * @var string
      *
-     * @ORM\Column(name="area", type="string", length=30, nullable=true)
+     * @ORM\Column(type="string", length=30, nullable=true)
      * @Assert\Length(min=0,max=30)
      */
     private $area;
@@ -79,7 +82,7 @@ class Country
     /**
      * @var string
      *
-     * @ORM\Column(name="subArea", type="string", length=30, nullable=true)
+     * @ORM\Column(type="string", length=30, nullable=true)
      * @Assert\Length(min=0,max=30)
      */
     private $subArea;
@@ -87,7 +90,7 @@ class Country
     /**
      * @var string
      *
-     * @ORM\Column(name="iso2", type="string", length=2, unique=true)
+     * @ORM\Column(type="string", length=2, unique=true)
      * @Assert\NotBlank()
      * @Assert\Length(min=2,max=2)
      * @Assert\Regex("/^[A-Z]/")
@@ -97,7 +100,7 @@ class Country
     /**
      * @var string
      *
-     * @ORM\Column(name="iso3", type="string", length=3, unique=true)
+     * @ORM\Column(type="string", length=3, unique=true)
      * @Assert\NotBlank()
      * @Assert\Length(min=3,max=3)
      * @Assert\Regex("/^[A-Z]/")
@@ -107,7 +110,7 @@ class Country
     /**
      * @var string
      *
-     * @ORM\Column(name="phoneCode", type="string", length=4, nullable=true, unique=false)
+     * @ORM\Column(type="string", length=4, nullable=true, unique=false)
      * @Assert\Length(min=1,max=4)
      * @Assert\Regex("/^[0-9]/")
      */
@@ -116,12 +119,12 @@ class Country
     /**
      * @var string
      *
-     * @ORM\Column(name="flagImage", type="string", length=255, nullable=true)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $flagImage;
 
     /**
-     * @var \File
+     * @var File
      *
      * @Vich\UploadableField(mapping="countries_flags_images", fileNameProperty="flagImage")
      */
@@ -130,10 +133,15 @@ class Country
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="lastFileUpdate", type="datetime", nullable=true)
-     * @Assert\Datetime()
+     * @ORM\Column(type="datetime", nullable=true)
+     * @Assert\DateTime()
      */
     private $lastFileUpdate;
+
+    /**
+     * @ORM\OneToMany(targetEntity="DRI\AgreementBundle\Entity\Institutional", mappedBy="country")
+     */
+    private $institutionals;
 
 
     /**
@@ -373,7 +381,7 @@ class Country
     /**
      * Set flagFile
      *
-     * @param File $flagImage
+     * @param File|\Symfony\Component\HttpFoundation\File\UploadedFile $flagImage
      *
      * @return Country
      */
@@ -393,7 +401,7 @@ class Country
     /**
      * Get flagFile
      *
-     * @return \stdClass
+     * @return File|null
      */
     public function getFlagFile()
     {
@@ -422,5 +430,46 @@ class Country
     public function getLastFileUpdate()
     {
         return $this->lastFileUpdate;
+    }
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->institutionals = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Add institutional
+     *
+     * @param \DRI\AgreementBundle\Entity\Institutional $institutional
+     *
+     * @return Country
+     */
+    public function addInstitutional(\DRI\AgreementBundle\Entity\Institutional $institutional)
+    {
+        $this->institutionals[] = $institutional;
+
+        return $this;
+    }
+
+    /**
+     * Remove institutional
+     *
+     * @param \DRI\AgreementBundle\Entity\Institutional $institutional
+     */
+    public function removeInstitutional(\DRI\AgreementBundle\Entity\Institutional $institutional)
+    {
+        $this->institutionals->removeElement($institutional);
+    }
+
+    /**
+     * Get institutionals
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getInstitutionals()
+    {
+        return $this->institutionals;
     }
 }

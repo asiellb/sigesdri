@@ -1,37 +1,3 @@
-{#
-{% block EconomicsType_label %}{% endblock %}
-{% block EconomicsType_errors %}{% endblock %}
-
-{% block EconomicType_label %}{% endblock %}
-{% block EconomicType_errors %}{% endblock %}
-
-{% block EconomicType_row %}
-        {{ form_label(form) }}
-        {{ form_errors(form) }}
-        {{ form_widget(form) }}
-{% endblock %}
-
-{% block EconomicType_widget %}
-    {{ form_widget(form) }}
-    <br/>
-    <p class="text-center">
-        <a href="#" class="collection-up btn btn-default">&lt;</a>
-        <a href="#" class="collection-remove btn btn-default">-</a>
-        <a href="#" class="collection-add btn btn-default">+</a>
-        <a href="#" class="collection-down btn btn-default">&gt;</a>
-    </p>
-{% endblock %}
-
-{% block EconomicsType_widget %}
-    {{ form_widget(form.economics) }}
-{% endblock %}#}
-
-
-
-{% block ExitApplicationType_widget %}
-
-{% endblock %}
-
 {# By default, collection uses the form_widget block to create its markup, but we want a table #}
 {% block collection_widget %}
     {% spaceless %}
@@ -49,49 +15,46 @@
         {% set attr = attr|merge({'data-allow-remove': allow_delete ? 1 : 0 }) %}
         {% set attr = attr|merge({'data-name-prefix': full_name}) %}
 
-        <fieldset class="well">
-            <label>{{ form_label(form) }}</label>
+        {{ form_errors(form) }}
 
-            {{ form_errors(form) }}
+        {# Don't forget to add the collection attributes in your markup #}
 
-            {# Don't forget to add the collection attributes in your markup #}
             <table {{ block('widget_attributes') }}>
                 <thead>
-                <th>Tipo</th>
-                <th>Costo</th>
-                <th>Financiamiento</th>
+                <th><label class="control-label">Tipo</label></th>
+                <th><label class="control-label">Costo</label></th>
+                <th><label class="control-label">Moneda</label></th>
+                <th><label class="control-label">Financiamiento</label></th>
                 <th>&nbsp;</th>
                 </thead>
                 <tbody>
-
-                {#
-                 # we can't form_widget(form) as it would render parent markup for a collection, so
-                 # we iterate manually on children
-                 #}
-                {% for item in form %}
-                    {{ form_widget(item) }}
-                {% endfor %}
-
+                    {#
+                     # we can't form_widget(form) as it would render parent markup for a collection, so
+                     # we iterate manually on children
+                     #}
+                    {% for item in form %}
+                        {{ form_widget(item) }}
+                    {% endfor %}
                 </tbody>
             </table>
-        </fieldset>
 
     {% endspaceless %}
 {% endblock %}
 
-{% block EconomicType_widget %}
-
+{% block economic_type_widget %}
     {# widget_attributes will generate class="item" from the DiscountCollectionType.entry_options configuration #}
     <tr {{ block('widget_attributes') }}>
         <td>{{ form_widget(form.type) }}</td>
         <td>{{ form_widget(form.amount) }}</td>
+        <td>{{ form_widget(form.currency) }}</td>
         <td>{{ form_widget(form.source) }}</td>
         <td class="text-center">
-            <a href="#" class="collection-remove btn btn-default" title="Eliminar Elemento"><span class="glyphicon glyphicon-trash"></span></a>
-            <a href="#" class="collection-duplicate btn btn-default" title="Duplicar Elemento"><span class="glyphicon glyphicon-th-large"></span></a>
+            <a href="#" class="collection-remove btn btn-circle btn-icon-only default" title="Eliminar Elemento"><span class="fa fa-trash"></span></a>
+            <a href="#" class="collection-duplicate btn btn-circle btn-icon-only default" title="Duplicar Elemento"><span class="fa fa-th-large"></span></a>
+            <a id="collection-add" href="#" class="collection-add btn btn-circle btn-icon-only default" title="Agregar Elemento"><span class="fa fa-plus"></span></a>
         </td>
     </tr>
 
 {% endblock %}
 
-{% block EconomicType_label %}{% endblock %}
+{% block economic_type_label %}{% endblock %}

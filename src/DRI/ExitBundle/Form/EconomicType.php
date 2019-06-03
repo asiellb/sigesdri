@@ -3,10 +3,13 @@
 namespace DRI\ExitBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\CurrencyType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Intl\Intl;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use DRI\ExitBundle\Entity\Economic;
 
@@ -17,19 +20,43 @@ class EconomicType extends AbstractType
         $builder
             ->add('type', ChoiceType::class, [
                 'label'     => 'Tipo',
-                'choices'   => array(
-                    'Pasaje'    => 'Pasaje',
-                    'Viáticos'  => 'Viáticos',
-                    'Otros'     => 'Otros',
-                ),
+                'choices'   => Economic::ECONOMIC_TYPE_CHOICE,
                 'placeholder' => 'Elije una opción',
+                'attr' => array(
+                    'class'=>'bs-select',
+                )
             ])
             ->add('amount', NumberType::class, [
-                'label' => 'Costo(CUC)'
+                'label' => 'Costo'
             ])
-            ->add('source', TextType::class, [
-                'label' => 'Financiamiento'
+            ->add('currency', CurrencyType::class, [
+                'label' => 'Moneda',
+                'attr' => [
+                    'class' => 'select2',
+                ],
+                'required' => false
             ])
+            ->add('source', ChoiceType::class, [
+                'label'     => 'Financiamiento',
+                'choices'   => Economic::ECONOMIC_SOURCE_CHOICE,
+                'placeholder' => 'Elije una opción',
+                'attr' => array(
+                    'class'=>'bs-select',
+                )
+            ])
+            ->add('eventAcount', CheckboxType::class, array(
+                'label' => false,
+                'attr' => array(
+                    'class'         => 'bootstrap-toggle',
+                    'data-toggle'   => 'toggle',
+                    'style'         => 'margin-left: 0px;',
+                    'data-on'       => 'Si',
+                    'data-off'      => 'No',
+                    'data-onstyle'  => 'success',
+                    'data-size'     => 'small'
+                ),
+                'required' => false,
+            ))
         ;
     }
 
@@ -42,6 +69,6 @@ class EconomicType extends AbstractType
 
     public function getBlockPrefix()
     {
-        return 'EconomicType';
+        return 'economic_type';
     }
 }

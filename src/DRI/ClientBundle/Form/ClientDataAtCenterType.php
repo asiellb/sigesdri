@@ -9,6 +9,7 @@
 namespace DRI\ClientBundle\Form;
 
 use Doctrine\ORM\Mapping\Entity;
+use DRI\ClientBundle\Entity\Client;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -52,14 +53,21 @@ class ClientDataAtCenterType extends AbstractType
                     'placeholder' => 'Ingrese el cargo'
                 ],
             ])
-            ->add('studentsCareer', TextType::class, [
-                'required' => false,
-                'attr' => [
-                    'placeholder' => 'Ingrese la carrera a la que pertenece'
-                ],
+            ->add('studentsCareer',EntityType::class, [
+                'attr' => [ 'class' => 'select2' ],
+                'class' => 'DRIUsefulBundle:Career',
+                'choice_label' => 'name',
+                'empty_data' => null,
+                'required' => false
             ])
-            ->add('studentsSchool',EntityType::class, [
-                'class' => 'DRI\UsefulBundle\Entity\School',
+            ->add('studentsFaculty',EntityType::class, [
+                'class' => 'DRIUsefulBundle:Area',
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('a')
+                        ->where("a.type = :type")
+                        ->setParameter("type", 'FAC')
+                        ->orderBy('a.name', 'ASC');
+                },
                 'choice_label' => 'name',
                 'placeholder' => 'Seleccione la Facultad',
                 'attr' => array(
@@ -68,7 +76,8 @@ class ClientDataAtCenterType extends AbstractType
                 'empty_data' => null,
                 'required' => false
             ])
-                //Trabajadores
+
+            //Trabajadores
             ->add('workersOccupation', TextType::class, [
                 'required' => false,
                 'attr' => [
@@ -84,14 +93,7 @@ class ClientDataAtCenterType extends AbstractType
             ->add('workersEduCategory', ChoiceType::class, array(
                 'placeholder' => 'Selecciones la categoría docente',
                 'label' => 'Categoría Docente',
-                'choices'  => array(
-                    'ATD'         => 'ATD',
-                    'Adiestrado'  => 'ADI',
-                    'Instructor'  => 'INS',
-                    'Asistente'   => 'ASI',
-                    'Auxiliar'    => 'AUX',
-                    'Titular'     => 'TIT',
-                ),
+                'choices'  => Client::TEACHING_CATEGORY_CHOICE,
                 'attr' => array(
                     'class'=>'bs-select',
                 ),
@@ -99,13 +101,7 @@ class ClientDataAtCenterType extends AbstractType
             ->add('workersSciGrade', ChoiceType::class, array(
                 'placeholder' => 'Selecciones el grado científico',
                 'label' => 'Grado Científico',
-                'choices'  => array(
-                    'Licenciado'  => 'LIC',
-                    'Ingeniero'   => 'ING',
-                    'Arquitecto'  => 'ARQ',
-                    'Master'      => 'MSC',
-                    'Doctor(a)'   => 'DRC',
-                ),
+                'choices'  => Client::SCIENTIFIC_GRADE_CHOICE,
                 'attr' => array(
                     'class'=>'bs-select',
                 ),
@@ -122,9 +118,25 @@ class ClientDataAtCenterType extends AbstractType
                     'placeholder' => 'Ingrese el lugar de trabajo'
                 ],
             ])
-            ->add('workersSchool', EntityType::class, [
-                'class' => 'DRI\UsefulBundle\Entity\School',
+            ->add('workersArea', EntityType::class, [
+                'class' => 'DRIUsefulBundle:Area',
                 'choice_label' => 'name',
+                'placeholder' => 'Seleccione el Área',
+                'attr' => array(
+                    'class'=>'select2',
+                ),
+                'empty_data' => null,
+                'required' => false
+            ])
+             ->add('workersFaculty', EntityType::class, [
+                'class' => 'DRIUsefulBundle:Area',
+                 'query_builder' => function (EntityRepository $er) {
+                     return $er->createQueryBuilder('a')
+                         ->where("a.type = :type")
+                         ->setParameter("type", 'FAC')
+                         ->orderBy('a.name', 'ASC');
+                 },
+                 'choice_label' => 'name',
                 'placeholder' => 'Seleccione la Facultad',
                 'attr' => array(
                     'class'=>'select2',

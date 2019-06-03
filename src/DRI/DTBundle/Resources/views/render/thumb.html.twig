@@ -11,7 +11,7 @@
     {% if image.enlarge is same as(true) %}
         {% set enlargedPath = path |imagine_filter(image.imagineFilterEnlarged) %}
         <a href="javascript:void(0);" data-featherlight="{{ enlargedPath | default(path) }}">
-            <img class="{{ image_class }}" src="{{ path | imagine_filter(image.imagineFilter) }}" />
+            <img class="{{ image_class }} img-circle" src="{{ path | imagine_filter(image.imagineFilter) }}" />
         </a>
     {% else %}
         <img class="{{ image_class }}" src="{{ path | imagine_filter(image.imagineFilter) }}" />

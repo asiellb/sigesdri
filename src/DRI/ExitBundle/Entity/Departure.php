@@ -15,11 +15,14 @@ use DRI\UserBundle\Entity\User;
 use DRI\PassportBundle\Entity\Passport;
 use DRI\UsefulBundle\Entity\Country;
 use DRI\ExitBundle\Entity\Economic;
+use DRI\ExitBundle\Entity\ManagerTravelPlan;
+use DRI\ExitBundle\Entity\Application;
+use DRI\UsefulBundle\Useful\Useful;
 
 /**
  * Departure
  *
- * @ORM\Table(name="departure")
+ * @ORM\Table(name="ext_departure")
  * @ORM\Entity(repositoryClass="DRI\ExitBundle\Repository\DepartureRepository")
  * @ORM\HasLifecycleCallbacks()
  *
@@ -30,11 +33,26 @@ class Departure
     /**
      * @var int
      *
-     * @ORM\Column(name="id", type="integer")
+     * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string", unique=true)
+     *
+     */
+    private $number;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string", unique=true)
+     */
+    private $numberSlug;
 
     /**
      * @var Client
@@ -43,6 +61,12 @@ class Departure
      * @ORM\JoinColumn(name="client_id", referencedColumnName="id", onDelete="SET NULL")
      */
     private $client;
+
+    /**
+     * @ORM\OneToOne(targetEntity="DRI\ExitBundle\Entity\Application", inversedBy="departure")
+     * @ORM\JoinColumn(name="application_id", referencedColumnName="id")
+     */
+    private $application;
 
     /**
      * @var Passport
@@ -55,7 +79,7 @@ class Departure
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="passport_delivery", type="date", nullable=true)
+     * @ORM\Column(type="date", nullable=true)
      *
      * @Assert\Date()
      */
@@ -64,7 +88,7 @@ class Departure
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="departure_date", type="date", nullable=true)
+     * @ORM\Column(type="date", nullable=true)
      *
      * @Assert\Date()
      */
@@ -73,7 +97,7 @@ class Departure
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="return_date", type="date", nullable=true)
+     * @ORM\Column(type="date", nullable=true)
      *
      * @Assert\Date()
      */
@@ -82,43 +106,44 @@ class Departure
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="passport_collection", type="date", nullable=true)
+     * @ORM\Column(type="date", nullable=true)
      *
      * @Assert\Date()
      */
     private $passportCollection;
 
     /**
-     * @ORM\OneToOne(targetEntity="DRI\ExitBundle\Entity\ExitApplication", inversedBy="departure")
-     * @ORM\JoinColumn(name="application_id", referencedColumnName="id")
-     */
-    private $application;
-
-    /**
      * @var string
      *
-     * @ORM\Column(name="observations", type="string", length=255, nullable=true)
+     * @ORM\Column(type="string", nullable=true)
      */
     private $observations;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="results", type="string", length=255, nullable=true)
+     * @ORM\Column(type="string", nullable=true)
      */
     private $results;
 
     /**
      * @var File
      *
-     * @Vich\UploadableField(mapping="departure_results_files", fileNameProperty="results")
+     * @Vich\UploadableField(mapping="ext_dep_res_files", fileNameProperty="results")
      */
     private $resultsFile;
 
     /**
+     * @var boolean
+     *
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $closed;
+
+    /**
      * @var \DateTime
      *
-     * @ORM\Column(name="createdAt", type="datetime")
+     * @ORM\Column(type="datetime")
      *
      * @Assert\DateTime()
      */
@@ -127,7 +152,7 @@ class Departure
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="updatedAt", type="datetime")
+     * @ORM\Column(type="datetime")
      *
      * @Assert\DateTime()
      */
@@ -159,14 +184,81 @@ class Departure
     {
         $this->createdAt = new \DateTime('now');
         $this->updatedAt = new \DateTime('now');
+        $this->closed    = false;
     }
 
+    public function __toString()
+    {
+        return $this->getNumber();
+    }
 
     public function hasClient(){
         if(is_null($this->client)){
             return null;
         }
         return true;
+    }
+
+    public function hasApplication(){
+        if(is_null($this->application) || $this->application == false){
+            return null;
+        }
+        return true;
+    }
+
+    public function hasPassport(){
+        if(is_null($this->passport) || $this->passport == false){
+            return null;
+        }
+        return true;
+    }
+
+    public function hasDepartureDate(){
+        if(is_null($this->departureDate) || $this->departureDate == false){
+            return null;
+        }
+        return true;
+    }
+
+    public function hasPassportDelivery(){
+        if(is_null($this->passportDelivery) || $this->passportDelivery == false){
+            return null;
+        }
+        return true;
+    }
+
+    public function isClosed(){
+        if($this->closed){
+            return true;
+        }
+        return false;
+    }
+
+    public function isInProgress(){
+        $inDate = $this->getDepartureDate();
+        $now    = new \DateTime("now");
+
+        if (($now >= $inDate))
+            return true;
+        return false;
+    }
+
+    public function isOnHold(){
+        $inDate = $this->getDepartureDate();
+        $now    = new \DateTime("now");
+
+        if (($now < $inDate))
+            return true;
+        return false;
+    }
+
+    public function isCompleted(){
+        $inDate = $this->getReturnDate();
+        $now    = new \DateTime("now");
+
+        if (($now > $inDate))
+            return true;
+        return false;
     }
 
     /**
@@ -179,6 +271,132 @@ class Departure
         return $this->id;
     }
 
+    /**
+     * Set number
+     *
+     * @ORM\PrePersist
+     * @ORM\PreUpdate
+     *
+     * @return Departure
+     */
+    public function setNumber()
+    {
+        $aDate      = $this->departureDate->format('ymd');
+        $aClient    = substr($this->client->getFirstName(), 0, 1).''.substr($this->client->getFirstLastName(), 0, 1).''.$this->client->getId();
+        $aPassport  = $this->passport->getId();
+
+        $this->number = $aDate.'-'.$aClient.'-'.$aPassport;
+
+        $this->numberSlug = Useful::getSlug($this->number);
+
+        return $this;
+    }
+
+    /**
+     * Get number
+     *
+     * @return string
+     */
+    public function getNumber()
+    {
+        return $this->number;
+    }
+
+    /**
+     * Set numberSlug
+     *
+     * @param string $numberSlug
+     *
+     * @return Departure
+     */
+    public function setNumberSlug($numberSlug)
+    {
+        $this->numberSlug = $numberSlug;
+
+        return $this;
+    }
+
+    /**
+     * Get numberSlug
+     *
+     * @return string
+     */
+    public function getNumberSlug()
+    {
+        return $this->numberSlug;
+    }
+
+    /**
+     * Set client
+     *
+     * @param Client $client
+     *
+     * @return Departure
+     */
+    public function setClient(Client $client = null)
+    {
+        $this->client = $client;
+
+        return $this;
+    }
+
+    /**
+     * Get client
+     *
+     * @return Client
+     */
+    public function getClient()
+    {
+        return $this->client;
+    }
+
+    /**
+     * Set application
+     *
+     * @param Application $application
+     *
+     * @return Departure
+     */
+    public function setApplication(Application $application)
+    {
+        $this->application = $application;
+
+        return $this;
+    }
+
+    /**
+     * Get application
+     *
+     * @return Application
+     */
+    public function getApplication()
+    {
+        return $this->application;
+    }
+
+    /**
+     * Set passport
+     *
+     * @param Passport $passport
+     *
+     * @return Departure
+     */
+    public function setPassport(Passport $passport = null)
+    {
+        $this->passport = $passport;
+
+        return $this;
+    }
+
+    /**
+     * Get passport
+     *
+     * @return Passport
+     */
+    public function getPassport()
+    {
+        return $this->passport;
+    }
 
     /**
      * Set passportDelivery
@@ -277,30 +495,6 @@ class Departure
     }
 
     /**
-     * Set application
-     *
-     * @param ExitApplication $application
-     *
-     * @return Departure
-     */
-    public function setApplication(ExitApplication $application)
-    {
-        $this->application = $application;
-
-        return $this;
-    }
-
-    /**
-     * Get application
-     *
-     * @return ExitApplication
-     */
-    public function getApplication()
-    {
-        return $this->application;
-    }
-
-    /**
      * Set observations
      *
      * @param string $observations
@@ -376,6 +570,30 @@ class Departure
     }
 
     /**
+     * Set closed
+     *
+     * @param boolean $closed
+     *
+     * @return Departure
+     */
+    public function setClosed($closed)
+    {
+        $this->closed = $closed;
+
+        return $this;
+    }
+
+    /**
+     * Get closed
+     *
+     * @return boolean
+     */
+    public function getClosed()
+    {
+        return $this->closed;
+    }
+
+    /**
      * Set createdAt
      *
      * @ORM\PrePersist()
@@ -421,55 +639,6 @@ class Departure
     public function getUpdatedAt()
     {
         return $this->updatedAt;
-    }
-
-    /**
-     * Set client
-     *
-     * @param Client $client
-     *
-     * @return Departure
-     */
-    public function setClient(Client $client = null)
-    {
-        $this->client = $client;
-
-        return $this;
-    }
-
-    /**
-     * Get client
-     *
-     * @return Client
-     */
-    public function getClient()
-    {
-        return $this->client;
-    }
-
-
-    /**
-     * Set passport
-     *
-     * @param Passport $passport
-     *
-     * @return Departure
-     */
-    public function setPassport(Passport $passport = null)
-    {
-        $this->passport = $passport;
-
-        return $this;
-    }
-
-    /**
-     * Get passport
-     *
-     * @return Passport
-     */
-    public function getPassport()
-    {
-        return $this->passport;
     }
 
     /**
@@ -519,5 +688,5 @@ class Departure
     {
         return $this->lastUpdateBy;
     }
-}
 
+}

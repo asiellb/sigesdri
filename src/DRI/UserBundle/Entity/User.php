@@ -19,7 +19,7 @@ use DRI\UserBundle\Entity\WorkFunction;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="fos_user")
+ * @ORM\Table(name="usr_user")
  *
  * @Vich\Uploadable
  */
@@ -62,6 +62,11 @@ class User extends BaseUser
      * )
      */
     private $lastName;
+
+    /**
+     * @ORM\Column(type="string", length=100)
+     */
+    private $fullName;
 
     /**
      * @ORM\Column(type="string", length=4, nullable=true)
@@ -197,7 +202,7 @@ class User extends BaseUser
 
     public function __toString()
     {
-        return $this->getFirstName().' '.$this->getLastName();
+        return $this->getFullName();
     }
 
 
@@ -247,6 +252,31 @@ class User extends BaseUser
     public function getLastName()
     {
         return $this->lastName;
+    }
+
+    /**
+     * Set fullName
+     *
+     * @ORM\PrePersist
+     * @ORM\PreUpdate
+     *
+     * @return User
+     */
+    public function setFullName()
+    {
+        $this->fullName = $this->firstName.' '.$this->lastName;
+
+        return $this;
+    }
+
+    /**
+     * Get fullName
+     *
+     * @return string
+     */
+    public function getFullName()
+    {
+        return $this->fullName;
     }
 
     /**

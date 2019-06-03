@@ -21,6 +21,8 @@ use Sg\DatatablesBundle\Datatable\Editable\TextareaEditable;
 use Sg\DatatablesBundle\Datatable\Editable\TextEditable;
 use Sg\DatatablesBundle\Datatable\Filter\Select2Filter;
 
+use DRI\ClientBundle\Entity\Client;
+
 //use Sg\DatatablesBundle\Datatable\Column\VirtualColumn;
 
 
@@ -44,7 +46,7 @@ class ClientDatatable extends AbstractDatatable
             $line['clientPicture'] = $this->formatClientPicture($line['clientPicture'],$line['gender']);
             $line['gender'] = $this->formatGender($line['gender']);
             $line['clientType'] = $this->formatClientType($line['clientType']);
-            $line['school']['name'] = $this->formatSchoolName($line['school']['name']);
+            $line['faculty']['name'] = $this->formatFacultyName($line['faculty']['name']);
 
             return $line;
         };
@@ -65,20 +67,21 @@ class ClientDatatable extends AbstractDatatable
 
         $this->ajax->set(array());
 
-
         $this->options->set(array(
-            'classes' => Style::BOOTSTRAP_3_STYLE,
+            'classes' => Style::BASE_STYLE_COMPACT,
             'individual_filtering' => true,
             'individual_filtering_position' => 'head',
             'order_cells_top' => true,
+            'order_classes' => false,
+            'scroll_collapse' => true,
             "order" => [
-                [2, "asc"]
+                [7, "desc"]
             ],
             //'dom' => "<'row' <'col-md-12 pull-left' >> lfrtip",
             'dom' => "<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12' <'table-group-actions pull-right'><>>r>t<'row'<'col-md-8 col-sm-12'pli><'col-md-4 col-sm-12'>>",
             "length_menu"=> [
-                [5, 10, 20, 50, 100, 150, -1],
-                [5, 10, 20, 50, 100, 150, "All"] // change per page values here
+                [10, 50, 100, 150, 200, -1],
+                [10, 50, 100, 150, 200, "Todo"] // change per page values here
             ],
             "paging_type" => "bootstrap_extended",
         ));
@@ -86,6 +89,7 @@ class ClientDatatable extends AbstractDatatable
         $this->features->set(array(
             'paging'     => true,
             'length_change' => true,
+            'auto_width' => true,
         ));
 
         $this->extensions->set(array(
@@ -153,15 +157,12 @@ class ClientDatatable extends AbstractDatatable
             ),
         ));
 
-        $school = $this->em->getRepository('DRIUsefulBundle:School')->findAll();
+        $area = $this->em->getRepository('DRIUsefulBundle:Area')->findAll();
         $clients = $this->em->getRepository('DRIClientBundle:Client')->findAll();
 
 
         $this->columnBuilder
-            ->add(
-                null,
-                MultiselectColumn::class,
-                array(
+            ->add(null, MultiselectColumn::class, array(
                     'start_html' => '<div class="start_checkboxes">',
                     'end_html' => '</div>',
                     'add_if' => function () {
@@ -192,21 +193,20 @@ class ClientDatatable extends AbstractDatatable
                             },
                         )
                     ),
-                )
-            )
+                ))
             ->add('clientPicture', ImageColumn::class, array(
                 'title' => 'Fotografía',
                 'searchable' => false,
                 'orderable' => false,
                 'width' => '5%',
                 'imagine_filter' => 'thumbnail_50_x_50',
-                'imagine_filter_enlarged' => 'thumbnail_250_x_250',
-                'relative_path' => '/uploads/images/clients',
+                'imagine_filter_enlarged' => 'client_250_x_250',
+                'relative_path' => '/images/clients',
                 'enlarge' => true,
             ))
             ->add('ci', Column::class, array(
                 'title' => 'CI',
-                'width' => '12%',
+                'width' => '13%',
                 'filter' => array(TextFilter::class, array(
                     'cancel_button' => true,
                     'classes' => 'form-control',
@@ -218,7 +218,7 @@ class ClientDatatable extends AbstractDatatable
                 'title' => 'Nombre del Cliente',
                 'searchable' => true,
                 'orderable' => true,
-                'width' => '20%',
+                'width' => '13%',
                 'filter' => array(Select2Filter::class, array(
                     'select_options' => array('' => 'Todos') + $this->getOptionsArrayFromEntities($clients, 'fullName', 'fullName'),
                     'search_type' => 'eq',
@@ -228,7 +228,7 @@ class ClientDatatable extends AbstractDatatable
             ))
             ->add('gender', Column::class, array(
                 'title' => 'Género',
-                'width' => '5%',
+                'width' => '13%',
                 'filter' => array(SelectFilter::class,
                     array(
                         'search_type' => 'eq',
@@ -239,36 +239,31 @@ class ClientDatatable extends AbstractDatatable
                             'F' => 'Femenino',
                             'M' => 'Masculino',
                         ),
-                        'cancel_button' => true,
                         'classes' => 'form-control input-xs input-sm input-inline form-filter bs-select',
                     ),
                 ),
                 ))
             ->add('clientType', Column::class, array(
                 'title' => 'Tipo',
-                'width' => '5%',
+                'width' => '13%',
                 'filter' => array(SelectFilter::class,
                     array(
                         'search_type' => 'eq',
                         'cancel_button' => true,
                         'multiple' => false,
-                        'select_options' => array(
-                            ''    => 'Todos',
-                            'EST' => 'Estudiante',
-                            'DOC' => 'Docente',
-                            'NOD' => 'No Docente'
-                        ),
+                        'select_options' => [''    => 'Todos'] + Client::CLIENT_TYPES,
                         'classes' => 'form-control input-xs input-sm input-inline form-filter bs-select',
                     ),
                 ),
             ))
-            ->add('school.name', Column::class, array(
+            ->add('faculty.name', Column::class, array(
                 'title' => 'Facultad',
                 'searchable' => true,
                 'orderable' => true,
-                'width' => '20%',
+                'default_content' => 'No asignado',
+                'width' => '13%',
                 'filter' => array(Select2Filter::class, array(
-                    'select_options' => array('' => 'Todas') + $this->getOptionsArrayFromEntities($school, 'name', 'name'),
+                    'select_options' => array('' => 'Todas') + $this->getOptionsArrayFromEntities($area, 'name', 'name'),
                     'search_type' => 'eq',
                     'cancel_button' => true,
                     'classes' => 'form-control',
@@ -276,7 +271,7 @@ class ClientDatatable extends AbstractDatatable
             ))
             ->add('createdAt', DateTimeColumn::class, array(
                 'title' => 'Creado',
-                'width' => '20%',
+                'width' => '13%',
                 'filter' => array(DateRangeFilter::class,
                     array(
                         'cancel_button' => true,
@@ -290,19 +285,19 @@ class ClientDatatable extends AbstractDatatable
             ))
             ->add(null, ActionColumn::class, array(
                 'title' => $this->translator->trans('sg.datatables.actions.title'),
-                'width' => '10%',
+
                 'actions' => array(
                     array(
-                        'route' => 'client_show',
+                        'route' => 'client_profile',
                         'route_parameters' => array(
                             'fullNameSlug' => 'fullNameSlug'
                         ),
 
-                        'icon' => ' icon-eye',
+                        'icon' => 'la la-ellipsis-h font-lg',
                         'attributes' => array(
                             //'rel' => 'tooltip',
                             //'title' => $this->translator->trans('sg.datatables.actions.show'),
-                            'class' => 'tooltips btn blue btn-outline btn-sm ',
+                            'class' => 'btn btn-circle green btn-icon-only btn-outline',
                             'role' => 'button',
                             'data-container' => 'body',
                             'data-placement' => 'bottom',
@@ -310,16 +305,16 @@ class ClientDatatable extends AbstractDatatable
                         ),
                     ),
                     array(
-                        'route' => 'client_edit',
+                        'route' => 'client_config',
                         'route_parameters' => array(
                             'fullNameSlug' => 'fullNameSlug'
                         ),
 
-                        'icon' => 'icon-settings',
+                        'icon' => 'la la-edit font-lg',
                         'attributes' => array(
                             //'rel' => 'tooltips',
                             //'title' => $this->translator->trans('sg.datatables.actions.edit'),
-                            'class' => 'tooltips btn blue btn-outline btn-sm',
+                            'class' => 'btn btn-circle green btn-icon-only btn-outline',
                             'role' => 'button',
                             'data-container' => 'body',
                             'data-placement' => 'bottom',
@@ -340,9 +335,9 @@ class ClientDatatable extends AbstractDatatable
      */
     private function formatGender($gender){
         if($gender == 'F'){
-            return '<i class="fa fa-venus"></i> Femenino';
+            return '<i class="fa fa-venus font-red-pink sbold"></i> Femenino';
         }elseif ($gender == 'M'){
-            return '<i class="fa fa-mars"></i> Masculino';
+            return '<i class="fa fa-mars font-blue sbold"></i> Masculino';
         }else{
             return '-';
         }
@@ -356,15 +351,7 @@ class ClientDatatable extends AbstractDatatable
      * @return string
      */
     private function formatClientType($clientType){
-        if($clientType == 'EST'){
-            return 'Estudiante';
-        }elseif ($clientType == 'DOC'){
-            return 'Docente';
-        }elseif ($clientType == 'NOD'){
-            return "No Docente";
-        }else{
-            return '-';
-        }
+        return Client::clientType_AcronimToName($clientType);
     }
 
     /**
@@ -389,16 +376,13 @@ class ClientDatatable extends AbstractDatatable
     /**
      * Format clientPicture
      *
-     * @param string $clientPicture
-     * @param string $gender
-     *
      * @return string
      */
-    private function formatSchoolName($schoolName){
-        if($schoolName == null){
-            return '<span class="label label-danger">No Asignado</span>';
+    private function formatFacultyName($facultyName){
+        if($facultyName == null){
+            return '<span class="font-red sbold"><i class="la la-calendar-times-o"></i> No Asignado</span>';
         }else{
-            return $schoolName;
+            return $facultyName;
         }
     }
 

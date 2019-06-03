@@ -10,11 +10,11 @@ Qué tenemos en SIGESDRI?
 
 La aplicación esta destinada a la gestión de los diferentes procesos que tienen que ver con Relaciones Internacionales, entre ellos tenemos:
 
-  * Gestión de Cliente;
-
-  * Gestión de Pasaportes;
-
-  * Gestión de Salidas al Exterior;
+  * Gestión de Cliente
+  * Gestión de Pasaportes
+  * Gestión de Salidas al Exterior
+  * Gestión de Convenios
+  * Gestión de Estudiantes Extranjeros
 
 Propiedad de la [**Universidad de Camagüey**][2]
 

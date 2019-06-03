@@ -51,10 +51,9 @@
 {% set cancel_button_html %}
     {% if true == column.filter.cancelButton %}
         <span class="input-group-btn">
-            <button type="button"
-                    id="{{ cancel_button_id_selector }}"
-                    class="btn default red-stripe"
-            ><i class="icon-close font-red-thunderbird"></i> </button>
+            <a id="{{ cancel_button_id_selector }}" class="btn btn-circle btn-icon-only font-lg cancel-filter" href="javascript:;">
+                <i class="icon-close" style=""></i>
+            </a>
         </span>
 
     {% endif %}

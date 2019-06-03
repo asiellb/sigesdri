@@ -3,6 +3,8 @@
 namespace DRI\UsefulBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -293,6 +295,60 @@ class AreaController extends Controller
 
         return $this->redirect($this->generateUrl('area'));
     }
-    
+
+
+    /**
+     * Returns a JSON string with the dependencies of the Area with the providen id.
+     *
+     * @param Request $request
+     *
+     * @Route("/list-area-career-dependencies", name="list_area_career_dependencies", options={"expose"=true})
+     * @Method({"POST"})
+     *
+     * @return JsonResponse|Response
+     */
+    public function listAreaDependenciesAction(Request $request)
+    {
+        $isAjax = $request->isXmlHttpRequest();
+        $em = $this->getDoctrine()->getManager();
+        $areaRepo = $em->getRepository("DRIUsefulBundle:Area");
+
+        if ($isAjax) {
+            $areaParam = $request->request->get('area');
+            $areaParam = (int)$areaParam;
+
+            //var_dump($areaParam);
+
+            $area = $areaRepo->findOneById($areaParam);
+
+            if(!$area){
+                throw $this->createNotFoundException("No existe el Área.");
+            }
+
+            // Search the Careers that belongs to the Area with the given id as GET parameter "area"
+            $careers     = $area->getCareers();
+
+            // Serialize into an array the data that we need, in this case only number and id
+            // Note: you can use a serializer as well, for explanation purposes, we'll do it manually
+            $careersList = array();
+
+            foreach ($careers as $career) {
+                $careersList[] = [
+                    "id"   => $career->getId(),
+                    "name" => $career->getName()
+                ];
+            }
+
+            //throw new Exception($institutionList);
+
+            // Return array with structure of the passports of the providen client id
+            return new JsonResponse(
+                array(
+                    'careers'     => $careersList
+                )
+            );
+        }
+    }
+
 
 }

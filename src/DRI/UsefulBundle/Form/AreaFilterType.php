@@ -18,11 +18,7 @@ class AreaFilterType extends AbstractType
         $builder
             ->add('id', Filters\NumberFilterType::class)
             ->add('name', Filters\TextFilterType::class)
-            ->add('active', Filters\BooleanFilterType::class)
-                    ->add('leader', Filters\EntityFilterType::class, array(
-                    'class' => 'DRI\ClientBundle\Entity\Cliente',
-                    'choice_label' => 'name',
-                )) 
+            ->add('leader', Filters\TextFilterType::class)
         
         ;
 

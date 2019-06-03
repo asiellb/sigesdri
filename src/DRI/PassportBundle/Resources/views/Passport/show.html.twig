@@ -1,195 +1,282 @@
 {% extends 'DRIPassportBundle::layout.passport.html.twig' %}
 
-{% block title %}{{ parent() }} | {{ passport.number }} {% endblock %}
+{% block title %}{{ parent() }} | Pasaporte | {{ passport.number }} {% endblock %}
 
 {% block  page_breadcrumb %}
     {{ parent() }}
     <li>
-        <span>Detalles </span>
+        <span>Pasaporte </span>
         <i class="fa fa-circle"></i>
-        <span>{{ passport.number }} </span>
+        <span># {{ passport.number }} </span>
     </li>
 {% endblock %}
 
 {% block page_title %}
-    Pasaporte: {{ passport.number }}
 {% endblock %}
 
 {% block page_dashboard %}
-
-    <div class="row" style="padding-bottom: 20px">
+    <div class="row">
         <div class="col-md-12">
-            <a href="{{ path('passport_new') }}" class="btn btn-primary btn-circle btn-sm active pull-right">
-                <i class="fa fa-plus"></i>
-                Crear Pasaporte
-            </a>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-6 col-sm-12">
-            <div class="portlet green-meadow box">
+            <div class="portlet light bordered">
                 <div class="portlet-title">
                     <div class="caption">
-                        <i class="fa fa-cogs"></i>Detalles del Pasaporte </div>
-                    <div class="actions">
-                        <a href="{{ path('passport_edit', { 'id':  passport.id }) }}" class="btn btn-default btn-sm">
-                            <i class="fa fa-pencil"></i> Editar </a>
-                    </div>
-                </div>
-                <div class="portlet-body">
-                    <div class="row static-info">
-                        <div class="col-md-5 name"> Número #: </div>
-                        <div class="col-md-7 value"> {{ passport.number }}</div>
-                    </div>
-                    <div class="row static-info">
-                        <div class="col-md-5 name"> Tipo: </div>
-                        <div class="col-md-7 value"> {{ passport.type == 'ORD' ? 'Ordinario' : 'Oficial'}} </div>
-                    </div>
-                    <div class="row static-info">
-                        <div class="col-md-5 name"> Emisión: </div>
-                        <div class="col-md-7 value"> {{ passport.issueDate | localizeddate('long', 'none') }} </div>
-                    </div>
-                    <div class="row static-info">
-                        <div class="col-md-5 name"> Vencimiento: </div>
-                        <div class="col-md-7 value"> {{ passport.expiryDate | localizeddate('long', 'none') }} </div>
-                    </div>
-                    <div class="row static-info">
-                        <div class="col-md-5 name"> Estado: </div>
-                        <div class="col-md-7 value">
-                            <span class="label {{ passport.state == 'ACT' ? 'label-success' : passport.state == 'VEN' ? 'label-danger' : 'label-info' }}">
-                                {{ passport.state == 'ACT' ? 'Activo' : passport.state == 'VEN' ? 'Vencido' : 'Baja' }}
+                        <i class="icon-layers font-blue-dark"></i>
+                        <span class="caption-subject font-blue-dark bold uppercase">
+                            Pasaporte
+                            <span class="font-green-sharp">
+                                # {{ passport.number }} |
+                                <small>{{ fn_passport_type(passport.type)}}</small> |
+                                <small>{{ passport.createdAt | localizeddate('long', 'none') }}</small>
                             </span>
-                        </div>
+                        </span>
                     </div>
-                    <div class="row static-info">
-                        <div class="col-md-5 name"> Primera página: </div>
-                        <div class="col-md-7 value">
-                            <a href="{{ asset(vich_uploader_asset(passport, 'firstPageFile', 'DRI\\PassportBundle\\Entity\\Passport')) }}" target="_blank" >
-                                <img src="{{ asset(vich_uploader_asset(passport, 'firstPageFile', 'DRI\\PassportBundle\\Entity\\Passport')) }}" class="img-responsive" alt="" style="max-width: 150px">
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% if passport.holder is not empty  %}
-        <div class="col-md-6 col-sm-12">
-            <div class="portlet blue-hoki box">
-                <div class="portlet-title">
-                    <div class="caption">
-                        <i class="fa fa-cogs"></i>Información del Titular </div>
-                    <div class="actions">
-                        <a href="{{ path('client_edit', { 'fullNameSlug':  passport.holder.fullNameSlug }) }}" class="btn btn-default btn-sm">
-                            <i class="fa fa-pencil"></i> Editar </a>
+                    <div class="actions btn-set">
+                        <a class="btn btn-transparent grey-cascade btn-outline btn-circle btn-sm" href="{{ path('passport_list') }}">
+                            <span class="fa fa-list" aria-hidden="true"></span>
+                            Ir al listado
+                        </a>
+                        <a class="btn green btn-circle btn-sm" href="{{ path('passport_new') }}">
+                            <span class="fa fa-plus" aria-hidden="true"></span>
+                            Agregar Pasaporte
+                        </a>
                     </div>
                 </div>
                 <div class="portlet-body">
-                    <div class="row static-info">
-                        <div class="col-md-5 name"> Nombre del Titular: </div>
-                        <div class="col-md-7 value"> {{ passport.holder.fullName }} </div>
-                    </div>
-                    <div class="row static-info">
-                        <div class="col-md-5 name"> Tipo de Cliente: </div>
-                        <div class="col-md-7 value"> {{ passport.holder.clientType == 'EST' ? 'Estudiante' : passport.holder.clientType == 'DOC' ? 'Docente' : passport.holder.clientType == 'NOD' ? 'No Docente' : '' }} </div>
-                    </div>
-                    <div class="row static-info">
-                        <div class="col-md-5 name"> Email: </div>
-                        <div class="col-md-7 value">
-                            <a href="mailto:{{ passport.holder.email }}">{{ passport.holder.email }}</a>
-                            {% if passport.holder.foreignEmail is not empty %}
-                                o
-                                <a href="mailto:{{ passport.holder.foreignEmail }}">{{ passport.holder.foreignEmail }}</a>
-                            {% endif %}
+                    <div class="tabbable-line">
+                        <ul class="nav nav-tabs nav-tabs-lg">
+                            <li class="active">
+                                <a href="#tab_1" data-toggle="tab"> Detalles </a>
+                            </li>
+                            <li>
+                                <a href="#tab_2" data-toggle="tab"> Solicitudes Asociadas </a>
+                            </li>
+                            <li>
+                                <a href="#tab_3" data-toggle="tab"> Salidas Asociadas </a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="tab_1">
+                                <div class="row">
+                                <div class="col-md-6 col-sm-12">
+                                    <div class="portlet green-meadow box">
+                                        <div class="portlet-title">
+                                            <div class="caption">
+                                                <i class="fa fa-book"></i>Detalles del Pasaporte </div>
+                                            <div class="actions">
+                                                <a href="{{ path('passport_edit', { 'numberSlug':  passport.numberSlug }) }}" class="btn btn-default btn-sm">
+                                                    <i class="fa fa-pencil"></i> Editar </a>
+                                            </div>
+                                        </div>
+                                        <div class="portlet-body">
+                                            <div class="row static-info">
+                                                <div class="col-md-5 name"> Número #: </div>
+                                                <div class="col-md-7 value"> {{ passport.number }}</div>
+                                            </div>
+                                            <div class="row static-info">
+                                                <div class="col-md-5 name"> Tipo: </div>
+                                                <div class="col-md-7 value"> {{ fn_passport_type(passport.type)}} </div>
+                                            </div>
+                                            <div class="row static-info">
+                                                <div class="col-md-5 name"> Emisión: </div>
+                                                <div class="col-md-7 value"> {{ passport.issueDate | localizeddate('long', 'none') }} </div>
+                                            </div>
+                                            <div class="row static-info">
+                                                <div class="col-md-5 name"> Vencimiento: </div>
+                                                <div class="col-md-7 value"> {{ passport.expiryDate | localizeddate('long', 'none') }} </div>
+                                            </div>
+                                            <div class="row static-info">
+                                                <div class="col-md-5 name"> Estado: </div>
+                                                <div class="col-md-7 value"> {{ fn_passport_state(passport.state) }} </div>
+                                            </div>
+                                            <div class="row static-info">
+                                                <div class="col-md-5 name"> Primera página: </div>
+                                                <div class="col-md-7 value">
+                                                    <a href="{{ asset(vich_uploader_asset(passport, 'firstPageFile', 'DRI\\PassportBundle\\Entity\\Passport')) }}" target="_blank" >
+                                                        <img src="{{ asset(vich_uploader_asset(passport, 'firstPageFile', 'DRI\\PassportBundle\\Entity\\Passport')) }}" class="img-responsive" alt="" style="max-width: 150px">
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% if passport.holder is not empty  %}
+                                    <div class="col-md-6 col-sm-12">
+                                        <div class="portlet blue-hoki box">
+                                            <div class="portlet-title">
+                                                <div class="caption">
+                                                    <i class="fa fa-user"></i>Información del Titular </div>
+                                                <div class="actions">
+                                                    <a href="{{ path('client_profile', { 'fullNameSlug':  passport.holder.fullNameSlug }) }}" class="btn btn-default btn-sm">
+                                                        <i class="fa fa-eye"></i> Ver </a>
+                                                    <a href="{{ path('client_config', { 'fullNameSlug':  passport.holder.fullNameSlug }) }}" class="btn btn-default btn-sm">
+                                                        <i class="fa fa-pencil"></i> Editar </a>
+                                                </div>
+                                            </div>
+                                            <div class="portlet-body">
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Nombre del Titular: </div>
+                                                    <div class="col-md-7 value"> {{ passport.holder.fullName }} </div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Tipo de Cliente: </div>
+                                                    <div class="col-md-7 value"> {{ fn_client_type(passport.holder.clientType) }} </div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Email: </div>
+                                                    <div class="col-md-7 value">
+                                                        <a href="mailto:{{ passport.holder.email }}">{{ passport.holder.email }}</a>
+                                                        {% if passport.holder.foreignEmail is not empty %}
+                                                            o
+                                                            <a href="mailto:{{ passport.holder.foreignEmail }}">{{ passport.holder.foreignEmail }}</a>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Teléfono: </div>
+                                                    <div class="col-md-7 value">
+                                                        {{ passport.holder.privatePhone is defined ? passport.holder.privatePhone }}
+                                                        {% if passport.holder.privatePhone is not empty and passport.holder.cellPhone is not empty %} o {% endif %}
+                                                        {{ passport.holder.cellPhone is defined ? passport.holder.cellPhone }}
+                                                    </div>
+                                                </div>
+                                                {% if passport.holder.area.name is defined %}
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Facultad o Centro: </div>
+                                                        <div class="col-md-7 value"> {{ passport.holder.area.name }} </div>
+                                                    </div>
+                                                {% endif %}
+                                                {% if passport.holder.workersWorkPlace is defined %}
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Lugar de Trabajo: </div>
+                                                        <div class="col-md-7 value"> {{ passport.holder.workersWorkPlace }} </div>
+                                                    </div>
+                                                {% endif %}
+                                                {% if passport.holder.workersWorkPhone %}
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Teléfono en Trabajo: </div>
+                                                        <div class="col-md-7 value"> {{ passport.holder.workersWorkPhone }} </div>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            </div>
+                            <div class="tab-pane" id="tab_2">
+                                <div class="row">
+                                    <div class="col-md-12 col-sm-12">
+                                        <div class="portlet grey-cascade box">
+                                            <div class="portlet-title">
+                                                <div class="caption">
+                                                    <i class="fa fa-cogs"></i>Solicitud Asociada al Pasaporte </div>
+                                                <div class="actions">
+                                                    <a href="javascript:;" class="btn btn-default btn-sm">
+                                                        <i class="fa fa-pencil"></i> Edit </a>
+                                                </div>
+                                            </div>
+                                            <div class="portlet-body">
+                                                <div class="table-responsive">
+                                                    <table class="table table-hover table-bordered table-striped">
+                                                        <thead>
+                                                        <tr>
+                                                            <th> Solicitud </th>
+                                                            <th> Motivo </th>
+                                                            <th> Fecha de creación </th>
+                                                            <th> Tramitada por </th>
+                                                        </tr>
+                                                        </thead>
+                                                        {% if passport.application is not null %}
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <a href="{{ path('passport_application_show', {'numberSlug' : passport.application.numberSlug}) }}">
+                                                                        {{ passport.application.number }} </a>
+                                                                </td>
+                                                                <td> {{ fn_passport_application_reason(passport.application.reason) }} </td>
+                                                                <td> {{ passport.application.applicationDate | localizeddate('long', 'none') }} </td>
+                                                                <td> {{ passport.application.createdBy.firstName }} </td>
+                                                            </tr>
+                                                        </tbody>
+                                                        {% endif %}
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="tab_3">
+                                <div class="row">
+                                    <div class="col-md-12 col-sm-12">
+                                        <div class="portlet grey-cascade box">
+                                            <div class="portlet-title">
+                                                <div class="caption">
+                                                    <i class="fa fa-cogs"></i>Salidas Asociadas al Pasaporte </div>
+                                                <div class="actions">
+                                                    <a href="javascript:;" class="btn btn-default btn-sm">
+                                                        <i class="fa fa-pencil"></i> Edit </a>
+                                                </div>
+                                            </div>
+                                            <div class="portlet-body">
+                                                <div class="table-responsive">
+                                                    <table class="table table-hover table-bordered table-striped">
+                                                        <thead>
+                                                        <tr>
+                                                            <th> País </th>
+                                                            <th> Institución </th>
+                                                            <th> Concepto de salida </th>
+                                                            <th> Fecha de partida </th>
+                                                            <th> Fecha de retorno </th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        {% for item in passport.departures %}
+                                                            <tr>
+                                                                <td>
+                                                                    <img alt="" class="img-circle" style="height: 29px" src="{{ asset(vich_uploader_asset(item.application.country, 'flagFile')) }}" />
+                                                                    <a href="{{ path('departure_show', { 'numberSlug':  item.numberSlug }) }}"> {{ item.application.country.spName }} </a>
+                                                                </td>
+                                                                <td> {{ item.application.institution }} </td>
+                                                                <td>
+                                                                    {% if item.application.concept == "ATE" %}
+                                                                        Asistencia Técnica Exportada
+                                                                    {% elseif item.application.concept == "PPO" %}
+                                                                        Paquete de Postgrado
+                                                                    {% elseif item.application.concept == "ASE" %}
+                                                                        Asesoría
+                                                                    {% elseif item.application.concept == "IAC" %}
+                                                                        Intercambio Académico
+                                                                    {% elseif item.application.concept == "EVE" %}
+                                                                        Evento
+                                                                    {% elseif item.application.concept == "MOF" %}
+                                                                        Misión Oficial
+                                                                    {% elseif item.application.concept == "BPR" %}
+                                                                        Beca Predoctoral
+                                                                    {% elseif item.application.concept == "BPO" %}
+                                                                        Beca Postdoctoral
+                                                                    {% elseif item.application.concept == "PIN" %}
+                                                                        Proyecto Internacional
+                                                                    {% endif %}
+                                                                </td>
+                                                                <td> {{ item.departureDate | localizeddate('long', 'none') }} </td>
+                                                                <td> {{ item.returnDate | localizeddate('long', 'none') }} </td>
+                                                            </tr>
+                                                        {% endfor %}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="row static-info">
-                        <div class="col-md-5 name"> Teléfono: </div>
-                        <div class="col-md-7 value">
-                            {{ passport.holder.privatePhone is defined ? passport.holder.privatePhone }}
-                            {% if passport.holder.privatePhone is not empty and passport.holder.cellPhone is not empty %} o {% endif %}
-                            {{ passport.holder.cellPhone is defined ? passport.holder.cellPhone }}
-                        </div>
-                    </div>
-                    {% if passport.holder.school.name is defined %}
-                    <div class="row static-info">
-                        <div class="col-md-5 name"> Facultad o Centro: </div>
-                        <div class="col-md-7 value"> {{ passport.holder.school.name }} </div>
-                    </div>
-                    {% endif %}
-                    {% if passport.holder.workersWorkPlace is defined %}
-                    <div class="row static-info">
-                        <div class="col-md-5 name"> Lugar de Trabajo: </div>
-                        <div class="col-md-7 value"> {{ passport.holder.workersWorkPlace }} </div>
-                    </div>
-                    {% endif %}
-                    {% if passport.holder.workersWorkPhone %}
-                    <div class="row static-info">
-                        <div class="col-md-5 name"> Teléfono en Trabajo: </div>
-                        <div class="col-md-7 value"> {{ passport.holder.workersWorkPhone }} </div>
-                    </div>
-                    {% endif %}
+
                 </div>
             </div>
-        </div>
-        {% endif %}
-    </div>
 
-    <div class="row">
-        <div class="col-md-12 col-sm-12">
-            <div class="portlet grey-cascade box">
-                <div class="portlet-title">
-                    <div class="caption">
-                        <i class="fa fa-cogs"></i>Solicitudes Asociadas al Pasaporte </div>
-                    <div class="actions">
-                        <a href="javascript:;" class="btn btn-default btn-sm">
-                            <i class="fa fa-pencil"></i> Edit </a>
-                    </div>
-                </div>
-                <div class="portlet-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover table-bordered table-striped">
-                            <thead>
-                            <tr>
-                                <th> Solicitud </th>
-                                <th> Motivo </th>
-                                <th> Fecha de creación </th>
-                                <th> Tramitada por </th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% for item in passport.applications %}
-                                <tr>
-                                    <td>
-                                        <a href="{{ path('passport_application_show', {'id' : item.id}) }}"> {{ item.applicationNumber }} </a>
-                                    </td>
-                                    <td> {{ item.applicationReason == 'CON' ? 'Confección' : item.applicationReason == 'PRO' ? 'Prórroga' }} </td>
-                                    <td> {{ item.applicationDate | localizeddate('long', 'none') }} </td>
-                                    <td> {{ item.createdBy.username }} </td>
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
-
-
-    <div class="form-group">
-        <a class="btn btn-default" href="{{ path('passport_dt_index') }}">
-            <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
-            Back to list
-        </a>
-        <form action="{{ path('passport_delete', { 'id': passport.id }) }}" method="post" style="display: inline-block">
-            <input type="hidden" name="_method" value="DELETE" />
-            {{ form_widget(delete_form) }}
-            <button class="btn btn-danger" type="submit" onclick="return confirm('Are you sure');">
-                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                Delete</button>
-        </form>
-    </div>
-
-
 {% endblock %}

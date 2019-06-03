@@ -40,15 +40,21 @@
                 <!-- END RESPONSIVE QUICK SEARCH FORM -->
             </li>
             #}
-            <li class="nav-item start {% if '/homepage' in app.request.getPathInfo() %}active open{% endif %}">
-                <a href="{{ path('homepage') }}" class="nav-link ">
+            <li class="nav-item start {% if '/dashboard' in app.request.getPathInfo() %}active open{% endif %}">
+                <a href="{{ path('dashboard') }}" class="nav-link ">
                     <i class="icon-home"></i>
-                    <span class="title">Portada</span>
+                    <span class="title">Dashboard</span>
                     <span class="selected"></span>
                 </a>
             </li>
+
+            {# ########################################################################################################
+
+                GRUPO DE TRAMITACION
+
+            ######################################################################################################## #}
             <li class="heading">
-                <h3 class="uppercase">General</h3>
+                <h3 class="uppercase">Tramitación</h3>
             </li>
             <li class="nav-item  {% if '/client/' in app.request.getPathInfo() %}active open{% endif %}">
                 <a href="javascript:;" class="nav-link nav-toggle">
@@ -59,84 +65,280 @@
                 <ul class="sub-menu">
                     <li class="nav-item {% if '/client/index' in app.request.getPathInfo() %}active open{% endif %} ">
                         <a href="{{ path('client_index') }}" class="nav-link ">
-                            <span class="title">General</span>
+                            <span class="title"><i class="icon-bar-chart"></i> Estadisticas</span>
                         </a>
                     </li>
                     <li class="nav-item {% if '/client/new' in app.request.getPathInfo() %}active open{% endif %} ">
                         <a href="{{ path('client_new') }}" class="nav-link ">
-                            <span class="title">Nuevo</span>
+                            <span class="title"><i class="icon-user-follow"></i> Agregar Cliente</span>
                         </a>
                     </li>
                     <li class="nav-item {% if '/client/list' in app.request.getPathInfo() %}active open{% endif %} ">
                         <a href="{{ path('client_list') }}" class="nav-link ">
-                            <span class="title">Listado</span>
+                            <span class="title"><i class="icon-list"></i> Listado General</span>
                         </a>
                     </li>
                 </ul>
             </li>
-            {#
-            <li class="nav-item  ">
+            <li class="nav-item {% if '/passport/' in app.request.getPathInfo() %}active open{% endif %}">
                 <a href="javascript:;" class="nav-link nav-toggle">
-                    <i class="icon-puzzle"></i>
-                    <span class="title">Trabajadores</span>
+                    <i class="icon-book-open"></i>
+                    <span class="title">Pasaportes</span>
                     <span class="arrow"></span>
                 </a>
                 <ul class="sub-menu">
-                    <li class="nav-item  ">
-                        <a href="" class="nav-link ">
-                            <span class="title">Listado</span>
+                    <li class="nav-item {% if '/passport/index' in app.request.getPathInfo() %}active open{% endif %}">
+                        <a href="{{ path('passport_index') }}" class="nav-link">
+                            <span class="title"><i class="icon-bar-chart"></i> Estadisticas</span>
                         </a>
+                    </li>
+                    <li class="nav-item {% if '/passport/new' in app.request.getPathInfo() %}active open{% endif %}">
+                        <a href="{{ path('passport_new') }}" class="nav-link">
+                            <span class="title"><i class="icon-plus"></i> Agregar Pasaporte</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {% if '/passport/list' in app.request.getPathInfo() %}active open{% endif %}">
+                        <a href="{{ path('passport_list') }}" class="nav-link">
+                            <span class="title"><i class="icon-list"></i> Listado General</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {% if '/passport/application/' in app.request.getPathInfo() %}active open{% endif %}">
+                        <a href="javascript:;" class="nav-link nav-toggle">
+                            <span class="title"><i class="icon-layers"></i> Solicitudes</span>
+                            <span class="arrow"></span>
+                        </a>
+                        <ul class="sub-menu">
+                            <li class="nav-item {% if '/passport/application/new' in app.request.getPathInfo() %}active open{% endif %}">
+                                <a href="{{ path('passport_application_new') }}" class="nav-link">
+                                    <span class="title"><i class="icon-plus"></i> Crear Solicitud</span>
+                                </a>
+                            </li>
+                            <li class="nav-item {% if '/passport/application/index' in app.request.getPathInfo() %}active open{% endif %}">
+                                <a href="{{ path('passport_application_index') }}" class="nav-link">
+                                    <span class="title"><i class="icon-list"></i> Listado de Solicitudes</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item {% if '/passport/control/' in app.request.getPathInfo() %}active open{% endif %}">
+                        <a href="javascript:;" class="nav-link nav-toggle">
+                            <span class="title"><i class="icon-loop"></i> Controles</span>
+                            <span class="arrow"></span>
+                        </a>
+                        <ul class="sub-menu">
+                            <li class="nav-item {% if '/passport/control/new' in app.request.getPathInfo() %}active open{% endif %}">
+                                <a href="{{ path('passport_control_new') }}" class="nav-link">
+                                    <span class="title"><i class="icon-plus"></i> Crear Control</span>
+                                </a>
+                            </li>
+                            <li class="nav-item {% if '/passport/control/index' in app.request.getPathInfo() %}active open{% endif %}">
+                                <a href="{{ path('passport_control_index') }}" class="nav-link">
+                                    <span class="title"><i class="icon-list"></i> Listado de Controles</span>
+                                </a>
+                            </li>
+                        </ul>
                     </li>
                 </ul>
             </li>
-            <li class="nav-item  ">
+            <li class="nav-item {% if '/exit/' in app.request.getPathInfo() %}active open{% endif %}">
                 <a href="javascript:;" class="nav-link nav-toggle">
-                    <i class="icon-settings"></i>
-                    <span class="title">Estudiantes</span>
+                    <i class="icon-plane"></i>
+                    <span class="title">Salidas al Exterior</span>
                     <span class="arrow"></span>
                 </a>
                 <ul class="sub-menu">
-                    <li class="nav-item  ">
-                        <a href="" class="nav-link ">
-                            <span class="title">Listado</span>
+                    <li class="nav-item {% if '/exit/managertravelplan/' in app.request.getPathInfo() %}active open{% endif %}">
+                        <a href="javascript:;" class="nav-link nav-toggle">
+                            <span class="title"><i class="icon-map"></i> Plan de Viajes</span>
+                            <span class="arrow"></span>
                         </a>
+                        <ul class="sub-menu">
+                            <li class="nav-item {% if '/exit/managertravelplan/current-plan' in app.request.getPathInfo() %}active open{% endif %}">
+                                <a href="{{ path('exit_managertravelplan_current_plan') }}" class="nav-link">
+                                    <span class="title"><i class="icon-list"></i> Plan {{ 'now'|date('Y')+1 }}</span>
+                                </a>
+                            </li>
+                            <li class="nav-item {% if '/exit/managertravelplan/old-plans' in app.request.getPathInfo() %}active open{% endif %}">
+                                <a href="{{ path('exit_managertravelplan_old_plan') }}" class="nav-link">
+                                    <span class="title"><i class="icon-list"></i> Planes Anteriores</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item {% if '/exit/application/' in app.request.getPathInfo() %}active open{% endif %}">
+                        <a href="javascript:;" class="nav-link nav-toggle">
+                            <span class="title"><i class="icon-layers"></i> Solicitudes</span>
+                            <span class="arrow"></span>
+                        </a>
+                        <ul class="sub-menu">
+                            <li class="nav-item {% if '/exit/application/new/dir' in app.request.getPathInfo() %}active open{% endif %}">
+                                <a href="{{ path('exit_application_new', {'type': 'dir' }) }}" class="nav-link">
+                                    <span class="title"><i class="icon-plus"></i> Solicitud Directivo </span>
+                                </a>
+                            </li>
+                            <li class="nav-item {% if '/exit/application/new/cua' in app.request.getPathInfo() %}active open{% endif %}">
+                                <a href="{{ path('exit_application_new', {'type': 'cua' }) }}" class="nav-link">
+                                    <span class="title"><i class="icon-plus"></i> Solicitud Cuadro </span>
+                                </a>
+                            </li>
+                            <li class="nav-item {% if '/exit/application/new/doc' in app.request.getPathInfo() %}active open{% endif %}">
+                                <a href="{{ path('exit_application_new', {'type': 'doc' }) }}" class="nav-link">
+                                    <span class="title"><i class="icon-plus"></i> Solicitud Docente </span>
+                                </a>
+                            </li>
+                            <li class="nav-item {% if '/exit/application/new/nod' in app.request.getPathInfo() %}active open{% endif %}">
+                                <a href="{{ path('exit_application_new', {'type': 'nod' }) }}" class="nav-link">
+                                    <span class="title"><i class="icon-plus"></i> Solicitud No Docente </span>
+                                </a>
+                            </li>
+                            <li class="nav-item {% if '/exit/application/new/est' in app.request.getPathInfo() %}active open{% endif %}">
+                                <a href="{{ path('exit_application_new', {'type': 'est' }) }}" class="nav-link">
+                                    <span class="title"><i class="icon-plus"></i> Solicitud Estudiante </span>
+                                </a>
+                            </li>
+                            <li class="nav-item {% if '/exit/application/index' in app.request.getPathInfo() %}active open{% endif %}">
+                                <a href="{{ path('exit_application_index') }}" class="nav-link">
+                                    <span class="title"><i class="icon-list"></i> Listado de Solicitudes</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item {% if '/exit/departure/' in app.request.getPathInfo() %}active open{% endif %}">
+                        <a href="javascript:;" class="nav-link nav-toggle">
+                            <span class="title"><i class="icon-paper-plane"></i> Salidas</span>
+                            <span class="arrow"></span>
+                        </a>
+                        <ul class="sub-menu">
+                            <li class="nav-item {% if '/exit/departure/index' in app.request.getPathInfo() %}active open{% endif %}">
+                                <a href="{{ path('departure_index') }}" class="nav-link">
+                                    <span class="title"><i class="icon-bar-chart"></i> Estadisticas</span>
+                                </a>
+                            </li>
+                            <li class="nav-item {% if '/daparture/new' in app.request.getPathInfo() %}active open{% endif %}">
+                                <a href="{{ path('departure_new') }}" class="nav-link">
+                                    <span class="title"><i class="icon-plus"></i> Agregar Salida</span>
+                                </a>
+                            </li>
+                            <li class="nav-item {% if '/departure/list' in app.request.getPathInfo() %}active open{% endif %}">
+                                <a href="{{ path('departure_list') }}" class="nav-link">
+                                    <span class="title"><i class="icon-list"></i> Listado General</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item {% if '/exit/report' in app.request.getPathInfo() %}active open{% endif %}">
+                        <a href="javascript:;" class="nav-link nav-toggle">
+                            <span class="title"><i class="icon-printer"></i> Reportes</span>
+                            <span class="arrow"></span>
+                        </a>
+                        <ul class="sub-menu">
+                            <li class="nav-item {% if '/exit/report/event-acount' in app.request.getPathInfo() %}active open{% endif %}">
+                                <a href="{{ path('exit_report_event_acount') }}" class="nav-link">
+                                    <span class="title"><i class="icon-doc"></i> Cuenta de Eventualidades</span>
+                                </a>
+                            </li>
+                            <li class="nav-item {% if '/exit/report/scc2' in app.request.getPathInfo() %}active open{% endif %}">
+                                <a href="{{ path('exit_report_dcc2') }}" class="nav-link">
+                                    <span class="title"><i class="icon-doc"></i> DCC 2</span>
+                                </a>
+                            </li>
+                        </ul>
                     </li>
                 </ul>
             </li>
-            #}
 
             {# ########################################################################################################
 
                 GRUPO DE GESTION DE LA INFORMACION
 
             ######################################################################################################## #}
-            {#
+
             <li class="heading">
-                <h3 class="uppercase">Gestión</h3>
+                <h3 class="uppercase">Gestión de Información</h3>
             </li>
-            <li class="nav-item  ">
+            <li class="nav-item {% if '/agreement/' in app.request.getPathInfo() %}active open{% endif %}">
                 <a href="javascript:;" class="nav-link nav-toggle">
-                    <i class="icon-layers"></i>
-                    <span class="title">Item 1</span>
+                    <i class="icon-docs"></i>
+                    <span class="title">Convenios</span>
                     <span class="arrow"></span>
                 </a>
                 <ul class="sub-menu">
-                    <li class="nav-item  ">
-                        <a href="subitem-1.1" class="nav-link ">
-                            <span class="title">Subitem-1</span>
+                    <li class="nav-item {% if '/agreement/institutional/index' in app.request.getPathInfo() %}active open{% endif %}">
+                        <a href="{{ path('agreement_institutional_index') }}" class="nav-link">
+                            <span class="title"><i class="icon-bar-chart"></i> Estadisticas</span>
                         </a>
                     </li>
-                    <li class="nav-item  ">
-                        <a href="subitem-1.2" class="nav-link ">
-                            <span class="title">Subitem-2</span>
+                    <li class="nav-item {% if '/agreement/institutional/new' in app.request.getPathInfo() %}active open{% endif %}">
+                        <a href="{{ path('agreement_institutional_new') }}" class="nav-link">
+                            <span class="title"><i class="icon-plus"></i> Crear Convenio</span>
                         </a>
                     </li>
+                    <li class="nav-item {% if '/agreement/institutional/list' in app.request.getPathInfo() %}active open{% endif %}">
+                        <a href="{{ path('agreement_institutional_list') }}" class="nav-link">
+                            <span class="title"><i class="icon-list"></i> Listado de Convenios</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {% if '/agreement/application/' in app.request.getPathInfo() %}active open{% endif %}">
+                        <a href="javascript:;" class="nav-link nav-toggle">
+                            <span class="title"><i class="icon-doc"></i> Fichas de Consulta</span>
+                            <span class="arrow"></span>
+                        </a>
+                        <ul class="sub-menu">
+                            <li class="nav-item {% if '/agreement/application/new' in app.request.getPathInfo() %}active open{% endif %}">
+                                <a href="{{ path('agreement_application_new') }}" class="nav-link">
+                                    <span class="title"><i class="icon-plus"></i> Crear Ficha</span>
+                                </a>
+                            </li>
+                            <li class="nav-item {% if '/agreement/application/index' in app.request.getPathInfo() %}active open{% endif %}">
+                                <a href="{{ path('agreement_application_index') }}" class="nav-link">
+                                    <span class="title"><i class="icon-list"></i> Listado de Fichas</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item {% if '/agreement/institutional/report' in app.request.getPathInfo() %}active open{% endif %}">
+                        <a href="javascript:;" class="nav-link nav-toggle">
+                            <span class="title"><i class="icon-printer"></i> Reportes</span>
+                            <span class="arrow"></span>
+                        </a>
+                        <ul class="sub-menu">
+                            <li class="nav-item {% if '/agreement/institutional/report/annual' in app.request.getPathInfo() %}active open{% endif %}">
+                                <a href="{{ path('list_agreement_annual_report') }}" class="nav-link">
+                                    <span class="title"><i class="icon-doc"></i> Reporte Anual</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    {#<li class="nav-item {% if '/agreement/institutional/' in app.request.getPathInfo() %}active open{% endif %}">
+                        <a href="javascript:;" class="nav-link nav-toggle">
+                            <span class="title"><i class="fa fa-globe"></i> Gubernamentales</span>
+                            <span class="arrow"></span>
+                        </a>
+                        <ul class="sub-menu">
+                            <li class="nav-item {% if '/agreement/institutional/index' in app.request.getPathInfo() %}active open{% endif %}">
+                                <a href="{{ path('agreement_institutional_index') }}" class="nav-link">
+                                    <span class="title"><i class="icon-bar-chart"></i> Estadisticas</span>
+                                </a>
+                            </li>
+                            <li class="nav-item {% if '/agreement/institutional/new' in app.request.getPathInfo() %}active open{% endif %}">
+                                <a href="{{ path('agreement_institutional_new') }}" class="nav-link">
+                                    <span class="title"><i class="icon-plus"></i> Crear Convenio Istitucional</span>
+                                </a>
+                            </li>
+                            <li class="nav-item {% if '/agreement/institutional/list' in app.request.getPathInfo() %}active open{% endif %}">
+                                <a href="{{ path('agreement_institutional_list') }}" class="nav-link">
+                                    <span class="title"><i class="icon-list"></i> Listado de Convenios Institucionales</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>#}
                 </ul>
             </li>
             <li class="nav-item  ">
                 <a href="javascript:;" class="nav-link nav-toggle">
-                    <i class="icon-feed"></i>
-                    <span class="title">Item 2</span>
+                    <i class="icon-users"></i>
+                    <span class="title">Visitantes Extranjeros</span>
                     <span class="arrow"></span>
                 </a>
                 <ul class="sub-menu">
@@ -152,95 +354,89 @@
                     </li>
                 </ul>
             </li>
-            #}
-
-            {# ########################################################################################################
-
-                GRUPO DE TRAMITACION
-
-            ######################################################################################################## #}
-            <li class="heading">
-                <h3 class="uppercase">Tramitación</h3>
-            </li>
-            <li class="nav-item {% if '/passport/' in app.request.getPathInfo() %}active open{% endif %}">
+            <li class="nav-item {% if '/foreing-student/' in app.request.getPathInfo() %}active open{% endif %} ">
                 <a href="javascript:;" class="nav-link nav-toggle">
-                    <i class="icon-layers"></i>
-                    <span class="title">Pasaportes</span>
+                    <i class="icon-users"></i>
+                    <span class="title">Becarios Extranjeros</span>
                     <span class="arrow"></span>
                 </a>
                 <ul class="sub-menu">
-                    <li class="nav-item {% if '/passport/new' in app.request.getPathInfo() %}active open{% endif %}">
-                        <a href="{{ path('passport_new') }}" class="nav-link">
-                            <span class="title">Nuevo</span>
-                        </a>
-                    </li>
-                    <li class="nav-item {% if '/passport/index' in app.request.getPathInfo() %}active open{% endif %}">
-                        <a href="{{ path('passport_dt_index') }}" class="nav-link">
-                            <span class="title">Listado</span>
-                        </a>
-                    </li>
-                    <li class="nav-item {% if '/passport/application/' in app.request.getPathInfo() %}active open{% endif %}">
+                    <li class="nav-item {% if '/foreing-student/undergraduate/' in app.request.getPathInfo() %}active open{% endif %}">
                         <a href="javascript:;" class="nav-link nav-toggle">
-                            <span class="title">Solicitudes</span>
+                            <span class="title"><i class="icon-graduation"></i> Pregrado</span>
                             <span class="arrow"></span>
                         </a>
                         <ul class="sub-menu">
-                            <li class="nav-item {% if '/passport/application/index' in app.request.getPathInfo() %}active open{% endif %}">
-                                <a href="{{ path('passport_application_index') }}" class="nav-link">
-                                    <span class="title">Listado</span>
+                            <li class="nav-item {% if '/foreing-student/undergraduate/index' in app.request.getPathInfo() %}active open{% endif %}">
+                                <a href="{{ path('undergraduate_index') }}" class="nav-link">
+                                    <span class="title"><i class="icon-bar-chart"></i> Estadísticas</span>
                                 </a>
-
+                            </li>
+                            <li class="nav-item {% if '/foreing-student/undergraduate/new' in app.request.getPathInfo() %}active open{% endif %}">
+                                <a href="{{ path('undergraduate_new') }}" class="nav-link">
+                                    <span class="title"><i class="icon-plus"></i> Agregar Estudiante</span>
+                                </a>
+                            </li>
+                            <li class="nav-item {% if '/foreing-student/undergraduate/list' in app.request.getPathInfo() %}active open{% endif %}">
+                                <a href="{{ path('undergraduate_list') }}" class="nav-link">
+                                    <span class="title"><i class="icon-list"></i> Listado de Pregrado</span>
+                                </a>
                             </li>
                         </ul>
                     </li>
-                </ul>
-            </li>
-            <li class="nav-item {% if '/exit/' in app.request.getPathInfo() %}active open{% endif %}">
-                <a href="javascript:;" class="nav-link nav-toggle">
-                    <i class="icon-plane"></i>
-                    <span class="title">Salidas</span>
-                    <span class="arrow"></span>
-                </a>
-                <ul class="sub-menu">
-                    <li class="nav-item {% if '/daparture/new' in app.request.getPathInfo() %}active open{% endif %}">
-                        <a href="{{ path('departure_new') }}" class="nav-link">
-                            <span class="title">Nueva</span>
-                        </a>
-                    </li>
-                    <li class="nav-item {% if '/departure/index' in app.request.getPathInfo() %}active open{% endif %}">
-                        <a href="{{ path('departure_index') }}" class="nav-link">
-                            <span class="title">Listado</span>
-                        </a>
-                    </li>
-                    <li class="nav-item {% if '/exit/application/' in app.request.getPathInfo() %}active open{% endif %}">
+                    <li class="nav-item {% if '/foreing-student/postgraduate/' in app.request.getPathInfo() %}active open{% endif %}">
                         <a href="javascript:;" class="nav-link nav-toggle">
-                            <span class="title">Solicitudes</span>
+                            <span class="title"><i class="icon-graduation"></i> Posgrado</span>
                             <span class="arrow"></span>
                         </a>
                         <ul class="sub-menu">
-                            <li class="nav-item {% if '/exit/application/new' in app.request.getPathInfo() %}active open{% endif %}">
-                                <a href="{{ path('exit_application_new') }}" class="nav-link">
-                                    <span class="title">Nueva</span>
+                            <li class="nav-item {% if '/foreing-student/postgraduate/index' in app.request.getPathInfo() %}active open{% endif %}">
+                                <a href="{{ path('postgraduate_index') }}" class="nav-link">
+                                    <span class="title"><i class="icon-bar-chart"></i> Estadísticas</span>
                                 </a>
                             </li>
-                            <li class="nav-item {% if '/exit/application/index' in app.request.getPathInfo() %}active open{% endif %}">
-                                <a href="{{ path('exit_application_index') }}" class="nav-link">
-                                    <span class="title">Listado</span>
+                            <li class="nav-item {% if '/foreing-student/postgraduate/new' in app.request.getPathInfo() %}active open{% endif %}">
+                                <a href="{{ path('postgraduate_new') }}" class="nav-link">
+                                    <span class="title"><i class="icon-plus"></i> Agregar Estudiante</span>
+                                </a>
+                            </li>
+                            <li class="nav-item {% if '/foreing-student/postgraduate/list' in app.request.getPathInfo() %}active open{% endif %}">
+                                <a href="{{ path('postgraduate_list') }}" class="nav-link">
+                                    <span class="title"><i class="icon-list"></i> Listado de Posgrado</span>
                                 </a>
                             </li>
                         </ul>
                     </li>
                 </ul>
             </li>
+
 
             {# ########################################################################################################
 
                 OTROS CONTENIDOS
 
             ######################################################################################################## #}
-            {#
+
             <li class="heading">
                 <h3 class="uppercase">Otros</h3>
+            </li>
+            <li class="nav-item {% if '/agreement/institution/' in app.request.getPathInfo() %}active open{% endif %}">
+                <a href="javascript:;" class="nav-link nav-toggle">
+                    <span class="title"><i class="icon-grid"></i> Instituciones</span>
+                    <span class="arrow"></span>
+                </a>
+                <ul class="sub-menu">
+                    <li class="nav-item {% if '/agreement/institution/new' in app.request.getPathInfo() %}active open{% endif %}">
+                        <a href="{{ path('institution_new') }}" class="nav-link">
+                            <span class="title"><i class="icon-plus"></i> Agregar Institución</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {% if '/agreement/institution/list' in app.request.getPathInfo() %}active open{% endif %}">
+                        <a href="{{ path('institution_index') }}" class="nav-link">
+                            <span class="title"><i class="icon-list"></i> Listado de Instituciones</span>
+                        </a>
+                    </li>
+                </ul>
             </li>
             <li class="nav-item">
                 <a href="javascript:;" class="nav-link nav-toggle">
@@ -250,72 +446,23 @@
                 </a>
                 <ul class="sub-menu">
                     <li class="nav-item">
-                        <a href="" class="nav-link">
-                            <i class="icon-bar-chart"></i> Facultades </a>
+                        <a href="{{ path('area') }}" class="nav-link">
+                            <i class="icon-tag"></i> Áreas </a>
                     </li>
                     <li class="nav-item">
-                        <a href="javascript:;" class="nav-link nav-toggle">
-                            <i class="icon-settings"></i> Item 1
-                            <span class="arrow"></span>
-                        </a>
-                        <ul class="sub-menu">
-                            <li class="nav-item">
-                                <a href="javascript:;" target="_blank" class="nav-link">
-                                    <i class="icon-user"></i> Arrow Toggle
-                                    <span class="arrow nav-toggle"></span>
-                                </a>
-                                <ul class="sub-menu">
-                                    <li class="nav-item">
-                                        <a href="#" class="nav-link">
-                                            <i class="icon-power"></i> Sample Link 1</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="#" class="nav-link">
-                                            <i class="icon-paper-plane"></i> Sample Link 1</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="#" class="nav-link">
-                                            <i class="icon-star"></i> Sample Link 1</a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <i class="icon-camera"></i> Sample Link 1</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <i class="icon-link"></i> Sample Link 2</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <i class="icon-pointer"></i> Sample Link 3</a>
-                            </li>
-                        </ul>
+                        <a href="{{ path('career') }}" class="nav-link">
+                            <i class="icon-tag"></i> Carreras </a>
                     </li>
                     <li class="nav-item">
-                        <a href="javascript:;" target="_blank" class="nav-link">
-                            <i class="icon-globe"></i> Arrow Toggle
-                            <span class="arrow nav-toggle"></span>
-                        </a>
-                        <ul class="sub-menu">
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <i class="icon-tag"></i> Sample Link 1</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <i class="icon-pencil"></i> Sample Link 1</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <i class="icon-graph"></i> Sample Link 1</a>
-                            </li>
-                        </ul>
+                        <a href="{{ path('course') }}" class="nav-link">
+                            <i class="icon-tag"></i> Postgrados </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ path('countries_list') }}" class="nav-link">
+                            <i class="icon-globe-alt "></i> Paises </a>
                     </li>
                 </ul>
             </li>
-            #}
         </ul>
         <!-- END SIDEBAR MENU -->
         <!-- END SIDEBAR MENU -->

@@ -24,6 +24,8 @@ use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
+use DRI\UsefulBundle\Useful\Useful;
+
 
 /**
  * Client controller.
@@ -33,7 +35,7 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 class ClientController extends Controller
 {
     /**
-     * Lists all Client entities.
+     * Estatistics for Client entities.
      *
      * @param Request $request
      *
@@ -126,7 +128,7 @@ class ClientController extends Controller
 
             $em->flush();
 
-            return $this->redirectToRoute('client_show', array('fullNameSlug' => $client->getFullNameSlug()));
+            return $this->redirectToRoute('client_profile', array('fullNameSlug' => $client->getFullNameSlug()));
         }
 
         return $this->render('DRIClientBundle:Client:new.html.twig', array(
@@ -140,34 +142,34 @@ class ClientController extends Controller
      *
      * @param Client $client
      *
-     * @Route("/view/{fullNameSlug}", name="client_show", options = {"expose" = true})
+     * @Route("/profile/{fullNameSlug}", name="client_profile", options = {"expose" = true})
      * @Method("GET")
      *
      * @return Response
      */
-    public function showAction(Client $client)
+    public function profileAction(Client $client)
     {
         $deleteForm = $this->createDeleteForm($client);
 
-        return $this->render('@DRIClient/Client/show.html.twig', array(
+        return $this->render('@DRIClient/Client/profile.html.twig', array(
             'client' => $client,
             'delete_form' => $deleteForm->createView(),
         ));
     }
 
     /**
-     * Displays a form to edit an existing client entity.
+     * Displays a form to config an existing client entity.
      *
      * @param Request $request
      * @param Client  $client
      *
-     * @Route("/edit/{fullNameSlug}", name="client_edit", options = {"expose" = true})
+     * @Route("/config/{fullNameSlug}", name="client_config", options = {"expose" = true})
      * @Method({"GET", "POST"})
      * @Security("has_role('ROLE_REQUIRE_SPECIALIST') or has_role('ROLE_INFO_SPECIALIST')")
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, Client $client)
+    public function configAction(Request $request, Client $client)
     {
         $user = null;
 
@@ -199,10 +201,10 @@ class ClientController extends Controller
             ($dcForm->isSubmitted() && $dcForm->isValid())){
             $this->getDoctrine()->getManager()->flush();
 
-            return $this->redirectToRoute('client_edit', array('fullNameSlug' => $client->getFullNameSlug()));
+            return $this->redirectToRoute('client_config', array('fullNameSlug' => $client->getFullNameSlug()));
         }
 
-        return $this->render('DRIClientBundle:Client:edit.html.twig', array(
+        return $this->render('DRIClientBundle:Client:config.html.twig', array(
             'client' => $client,
             'gi_form' => $giForm->createView(),
             'ci_form' => $ciForm->createView(),
@@ -333,7 +335,7 @@ class ClientController extends Controller
         $em = $this->getDoctrine()->getManager();
         $c = $em->getRepository('DRIClientBundle:Client')->find($client);
 
-        $html = $this->renderView('DRIClientBundle::1.htm.twig', [
+        $html = $this->renderView('DRIClientBundle::pdf_report.html.twig', [
             'client' => $client
         ]);
 
@@ -341,14 +343,25 @@ class ClientController extends Controller
 
         $filename = sprintf('%s-%s.pdf', $name, date('Y-m-d'));
 
-        return new Response(
-            $this->get('knp_snappy.pdf')->getOutputFromHtml($html),
+        $response = new Response (
+            $this->get('knp_snappy.pdf')->getOutputFromHtml($html,
+                [
+                    'images' => true,
+                    'enable-javascript' => true,
+                    'margin-left' => '15mm',
+                    'margin-right' => '15mm',
+                    'margin-top' => '15mm',
+                    'margin-bottom' => '15mm',
+                    //'orientation' => 'landscape',
+                ]),
             200,
             [
                 'Content-Type'        => 'application/pdf',
-                'Content-Disposition' => sprintf('attachment; filename="%s"', $filename),
+                'Content-Disposition' => sprintf('inline; filename="%s"', $filename),
+                //'Content-Disposition' => sprintf('attachment; filename="%s"', $filename),
             ]
         );
+        return $response;
     }
 
     /**
@@ -410,6 +423,8 @@ class ClientController extends Controller
     }
 
     /**
+     * Generate the Short Name for all Client entities
+     *
      * @Route("/generate-shortname", name="generate-shortname")
      */
     public function generateShortNameAction()
@@ -420,10 +435,35 @@ class ClientController extends Controller
         $clients = $clientRepo->findAll();
 
         foreach ($clients as $client){
-            $client->setShortName($client->getFirstName().' '.$client->getFirstLastName());
+            $client->setShortNameSlug(Useful::getSlug($client->getShortName()));
 
             $em->persist($client);
             $em->flush();
         }
+    }
+
+    /**
+     * Generate the Short Name for all Client entities
+     *
+     * @Route("/generate-type", name="generate-type")
+     */
+    public function generateTypeAction()
+    {
+        $em = $this->getDoctrine()->getManager();
+        $clientRepo = $em->getRepository("DRIClientBundle:Client");
+
+        $clients = $clientRepo->findAll();
+
+        foreach ($clients as $client){
+            switch ($client->getClientType()){
+                case 'DIR': $client->setClientType('dir');break;
+                case 'DOC': $client->setClientType('doc');break;
+                case 'NOD': $client->setClientType('nod');break;
+                case 'EST': $client->setClientType('est');break;
+            }
+
+            $em->persist($client);
+        }
+            $em->flush();
     }
 }

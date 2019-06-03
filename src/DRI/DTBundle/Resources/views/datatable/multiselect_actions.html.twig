@@ -80,7 +80,7 @@
 
 {% set multiselect_actions %}
     <span></span>
-    <select id="table-group-action-input" class="table-group-action-input form-control input-inline input-small input-sm">
+    <select id="table-group-action-input" class="table-group-action-input bs-select form-control input-inline input-small">
         <option value="">Seleccionar...</option>
         {% for actionKey, action in actions %}
             {% if action.callRenderIfClosure is same as(true) %}
@@ -103,8 +103,6 @@
     $("#{{ dom_id }}").append("{{ multiselect_actions|e('js') }}");
 {% endif %}
 
-
-
 {# function to update the check-all-checkbox #}
 function updateCheckAll() {
     var cbox_all = $("#sg-datatables-{{ datatable_name }} tbody input.sg-datatables-{{ datatable_name }}-multiselect-checkbox:checkbox");
@@ -124,6 +122,13 @@ function updateCheckAll() {
 
     countSelectedRecords();
 }
+
+$('.bs-select').selectpicker({
+    iconBase: 'fa',
+    tickIcon: 'fa-check',
+    noneSelectedText: '',
+    container: true
+})
 
 {# handle row <tr> click #}
 $("#sg-datatables-{{ datatable_name }} tbody").on("click", "tr", function () {

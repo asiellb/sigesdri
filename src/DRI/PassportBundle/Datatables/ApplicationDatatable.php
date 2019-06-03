@@ -38,9 +38,10 @@ class ApplicationDatatable extends AbstractDatatable
 
         $formatter = function ($line) use ($router) {
             //$route = $router->generate('profile_show', array('id' => $line['createdBy']['id']));
-            $line['applicationReason'] = $this->formatReason($line['applicationReason']);
-            $line['passportType'] = $this->formatPassportType($line['passportType']);
+            //$line['reason'] = $this->formatReason($line['reason']);
+            //$line['passportType'] = $this->formatPassportType($line['passportType']);
             $line['state'] = $this->formatState($line['state']);
+            $line['used'] = $this->formatUsed($line['used']);
 
             return $line;
         };
@@ -62,18 +63,20 @@ class ApplicationDatatable extends AbstractDatatable
         ));
 
         $this->options->set(array(
-            'classes' => Style::BOOTSTRAP_3_STYLE,
+            'classes' => Style::BASE_STYLE_COMPACT,
             'individual_filtering' => true,
             'individual_filtering_position' => 'head',
             'order_cells_top' => true,
+            'order_classes' => false,
+            'scroll_collapse' => true,
             "order" => [
-                [2, "asc"]
+                [3, "desc"]
             ],
             //'dom' => "<'row' <'col-md-12 pull-left' >> lfrtip",
             'dom' => "<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12' <'table-group-actions pull-right'><>>r>t<'row'<'col-md-8 col-sm-12'pli><'col-md-4 col-sm-12'>>",
             "length_menu"=> [
-                [5, 10, 20, 50, 100, 150, -1],
-                [5, 10, 20, 50, 100, 150, "All"] // change per page values here
+                [10, 50, 100, 150, 200, -1],
+                [10, 50, 100, 150, 200, "Todo"] // change per page values here
             ],
             "paging_type" => "bootstrap_extended",
         ));
@@ -81,6 +84,7 @@ class ApplicationDatatable extends AbstractDatatable
         $this->features->set(array(
             'paging'     => true,
             'length_change' => true,
+            'auto_width' => true,
         ));
 
         $this->extensions->set(array(
@@ -184,15 +188,14 @@ class ApplicationDatatable extends AbstractDatatable
                             },
                         )
                     ),
-                )
-            )
-            ->add('applicationNumber', Column::class, array(
+                ))
+            ->add('number', Column::class, array(
                 'title' => 'Número',
                 'searchable' => true,
                 'orderable' => true,
-                'width' => '10%',
+                'width' => '14%',
                 'filter' => array(Select2Filter::class, array(
-                    'select_options' => array('' => 'Todos') + $this->getOptionsArrayFromEntities($applications, 'applicationNumber', 'applicationNumber'),
+                    'select_options' => array('' => 'Todos') + $this->getOptionsArrayFromEntities($applications, 'number', 'number'),
                     'search_type' => 'eq',
                     'cancel_button' => true,
                     'classes' => 'form-control'
@@ -202,7 +205,7 @@ class ApplicationDatatable extends AbstractDatatable
                 'title' => 'Cliente',
                 'searchable' => true,
                 'orderable' => true,
-                'width' => '20%',
+                'width' => '14%',
                 'filter' => array(Select2Filter::class, array(
                     'select_options' => array('' => 'Todos') + $this->getOptionsArrayFromEntities($clients, 'fullName', 'fullName'),
                     'search_type' => 'eq',
@@ -210,56 +213,20 @@ class ApplicationDatatable extends AbstractDatatable
                     'classes' => 'form-control'
                 )),
             ))
-            ->add('applicationReason', Column::class, array(
-                'title' => 'Motivo',
-                'width' => '2%',
-                'filter' => array(SelectFilter::class,
-                    array(
-                        'search_type' => 'eq',
-                        'multiple' => false,
-                        'select_options' => array(
-                            '' => 'Ambos',
-                            'CON' => 'Confección',
-                            'PRO' => 'Prórroga',
-                        ),
-                        'cancel_button' => true,
-                        'classes' => 'form-control input-xs input-sm input-inline form-filter bs-select',
-                    ),
-                ),
-                ))
             ->add('applicationDate', DateTimeColumn::class, array(
                 'title' => 'Se solicitó',
-                'width' => '20%',
+                'default_content' => '--',
+                'date_format' => 'LL',
+                'width' => '14%',
                 'filter' => array(DateRangeFilter::class,
                     array(
                         'cancel_button' => true,
                     ),
                 ),
-                'timeago' => true,
-                ))
-            ->add('passportType', Column::class, array(
-                'title' => 'Tipo de Pasaporte',
-                'width' => '5%',
-                'filter' => array(SelectFilter::class,
-                    array(
-                        'search_type' => 'eq',
-                        'multiple' => false,
-                        'select_options' => array(
-                            '' => 'Ambos',
-                            'COR' => 'Corriente',
-                            'DIP' => 'Diplomático',
-                            'OFI' => 'Oficial',
-                            'SER' => 'Servicio',
-                            'MAR' => 'Marino',
-                        ),
-                        'cancel_button' => true,
-                        'classes' => 'form-control input-xs input-sm input-inline form-filter bs-select',
-                    ),
-                ),
                 ))
             ->add('state', Column::class, array(
                 'title' => 'Estado',
-                'width' => '5%',
+                'width' => '14%',
                 'filter' => array(SelectFilter::class,
                     array(
                         'search_type' => 'eq',
@@ -276,27 +243,37 @@ class ApplicationDatatable extends AbstractDatatable
                     ),
                 ),
                 ))
-            ->add('createdBy.username', Column::class, array(
+            ->add('used', Column::class, array(
+                'title' => 'Usada',
+                'width' => '14%',
+                'filter' => array(SelectFilter::class,
+                    array(
+                        'search_type' => 'eq',
+                        'multiple' => false,
+                        'select_options' => array(
+                            '' => 'Todos',
+                            1  => 'Si',
+                            0  => 'No',
+                        ),
+                        'cancel_button' => true,
+                        'classes' => 'form-control input-xs input-sm input-inline form-filter bs-select',
+                    ),
+                ),
+                ))
+            ->add('createdBy.fullName', Column::class, array(
                 'title' => 'Creada por',
                 'searchable' => true,
                 'orderable' => true,
-                'width' => '20%',
+                'width' => '14%',
                 'filter' => array(Select2Filter::class, array(
-                    'select_options' => array('' => 'Todos') + $this->getOptionsArrayFromEntities($users, 'username', 'username'),
+                    'select_options' => array('' => 'Todos') + $this->getOptionsArrayFromEntities($users, 'fullName', 'fullName'),
                     'search_type' => 'eq',
                     'cancel_button' => true,
                     'classes' => 'form-control'
                 )),
                 ))
-            ->add('createdAt', DateTimeColumn::class, array(
-                'title' => 'Creada',
-                'width' => '20%',
-                'filter' => array(DateRangeFilter::class,
-                    array(
-                        'cancel_button' => true,
-                    ),
-                ),
-                'timeago' => true,
+            ->add('numberSlug', Column::class, array(
+                'visible' => false,
                 ))
             ->add(null, ActionColumn::class, array(
                 'title' => $this->translator->trans('sg.datatables.actions.title'),
@@ -304,13 +281,13 @@ class ApplicationDatatable extends AbstractDatatable
                     array(
                         'route' => 'passport_application_show',
                         'route_parameters' => array(
-                            'id' => 'id'
+                            'numberSlug' => 'numberSlug'
                         ),
-                        'icon' => ' icon-eye',
+                        'icon' => 'la la-ellipsis-h font-lg',
                         'attributes' => array(
                             //'rel' => 'tooltip',
                             //'title' => $this->translator->trans('sg.datatables.actions.show'),
-                            'class' => 'tooltips btn blue btn-outline btn-sm ',
+                            'class' => 'btn btn-circle green btn-icon-only btn-outline',
                             'role' => 'button',
                             'data-container' => 'body',
                             'data-placement' => 'bottom',
@@ -320,14 +297,14 @@ class ApplicationDatatable extends AbstractDatatable
                     array(
                         'route' => 'passport_application_edit',
                         'route_parameters' => array(
-                            'id' => 'id'
+                            'numberSlug' => 'numberSlug'
                         ),
 
-                        'icon' => 'icon-settings',
+                        'icon' => 'la la-edit font-lg',
                         'attributes' => array(
                             //'rel' => 'tooltips',
                             //'title' => $this->translator->trans('sg.datatables.actions.edit'),
-                            'class' => 'tooltips btn blue btn-outline btn-sm',
+                            'class' => 'btn btn-circle green btn-icon-only btn-outline',
                             'role' => 'button',
                             'data-container' => 'body',
                             'data-placement' => 'bottom',
@@ -393,13 +370,33 @@ class ApplicationDatatable extends AbstractDatatable
         $type = '';
         switch ($state){
             case 'CON':
-                $type = '<span class="label label-default"> Confeccionada </span>'; break;
+                $type = '<div class="alert alert-info sbold"> Confeccionada </div>'; break;
             case 'ENV':
-                $type = '<span class="label label-primary"> Enviada </span>'; break;
+                $type = '<div class="alert alert-warning sbold"> Enviada </div>'; break;
             case 'CNF':
-                $type = '<span class="label label-success"> Confirmada </span>'; break;
+                $type = '<div class="alert alert-success sbold" style="width: 100%"> Confirmada </div>'; break;
             case 'REC':
-                $type = '<span class="label label-danger"> Rechazada </span>'; break;
+                $type = '<div class="alert alert-danger sbold"> Rechazada </div>'; break;
+            default:
+                $type = '-'; break;
+        }
+        return $type;
+    }
+
+    /**
+     * Determinate used
+     *
+     * @param string $used
+     *
+     * @return string
+     */
+    private function formatUsed($used){
+        $type = '';
+        switch ($used){
+            case false:
+                $type = '<span class="font-green sbold"> No </span>'; break;
+            case true:
+                $type = '<span class="font-red sbold"> Si </span>'; break;
             default:
                 $type = '-'; break;
         }

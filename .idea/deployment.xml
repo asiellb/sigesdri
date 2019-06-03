@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" serverName="SIGESDRI" showNewOnTargetInSync="false">
+    <serverData>
+      <paths name="DRIUC Server">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="ILUVATAR">
+        <serverdata>
+          <mappings>
+            <mapping deploy="sigesdri" local="$PROJECT_DIR$" web="/sigesdri/web" />
+            <mapping local="" />
+          </mappings>
+          <excludedPaths>
+            <excludedPath local="true" path="$PROJECT_DIR$/var" />
+            <excludedPath local="true" path="$PROJECT_DIR$/vendor" />
+            <excludedPath local="true" path="$PROJECT_DIR$/bin" />
+            <excludedPath local="true" path="$PROJECT_DIR$/web/assets/global/plugins" />
+          </excludedPaths>
+        </serverdata>
+      </paths>
+      <paths name="SIGESDRI">
+        <serverdata>
+          <mappings>
+            <mapping deploy="\" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="localhost">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="sigesdri/web/" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+  </component>
+</project>

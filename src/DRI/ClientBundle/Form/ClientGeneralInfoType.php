@@ -8,7 +8,6 @@
 
 namespace DRI\ClientBundle\Form;
 
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -20,9 +19,11 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\LanguageType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Doctrine\ORM\EntityRepository;
 
 
+use DRI\ClientBundle\Entity\Client;
 use DRI\UsefulBundle\Form\DatePickerType;
 
 /**
@@ -85,10 +86,7 @@ class ClientGeneralInfoType extends AbstractType
                 'label_attr' => [
                     'class' => 'radio-inline'
                 ],
-                'choices'  => array(
-                    'Femenino'    =>'F',
-                    'Masculino'   =>'M',
-                ),
+                'choices'  => Client::GENDER_CHOICE,
                 'attr' => array(
                     'class'=>'radio-list',
                 ),
@@ -132,11 +130,7 @@ class ClientGeneralInfoType extends AbstractType
                 'label_attr' => [
                     'class' => 'radio-inline'
                 ],
-                'choices'  => array(
-                    'Docente'       =>'DOC',
-                    'No Docente'    =>'NOD',
-                    'Estudiante'    =>'EST',
-                ),
+                'choices'  => Client::CLIENT_TYPES_CHOICE,
                 'attr' => array(
                     'class'=>'radio-list',
                 ),
@@ -148,7 +142,6 @@ class ClientGeneralInfoType extends AbstractType
                 'multiple'=> false,
                 'expanded'=> true,
             ))
-
             ->add('languages', LanguageType::class, [
                 'attr' => [
                     'class' => 'select2-multiple'
@@ -159,17 +152,9 @@ class ClientGeneralInfoType extends AbstractType
                 'attr' => [
                     'class' => 'select2-multiple'
                 ],
-                'choices'  => [
-                    'CDR'   =>'cdr',
-                    'CTC'   =>'ctc',
-                    'FMC'   =>'fmc',
-                    'UJC'   =>'ujc',
-                    'PCC'   =>'pcc',
-                ],
+                'choices'  => Client::ORGANIZATION_CHOICE,
                 'multiple'=> true,
             ])
-            //->add('languages')
-            //->add('organizations')
         ;
     }
 

@@ -8,6 +8,7 @@
 
 namespace DRI\ClientBundle\Form;
 
+use DRI\ClientBundle\Entity\Client;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -28,7 +29,7 @@ use Presta\ImageBundle\Form\Type\ImageType;
 use Vich\UploaderBundle\Form\Type\VichFileType;
 use Vich\UploaderBundle\Form\Type\VichImageType;
 
-use DRI\UsefulBundle\Entity\School;
+use DRI\UsefulBundle\Entity\Area;
 
 /**
  * Class ClientType
@@ -44,17 +45,15 @@ class ClientType extends AbstractType
     {
         $builder
             //Datos Generales
-           /* ->add('clientPictureFile', VichImageType::class, array(
-                'label'         => 'Imagen',
-                'required'      => false,
-                'allow_delete'  => true, // not mandatory, default is true
-                'download_link' => true, // not mandatory, default is true
-                //'crop' => true,
-            ))*/
             ->add('clientPictureFile', ImageType::class, [
+                'cancel_button_class' => 'btn dark btn-outline',
+                'save_button_class' => 'btn green',
                 'enable_remote' => false,
-                'max_width' => '150',
-                'max_height' => '150',
+                'required' => false,
+                'max_width' => '250',
+                'max_height' => '250',
+                'preview_width' => '150',
+                'preview_height' => '150',
             ])
             ->add('ci', TextType::class,[
                 'attr' => [
@@ -97,10 +96,7 @@ class ClientType extends AbstractType
                 'label_attr' => [
                     'class' => 'radio-inline'
                 ],
-                'choices'  => array(
-                    'Femenino'    =>'F',
-                    'Masculino'   =>'M',
-                ),
+                'choices'  => Client::GENDER_CHOICE,
                 'attr' => array(
                     'class'=>'radio-list',
                 ),
@@ -142,11 +138,7 @@ class ClientType extends AbstractType
                 'label_attr' => [
                     'class' => 'radio-inline'
                 ],
-                'choices'  => array(
-                    'Docente'       =>'DOC',
-                    'No Docente'    =>'NOD',
-                    'Estudiante'    =>'EST',
-                ),
+                'choices'  => Client::CLIENT_TYPES_CHOICE,
                 'attr' => array(
                     'class'=>'radio-list',
                 ),
@@ -168,13 +160,7 @@ class ClientType extends AbstractType
                 'attr' => [
                     'class' => 'select2-multiple'
                 ],
-                'choices'  => [
-                    'CDR'   =>'cdr',
-                    'CTC'   =>'ctc',
-                    'FMC'   =>'fmc',
-                    'UJC'   =>'ujc',
-                    'PCC'   =>'pcc',
-                ],
+                'choices'  => Client::ORGANIZATION_CHOICE,
                 'multiple'=> true,
             ])
 
@@ -194,12 +180,7 @@ class ClientType extends AbstractType
             ->add('civilState', ChoiceType::class, array(
                 'placeholder' => 'Seleccione estado civil',
                 'label' => 'Estado civil',
-                'choices'  => array(
-                    'Soltero(a)'    =>'SOL',
-                    'Casado(a)'     =>'CAS',
-                    'Divorciado(a)' =>'DIV',
-                    'Viudo(a)'      =>'VIU',
-                ),
+                'choices'  => Client::CIVIL_STATE_CHOICE,
                 'attr' => array(
                     'class'=>'bs-select',
                 ),
@@ -219,11 +200,7 @@ class ClientType extends AbstractType
             ->add('eyesColor', ChoiceType::class, array(
                 'placeholder' => 'Seleccione color de los ojos',
                 'label' => 'Color de los ojos',
-                'choices'  => array(
-                    'Claros'    =>'Claros',
-                    'Negros'    =>'Negros',
-                    'Pardos'    =>'Pardos',
-                ),
+                'choices'  => Client::EYES_COLOR_CHOICE,
                 'attr' => array(
                     'class'=>'bs-select',
                 ),
@@ -232,13 +209,7 @@ class ClientType extends AbstractType
             ->add('skinColor', ChoiceType::class, array(
                 'placeholder' => 'Seleccione color de la piel',
                 'label' => 'Color de la piel',
-                'choices'  => array( //"Blanca", "Negra", "Amarilla", "Mulata", "Albina"
-                    'Blanca'    =>'Blanca',
-                    'Negra'     =>'Negra',
-                    'Amarilla'  =>'Amarilla',
-                    'Mulata'    =>'Mulata',
-                    'Albina'    =>'Albina',
-                ),
+                'choices'  => Client::SKIN_COLOR_CHOICE,
                 'attr' => array(
                     'class'=>'bs-select',
                 ),
@@ -247,14 +218,7 @@ class ClientType extends AbstractType
             ->add('hairColor', ChoiceType::class, array(
                 'placeholder' => 'Seleccione color del cabello',
                 'label' => 'Color del cabello',
-                'choices'  => array( //"Canoso", "Castaño", "Negro", "Rojo", "Rubio", "Otros"
-                    'Canoso'    =>'Canoso',
-                    'Castaño'   =>'Castaño',
-                    'Negro'     =>'Negro',
-                    'Rojo'      =>'Rojo',
-                    'Rubio'     =>'Rubio',
-                    'Otros'     =>'Otros',
-                ),
+                'choices'  => Client::HAIR_COLOR_CHOICE,
                 'attr' => array(
                     'class'=>'bs-select',
                 ),
@@ -275,7 +239,7 @@ class ClientType extends AbstractType
             ])
             ->add('countryBirth', EntityType::class, [
                 'attr' => [ 'class' => 'country_list' ],
-                'class' => 'DRI\UsefulBundle\Entity\Country',
+                'class' => 'DRIUsefulBundle:Country',
                 'choice_label' => 'spName',
                 'choice_value' => 'iso3',
                 'empty_data' => null,
@@ -304,7 +268,7 @@ class ClientType extends AbstractType
             ])
             ->add('country', EntityType::class, [
                 'attr' => [ 'class' => 'country_list' ],
-                'class' => 'DRI\UsefulBundle\Entity\Country',
+                'class' => 'DRIUsefulBundle:Country',
                 'choice_label' => 'spName',
                 'choice_value' => 'iso3',
                 'empty_data' => null,
@@ -323,7 +287,7 @@ class ClientType extends AbstractType
                     'placeholder' => 'Ingrese el municipio o la ciudad'
                 ],
             ])
-            ->add('area', TextType::class, [
+            ->add('district', TextType::class, [
                 'required' => false,
                 'attr' => [
                     'placeholder' => 'Ingrese el reparto'
@@ -415,7 +379,8 @@ class ClientType extends AbstractType
             ])
 
             //Datos en la UC
-                //Estudiantes
+
+            //Estudiantes
             ->add('studentsYear', TextType::class, [
                 'required' => false,
                 'attr' => [
@@ -428,20 +393,28 @@ class ClientType extends AbstractType
                     'placeholder' => 'Ingrese el cargo'
                 ],
             ])
-            ->add('studentsCareer', TextType::class, [
-                'required' => false,
-                'attr' => [
-                    'placeholder' => 'Ingrese la carrera a la que pertenece'
-                ],
-            ])
-            ->add('studentsSchool',EntityType::class, [
+            ->add('studentsCareer',EntityType::class, [
                 'attr' => [ 'class' => 'select2' ],
-                'class' => 'DRI\UsefulBundle\Entity\School',
+                'class' => 'DRIUsefulBundle:Career',
                 'choice_label' => 'name',
                 'empty_data' => null,
                 'required' => false
             ])
-                //Trabajadores
+            ->add('studentsFaculty',EntityType::class, [
+                'attr' => [ 'class' => 'select2' ],
+                'class' => 'DRIUsefulBundle:Area',
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('a')
+                        ->where("a.type = :type")
+                        ->setParameter("type", 'FAC')
+                        ->orderBy('a.name', 'ASC');
+                },
+                'choice_label' => 'name',
+                'empty_data' => null,
+                'required' => false
+            ])
+
+            //Trabajadores
             ->add('workersOccupation', TextType::class, [
                 'required' => false,
                 'attr' => [
@@ -457,14 +430,7 @@ class ClientType extends AbstractType
             ->add('workersEduCategory', ChoiceType::class, array(
                 'placeholder' => 'Selecciones la categoría docente',
                 'label' => 'Categoría Docente',
-                'choices'  => array(
-                    'ATD'         => 'ATD',
-                    'Adiestrado'  => 'ADI',
-                    'Instructor'  => 'INS',
-                    'Asistente'   => 'ASI',
-                    'Auxiliar'    => 'AUX',
-                    'Titular'     => 'TIT',
-                ),
+                'choices'  => Client::TEACHING_CATEGORY_CHOICE,
                 'attr' => array(
                     'class'=>'bs-select',
                 ),
@@ -472,13 +438,7 @@ class ClientType extends AbstractType
             ->add('workersSciGrade', ChoiceType::class, array(
                 'placeholder' => 'Selecciones el grado científico',
                 'label' => 'Grado Científico',
-                'choices'  => array(
-                    'Licenciado'  => 'LIC',
-                    'Ingeniero'   => 'ING',
-                    'Arquitecto'  => 'ARQ',
-                    'Master'      => 'MSC',
-                    'Doctor(a)'   => 'DRC',
-                ),
+                'choices'  => Client::SCIENTIFIC_GRADE_CHOICE,
                 'attr' => array(
                     'class'=>'bs-select',
                 ),
@@ -489,9 +449,22 @@ class ClientType extends AbstractType
                     'placeholder' => 'Ingrese el Cargo que ocupa'
                 ],
             ])
-            ->add('workersSchool', EntityType::class, [
+            ->add('workersArea', EntityType::class, [
                 'attr' => [ 'class' => 'select2' ],
-                'class' => 'DRI\UsefulBundle\Entity\School',
+                'class' => 'DRIUsefulBundle:Area',
+                'choice_label' => 'name',
+                'empty_data' => null,
+                'required' => false
+            ])
+            ->add('workersFaculty', EntityType::class, [
+                'attr' => [ 'class' => 'select2' ],
+                'class' => 'DRIUsefulBundle:Area',
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('a')
+                        ->where("a.type = :type")
+                        ->setParameter("type", 'FAC')
+                        ->orderBy('a.name', 'ASC');
+                },
                 'choice_label' => 'name',
                 'empty_data' => null,
                 'required' => false

@@ -1,9 +1,0 @@
-services:
-#    dri_tramites.example:
-#        class: Dri\TramitesBundle\Example
-#        arguments: ["@service_id", "plain_value", %parameter%]
-
-    namer.imagen_pasaportes:
-        class: Dri\TramitesBundle\Service\PasaporteNamer
-        tags:
-            - { name: namer }

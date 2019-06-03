@@ -37,9 +37,10 @@ class DepartureDatatable extends AbstractDatatable
 
         $formatter = function ($line) use ($router) {
             //$route = $router->generate('profile_show', array('id' => $line['createdBy']['id']));
-            //$line['applicationReason'] = $this->formatReason($line['applicationReason']);
+            //$line['reason'] = $this->formatReason($line['reason']);
             //$line['concept'] = $this->formatConcept($line['concept']);
             //$line['state'] = $this->formatState($line['state']);
+            $line['closed'] = $this->formatState($line['closed']);
 
             return $line;
         };
@@ -61,18 +62,20 @@ class DepartureDatatable extends AbstractDatatable
         ));
 
         $this->options->set(array(
-            'classes' => Style::BOOTSTRAP_3_STYLE,
+            'classes' => Style::BASE_STYLE_COMPACT,
             'individual_filtering' => true,
             'individual_filtering_position' => 'head',
             'order_cells_top' => true,
+            'order_classes' => false,
+            'scroll_collapse' => true,
             "order" => [
-                [2, "asc"]
+                [3, "desc"]
             ],
             //'dom' => "<'row' <'col-md-12 pull-left' >> lfrtip",
             'dom' => "<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12' <'table-group-actions pull-right'><>>r>t<'row'<'col-md-8 col-sm-12'pli><'col-md-4 col-sm-12'>>",
             "length_menu"=> [
-                [5, 10, 20, 50, 100, 150, -1],
-                [5, 10, 20, 50, 100, 150, "All"] // change per page values here
+                [10, 50, 100, 150, 200, -1],
+                [10, 50, 100, 150, 200, "Todo"] // change per page values here
             ],
             "paging_type" => "bootstrap_extended",
         ));
@@ -80,6 +83,7 @@ class DepartureDatatable extends AbstractDatatable
         $this->features->set(array(
             'paging'     => true,
             'length_change' => true,
+            'auto_width' => true,
         ));
 
         $this->extensions->set(array(
@@ -104,7 +108,7 @@ class DepartureDatatable extends AbstractDatatable
                         'button_options' => array(
                             'download' => 'open',
                             'exportOptions' => array(
-                                'columns' => array('1','2', '3', '4', '5', '6',),
+                                'columns' => array('1','2', '3', '4'),
                             ),
                             'orientation' => 'landscape',
                             'pageSize' => 'LEGAL',
@@ -185,12 +189,11 @@ class DepartureDatatable extends AbstractDatatable
                         )
                     ),
                 ))
-
             ->add('client.fullName', Column::class, array(
                 'title' => 'Cliente',
                 'searchable' => true,
                 'orderable' => true,
-                'width' => '20%',
+                'width' => '16%',
                 'filter' => array(Select2Filter::class, array(
                     'select_options' => array('' => 'Todos') + $this->getOptionsArrayFromEntities($clients, 'fullName', 'fullName'),
                     'search_type' => 'eq',
@@ -202,7 +205,7 @@ class DepartureDatatable extends AbstractDatatable
                 'title' => 'Pasaporte',
                 'searchable' => true,
                 'orderable' => true,
-                'width' => '20%',
+                'width' => '16%',
                 'filter' => array(Select2Filter::class, array(
                     'select_options' => array('' => 'Todos') + $this->getOptionsArrayFromEntities($passports, 'number', 'number'),
                     'search_type' => 'eq',
@@ -212,39 +215,59 @@ class DepartureDatatable extends AbstractDatatable
             ))
             ->add('departureDate', DateTimeColumn::class, array(
                 'title' => 'Fecha de Partida',
-                'width' => '12%',
+                'date_format' => 'LL',
+                'width' => '16%',
                 'filter' => array(DateRangeFilter::class,
                     array(
                         'cancel_button' => true,
                     ),
                 ),
-                'timeago' => true,
             ))
             ->add('returnDate', DateTimeColumn::class, array(
                 'title' => 'Fecha de Retorno',
-                'width' => '12%',
+                'default_content' => '--',
+                'date_format' => 'LL',
+                'width' => '16%',
                 'filter' => array(DateRangeFilter::class,
                     array(
                         'cancel_button' => true,
                     ),
                 ),
-                'timeago' => true,
             ))
-
+            ->add('closed', Column::class, array(
+                'title' => 'Estado',
+                'searchable' => true,
+                'orderable' => true,
+                'width' => '16%',
+                'default_content' => 'No asignado',
+                'filter' => array(SelectFilter::class, array(
+                    'search_type' => 'eq',
+                    'select_options' => array(
+                        '' => 'Todos',
+                        '1' => 'Culminada',
+                        '0' => 'En Ejecución'
+                    ),
+                    'cancel_button' => true,
+                    'classes' => 'form-control input-xs input-sm input-inline form-filter bs-select',
+                ))
+            ))
+            ->add('numberSlug', Column::class, array(
+                'visible' => false,
+            ))
             ->add(null, ActionColumn::class, array(
                 'title' => $this->translator->trans('sg.datatables.actions.title'),
-                'width' => '12%',
+
                 'actions' => array(
                     array(
                         'route' => 'departure_show',
                         'route_parameters' => array(
-                            'id' => 'id'
+                            'numberSlug' => 'numberSlug'
                         ),
-                        'icon' => ' icon-eye',
+                        'icon' => 'la la-ellipsis-h font-lg',
                         'attributes' => array(
                             //'rel' => 'tooltip',
                             //'title' => $this->translator->trans('sg.datatables.actions.show'),
-                            'class' => 'tooltips btn blue btn-outline btn-sm ',
+                            'class' => 'btn btn-circle green btn-icon-only btn-outline',
                             'role' => 'button',
                             'data-container' => 'body',
                             'data-placement' => 'bottom',
@@ -254,14 +277,14 @@ class DepartureDatatable extends AbstractDatatable
                     array(
                         'route' => 'departure_edit',
                         'route_parameters' => array(
-                            'id' => 'id'
+                            'numberSlug' => 'numberSlug'
                         ),
 
-                        'icon' => 'icon-settings',
+                        'icon' => 'la la-edit font-lg',
                         'attributes' => array(
                             //'rel' => 'tooltips',
                             //'title' => $this->translator->trans('sg.datatables.actions.edit'),
-                            'class' => 'tooltips btn blue btn-outline btn-sm',
+                            'class' => 'btn btn-circle green btn-icon-only btn-outline',
                             'role' => 'button',
                             'data-container' => 'body',
                             'data-placement' => 'bottom',
@@ -272,6 +295,23 @@ class DepartureDatatable extends AbstractDatatable
             ))
         ;
     }
+
+    /**
+     * Determinate state
+     *
+     * @param boolean $state
+     *
+     * @return string
+     */
+    private function formatState($state){
+        $type = '<span class="font-green-meadow sbold"><i class="la la-paper-plane-o"></i> En Ejecución </span>';
+
+        if($state)
+            $type = '<span class="font-red-thunderbird sbold"><i class="la la-archive"></i> Culminada </span>';
+
+        return $type;
+    }
+
 
     /**
      * {@inheritdoc}

@@ -10,14 +10,17 @@ parameters:
 
     app.path.users_images:              images/users
     app.path.clients_images:            images/clients
+    app.path.undergraduates_pictures:   images/undergraduates
+    app.path.postgraduates_pictures:    images/postgraduates
     app.path.passports_images:          images/passports
+    app.path.institutions_logos:        images/institutions_logos
     app.path.countries_flags_images:    images/countries_flags
     app.path.images_images:             images/images
 
-    app.path.exit_wps_files:            files/exit_wps
-    app.path.departure_results_files:   files/departure_results
-
-
+    app.path.ext_mis_wps_files:         files/ext_mis_wps
+    app.path.ext_app_dco_files:         files/ext_app_dco
+    app.path.ext_dep_res_files:         files/ext_dep_res
+    app.path.agr_int_dco_files:         files/agr_int_dco
 
 framework:
     #esi:             ~
@@ -40,7 +43,10 @@ framework:
         save_path:   "%kernel.root_dir%/../var/sessions/%kernel.environment%"
     fragments:       ~
     http_method_override: true
-    assets: ~
+    assets:
+        packages:
+            avatars:
+                base_urls: 'http://sigesdri.lh/app_dev.php/'
 
 # Twig Configuration
 twig:
@@ -50,7 +56,10 @@ twig:
         #- 'form/comurimage.html.twig'
         - 'form/metronic_3_layout.html.twig'
         - 'form/metronic_3_horizontal_layout.html.twig'
+        #- 'bootstrap_3_layout.html.twig'
+        #- 'bootstrap_3_horizontal_layout.html.twig'
         - 'form/image_widget.html.twig'
+        - 'form/ckeditor_widget.html.twig'
         #- 'form/jquery.collection.html.twig'
 
         #- 'form_div_layout.html.twig'
@@ -78,11 +87,16 @@ doctrine:
         auto_generate_proxy_classes: true
         naming_strategy: doctrine.orm.naming_strategy.underscore
         auto_mapping: true
+        dql:
+            datetime_functions:
+                day:    'DRI\UsefulBundle\DQL\DatetimeFunction\Day'
+                month:  'DRI\UsefulBundle\DQL\DatetimeFunction\Month'
+                year:   'DRI\UsefulBundle\DQL\DatetimeFunction\Year'
 
 # Assetic Configuration
 assetic:
-    debug: '%kernel.debug%'
-    use_controller: '%kernel.debug%'
+    debug:          '%kernel.debug%'
+    use_controller: false #'%kernel.debug%'
     filters:
         cssrewrite: ~
 
@@ -142,10 +156,31 @@ vich_uploader:
             delete_on_remove:     true
             delete_on_update:     true
             inject_on_load:       false
+        undergraduates_pictures:
+            uri_prefix:           '%app.path.undergraduates_pictures%'
+            upload_destination:   '%kernel.root_dir%/../web/images/undergraduates'
+            namer:                namer.undergraduates_pictures
+            delete_on_remove:     true
+            delete_on_update:     true
+            inject_on_load:       false
+        postgraduates_pictures:
+            uri_prefix:           '%app.path.postgraduates_pictures%'
+            upload_destination:   '%kernel.root_dir%/../web/images/postgraduates'
+            namer:                namer.postgraduates_pictures
+            delete_on_remove:     true
+            delete_on_update:     true
+            inject_on_load:       false
         passports_images:
             uri_prefix:           '%app.path.passports_images%'
             upload_destination:   '%kernel.root_dir%/../web/images/passports'
             namer:                namer.passports_images
+            delete_on_remove:     true
+            delete_on_update:     true
+            inject_on_load:       false
+        institutions_logos:
+            uri_prefix:           '%app.path.institutions_logos%'
+            upload_destination:   '%kernel.root_dir%/../web/images/institutions_logos'
+            namer:                namer.institutions_logos
             delete_on_remove:     true
             delete_on_update:     true
             inject_on_load:       false
@@ -164,17 +199,34 @@ vich_uploader:
             delete_on_update:     true
             inject_on_load:       false
 
-        exit_wps_files:
-            uri_prefix:           '%app.path.exit_wps_files%'
-            upload_destination:   '%kernel.root_dir%/../web/files/exit_wps'
-            namer:                namer.exit_wps_files
+        ext_app_dco_files:
+            uri_prefix:           '%app.path.ext_app_dco_files%'
+            upload_destination:   '%kernel.root_dir%/../web/files/ext_app_dco'
+            namer:                namer.ext_app_dco_files
             delete_on_remove:     true
             delete_on_update:     true
             inject_on_load:       false
-        departure_results_files:
-            uri_prefix:           '%app.path.departure_results_files%'
-            upload_destination:   '%kernel.root_dir%/../web/files/departure_results'
-            namer:                namer.departure_results_files
+
+        ext_mis_wps_files:
+            uri_prefix:           '%app.path.ext_mis_wps_files%'
+            upload_destination:   '%kernel.root_dir%/../web/files/ext_mis_wps'
+            namer:                namer.ext_mis_wps_files
+            delete_on_remove:     true
+            delete_on_update:     true
+            inject_on_load:       false
+
+        ext_dep_res_files:
+            uri_prefix:           '%app.path.ext_dep_res_files%'
+            upload_destination:   '%kernel.root_dir%/../web/files/ext_dep_res'
+            namer:                namer.ext_dep_res_files
+            delete_on_remove:     true
+            delete_on_update:     true
+            inject_on_load:       false
+
+        agr_int_dco_files:
+            uri_prefix:           '%app.path.agr_int_dco_files%'
+            upload_destination:   '%kernel.root_dir%/../web/files/agr_int_dco'
+            namer:                namer.agr_int_dco_files
             delete_on_remove:     true
             delete_on_update:     true
             inject_on_load:       false
@@ -194,13 +246,12 @@ liip_imagine:
             quality: 100
             filters:
                 thumbnail: { size: [50, 50], mode: outbound }
-                background : { size : [54, 54], position : center, color : '#ddd' }
+                background : { size : [54, 54], position : center, color : '#fff' }
 
-        thumbnail_250_x_250:
+        client_250_x_250:
             quality: 100
             filters:
                 thumbnail: { size: [250, 250], mode: outbound }
-                background : { size : [254, 254], position : center, color : '#ddd' }
 
         flag_28_x_14:
             filters:
@@ -217,9 +268,7 @@ image_crop:
     mappings:
         DRI\ClientBundle\Entity\Client:
             filters:
-                - post_image
-                - thumbnail_50_x_50
-                - thumbnail_250_x_250
+                - client_250_x_250
 
 # Swiftmailer Configuration
 swiftmailer:
@@ -232,20 +281,72 @@ swiftmailer:
 # app/config/config.yml
 knp_snappy:
     pdf:
-            enabled: true
-            binary: "%kernel.root_dir%/../vendor/wemersonjanuario/wkhtmltopdf-windows/bin/64bit/wkhtmltopdf.exe"
-            options:
-               page-size: A4
-               dpi: 300
-               image-quality: 80
-               margin-left: 15mm
-               margin-right: 15mm
-               margin-top: 15mm
-               margin-bottom: 15mm
-               user-style-sheet: "%kernel.root_dir%/../web/assets/css/pdf.css"
+        enabled: true
+        binary: "%kernel.root_dir%/../vendor/wemersonjanuario/wkhtmltopdf-windows/bin/64bit/wkhtmltopdf.exe"
+        options:
+           page-size: A4
+           viewport-size: 1280x1024
+           dpi: 300
+           image-quality: 80
+           margin-left: 15mm
+           margin-right: 15mm
+           margin-top: 30mm
+           margin-bottom: 30mm
+           user-style-sheet: "%kernel.root_dir%/../web/assets/pdf/css/pdf.css"
     image:
         enabled:    true
         binary:     "%kernel.root_dir%/../vendor/wemersonjanuario/wkhtmltopdf-windows/bin/64bit/wkhtmltopdf.exe"
         options:    []
 
+fos_ck_editor:
+    #inline: true
+    default_config: my_config
 
+    configs:
+        my_config:
+            #extraPlugins: "templates"
+            stylesSet: "my_styles"
+            toolbar: basic
+            height: 150
+            font_names: 'Arial Narrow;'
+    styles:
+        my_styles:
+            - { name: "Ordered List", element: "div", attributes: { class: "ordered-list" }}
+            - { name: "Highlight", element: "p", attributes: { class: "highlight" }}
+            - { name: "Small Text", element: "p", attributes: { class: "small-text" }}
+            - { name: "Color Red", element: "span", attributes: { class: "color1" }}
+            - { name: "Color Yellow", element: "span", attributes: { class: "color2" }}
+            - { name: "Light Italic", element: "p", attributes: { class: "light italic" }}
+            - { name: "Reset Italic", element: "span", attributes: { class: "reset-italic" }}
+    toolbars:
+        configs:
+            editor:
+                -
+                  - Bold
+                  - Italic
+                  - Underline
+                  - Strike
+                  - RemoveFormat
+                  - NumberedList
+                  - BulletedList
+                  - Outdent
+                  - Indent
+                  - Blockquote
+                  - CreateDiv
+                  - JustifyLeft
+                  - JustifyCenter
+                  - JustifyRight
+                  - JustifyBlock
+                  - Link
+                  - Unlink
+                  - Image
+                  - Table
+                  - HorizontalRule
+                - /
+                -
+                  - Styles
+                  - Format
+                  - Font
+                  - FontSize
+                  - TextColor
+                  - BGColor

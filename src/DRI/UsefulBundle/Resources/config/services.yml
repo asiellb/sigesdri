@@ -9,7 +9,7 @@ services:
             - { name: namer }
 
     twig.extension.fechas:
-        class: DRI\UsefulBundle\Twig\Extension\DRIExtension
+        class: DRI\UsefulBundle\Twig\Extension\DRIUsefulExtension
         tags:
             - { name: twig.extension }
 

@@ -54,8 +54,8 @@ class ClientChangeImageType extends AbstractType
                 'cancel_button_class' => 'btn dark btn-outline',
                 'save_button_class' => 'btn green',
                 'enable_remote' => false,
-                'max_width' => '150',
-                'max_height' => '150',
+                'max_width' => '250',
+                'max_height' => '250',
                 'cropper_options' => [
                     //'movable' => false,
                     //'zoomable' => false,

@@ -13,11 +13,12 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use DRI\ClientBundle\Entity\Client;
 use DRI\UserBundle\Entity\User;
 use DRI\PassportBundle\Entity\Application;
+use DRI\UsefulBundle\Useful\Useful;
 
 /**
  * Passport
  *
- * @ORM\Table(name="passport")
+ * @ORM\Table(name="pas_passport")
  * @ORM\Entity(repositoryClass="DRI\PassportBundle\Repository\PassportRepository")
  * @ORM\HasLifecycleCallbacks()
  * @UniqueEntity("number")
@@ -26,31 +27,90 @@ use DRI\PassportBundle\Entity\Application;
  */
 class Passport
 {
+
+    /**********************************************************************************
+     * ********************************************************************************
+     * *
+     * *    PASSPORT'S CONSTANTS
+     * *
+     * ********************************************************************************
+     **********************************************************************************/
+
+    const PASSPORT_TYPE = [
+        'COR' => 'Corriente',
+        //'DIP' => 'Diplomático',
+        'OFI' => 'Oficial',
+        //'SER' => 'Servicio',
+        //'MAR' => 'Marino',
+    ];
+
+    const PASSPORT_TYPE_CHOICE = [
+        'Corriente'   =>'COR',
+        //'Diplomático' =>'DIP',
+        'Oficial'     =>'OFI',
+        //'Servicio'    =>'SER',
+        //'Marino'      =>'MAR',
+    ];
+
+    const PASSPORT_STATE = [
+        'ACT'  => 'Activo',
+        'PPRO' => 'Por Prorrogar',
+        'RPRO' => 'Requiere Prorrogar',
+        'PVEN' => 'Por Vencer',
+        'VEN'  => 'Vencido',
+        'BAJ'  => 'Baja',
+    ];
+
+    const PASSPORT_STATE_CHOICE = [
+        'Activo'             =>'ACT',
+        'Por Prorrogar'      =>'PPRO',
+        'Requiere Prorrogar' =>'RPRO',
+        'Por Vencer'         =>'PVEN',
+        'Vencido'            =>'VEN',
+        'Baja'               =>'BAJ',
+    ];
+
+
+
+    /**********************************************************************************
+     * ********************************************************************************
+     * *
+     * *    PASSPORT'S VARIABLES
+     * *
+     * ********************************************************************************
+     **********************************************************************************/
+
     /**
      * @var int
      *
-     * @ORM\Column(name="id", type="integer")
+     * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
 
     /**
-     * @var ArrayCollection
-     *
-     * @ORM\OneToMany(targetEntity="DRI\PassportBundle\Entity\Application", mappedBy="passport")
+     * @ORM\OneToOne(targetEntity="DRI\PassportBundle\Entity\Application", inversedBy="passport")
+     * @ORM\JoinColumn(name="application_id", referencedColumnName="id")
      */
-    private $applications;
+    private $application;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="noPas", type="string", length=7, unique=true)
+     * @ORM\Column(type="string", length=7, unique=true)
      *
      * @Assert\NotBlank()
      * @Assert\Length(min=7, max=7)
      */
     private $number;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string", length=7, unique=true)
+     */
+    private $numberSlug;
 
     /**
      * @var Client
@@ -63,7 +123,7 @@ class Passport
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="issueDate", type="date")
+     * @ORM\Column(type="date")
      *
      * @Assert\NotBlank()
      * @Assert\Date()
@@ -73,7 +133,7 @@ class Passport
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="expiryDate", type="date")
+     * @ORM\Column(type="date")
      *
      * @Assert\NotBlank()
      * @Assert\Date()
@@ -83,24 +143,13 @@ class Passport
     /**
      * @var string
      *
-     * @ORM\Column(name="type", type="string", length=3)
+     * @ORM\Column(type="string", length=3)
      *
      * @Assert\NotBlank()
      * @Assert\Length(min=3, max=3,)
-     * @Assert\Choice(choices={"ORD", "OFI"})
+     * @Assert\Choice(choices={"COR", "DIP", "OFI", "SER", "MAR"})
      */
     private $type;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="state", type="string", length=3)
-     *
-     * @Assert\NotBlank()
-     * @Assert\Length(min=3, max=3,)
-     * @Assert\Choice(choices={"ACT", "VEN", "BAJ"})
-     */
-    private $state;
 
     /**
      * @var string
@@ -117,32 +166,88 @@ class Passport
     private $firstPageFile;
 
     /**
-     * @var string
+     * @var boolean
      *
-     * @ORM\Column(name="dropReason", type="string", length=255, nullable=true)
+     * @ORM\Column(type="boolean", nullable=true)
+     *
      */
-    private $dropReason;
+    private $firstExtension;
 
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="dropDate", type="date", nullable=true)
+     * @ORM\Column(type="date", nullable=true)
+     *
+     * @Assert\Date()
+     */
+    private $firstExtensionDate;
+
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(type="boolean", nullable=true)
+     *
+     */
+    private $secondExtension;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(type="date", nullable=true)
+     *
+     * @Assert\Date()
+     */
+    private $secondExtensionDate;
+
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="drop_passport", type="boolean", nullable=true)
+     *
+     */
+    private $drop;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(type="date", nullable=true)
      *
      * @Assert\Date()
      */
     private $dropDate;
 
     /**
-     * @var ArrayCollection
+     * @var string
      *
-     * @ORM\OneToMany(targetEntity="DRI\ExitBundle\Entity\Departure", mappedBy="passport")
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $departures;
+    private $dropReason;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string", length=11)
+     */
+    private $clientCi;
+
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $closed;
+
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $inStore;
 
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="createdAt", type="datetime", nullable=true)
+     * @ORM\Column(type="datetime", nullable=true)
      *
      * @Assert\Date()
      */
@@ -151,7 +256,7 @@ class Passport
     /**
      * @var \Datetime
      *
-     * @ORM\Column(name="updatedAt", type="datetime", nullable=true)
+     * @ORM\Column(type="datetime", nullable=true)
      *
      * @Assert\Date()
      */
@@ -174,12 +279,28 @@ class Passport
     private $lastUpdateBy;
 
     /**
-     * @var string
+     * @var ArrayCollection
      *
-     * @ORM\Column(name="client_ci", type="string", length=11)
+     * @ORM\OneToMany(targetEntity="DRI\ExitBundle\Entity\Departure", mappedBy="passport")
      */
-    private $clientCi;
+    private $departures;
 
+    /**
+     * @var ArrayCollection
+     *
+     * @ORM\OneToMany(targetEntity="DRI\PassportBundle\Entity\Control", mappedBy="passport")
+     */
+    private $controls;
+
+
+
+    /**********************************************************************************
+     * ********************************************************************************
+     * *
+     * *    PASSPORT'S CONSTRUCTOR & TO_STRING METHOD
+     * *
+     * ********************************************************************************
+     **********************************************************************************/
 
 
     /**
@@ -188,10 +309,12 @@ class Passport
      */
     public function __construct()
     {
-        $this->firstPage = '';
-        $this->dropDate = null;
-        $this->createdAt = new \DateTime('now');
-        $this->updatedAt = new \DateTime('now');
+        $this->controls     = new ArrayCollection();
+        $this->firstPage    = '';
+        $this->dropDate     = null;
+        $this->createdAt    = new \DateTime('now');
+        $this->updatedAt    = new \DateTime('now');
+        $this->inStore      = true;
     }
 
     public function __toString()
@@ -199,12 +322,152 @@ class Passport
         return $this->getNumber();
     }
 
+
+
+    /**********************************************************************************
+     * ********************************************************************************
+     * *
+     * *    PASSPORT'S ENTITY METHODS
+     * *
+     * ********************************************************************************
+     **********************************************************************************/
+
+
+
+
     public function hasHolder(){
         if(is_null($this->holder)){
             return null;
         }
         return true;
     }
+
+    public function hasApplication(){
+        if(is_null($this->application) || $this->application == false){
+            return null;
+        }
+        return true;
+    }
+
+    public function isClosed(){
+        if($this->closed){
+            return true;
+        }
+        return false;
+    }
+
+    public function isInStore(){
+        if($this->inStore){
+            return true;
+        }
+        return false;
+    }
+
+    public function isActive(){
+        $inDate = $this->getIssueDate();
+        $exDate = $this->getExpiryDate();
+        $now    = new \DateTime("now");
+
+        if (($now >= $inDate) && ($now <= $exDate))
+            return true;
+        return false;
+    }
+
+    public function isExpired(){
+        $exDate = $this->getExpiryDate();
+        $now    = new \DateTime("now");
+
+        if ($now > $exDate)
+            return true;
+        return false;
+    }
+
+    public function isForExtend(){
+        if($this->getType() == 'COR'){
+            $issueDate      = $this->getIssueDate();
+            $firstLimitExt  = clone $issueDate;
+            $firstLimitExt->add(new \DateInterval('P2Y'));
+            $secondLimitExt = clone $issueDate;
+            $secondLimitExt->add(new \DateInterval('P4Y'));
+            $now            = new \DateTime("now");
+
+            if(!$this->getFirstExtension()){
+                $firstAdvise = clone $firstLimitExt;
+                $firstAdvise->sub(new \DateInterval('P3M'));
+
+                if ($now >= $firstAdvise)
+                    return true;
+            }elseif (!$this->getSecondExtension()){
+                $secondAdvise = clone $secondLimitExt;
+                $secondAdvise->sub(new \DateInterval('P3M'));
+
+                if ($now >= $secondAdvise)
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    public function isRequireExtend(){
+        if($this->getType() == 'COR'){
+            $issueDate      = $this->getIssueDate();
+            $firstLimitExt  = clone $issueDate;
+            $firstLimitExt->add(new \DateInterval('P2Y'));
+            $secondLimitExt = clone $issueDate;
+            $secondLimitExt->add(new \DateInterval('P4Y'));
+            $now            = new \DateTime("now");
+
+            if(!$this->getFirstExtension()){
+                if ($now >= $firstLimitExt)
+                    return true;
+            }elseif (!$this->getSecondExtension()){
+                if ($now >= $secondLimitExt)
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    public function isForExpiring(){
+        $exDate = $this->getExpiryDate();
+        $toExDate = clone $exDate;
+        $toExDate->sub(new \DateInterval('P6M'));
+        $now    = new \DateTime("now");
+
+        if (($now >= $toExDate) && ($now <= $exDate))
+            return true;
+        return false;
+    }
+
+    public function getState(){
+        if($this->isExpired()){
+            $this->state = 'VEN';
+        }elseif ($this->isForExpiring()){
+            $this->state = 'PVEN';
+        }elseif ($this->getDrop() == true){
+            $this->state = 'BAJ';
+        }elseif ($this->isRequireExtend()){
+            $this->state = 'RPRO';
+        }elseif ($this->isForExtend()){
+            $this->state = 'PPRO';
+        }elseif ($this->isActive()){
+            $this->state = 'ACT';
+        }
+
+        return $this->state;
+    }
+
+
+
+    /**********************************************************************************
+     * ********************************************************************************
+     * *
+     * *    PASSPORT'S GET & SET METHODS
+     * *
+     * ********************************************************************************
+     **********************************************************************************/
+
+
 
 
     /**
@@ -268,7 +531,6 @@ class Passport
         return $this->firstPageFile;
     }
 
-
     /**
      * Set number
      *
@@ -279,6 +541,7 @@ class Passport
     public function setNumber($number)
     {
         $this->number = $number;
+        $this->numberSlug = Useful::getSlug($this->number);
 
         return $this;
     }
@@ -291,6 +554,30 @@ class Passport
     public function getNumber()
     {
         return $this->number;
+    }
+
+    /**
+     * Set numberSlug
+     *
+     * @param string $numberSlug
+     *
+     * @return Passport
+     */
+    public function setNumberSlug($numberSlug)
+    {
+        $this->numberSlug = $numberSlug;
+
+        return $this;
+    }
+
+    /**
+     * Get numberSlug
+     *
+     * @return string
+     */
+    public function getNumberSlug()
+    {
+        return $this->numberSlug;
     }
 
     /**
@@ -366,31 +653,33 @@ class Passport
     }
 
     /**
-     * Set state
+     * Set drop
      *
-     * @param string $state
+     * @param boolean $drop
      *
      * @return Passport
      */
-    public function setState($state)
+    public function setDrop($drop)
     {
-        $this->state = $state;
+        $this->drop = $drop;
 
-        if ($state == 'BAJ'){
+        if ($drop){
             $this->dropDate = new \DateTime('now');
+            $this->closed = true;
+            $this->inStore = false;
         }
 
         return $this;
     }
 
     /**
-     * Get state
+     * Get drop
      *
-     * @return string
+     * @return boolean
      */
-    public function getState()
+    public function getDrop()
     {
-        return $this->state;
+        return $this->drop;
     }
 
     /**
@@ -562,37 +851,27 @@ class Passport
     }
 
     /**
-     * Add application
+     * Set application
      *
      * @param Application $application
      *
      * @return Passport
      */
-    public function addApplication(Application $application)
+    public function setApplication(Application $application)
     {
-        $this->applications[] = $application;
+        $this->application = $application;
 
         return $this;
     }
 
     /**
-     * Remove application
+     * Get application
      *
-     * @param Application $application
+     * @return Application
      */
-    public function removeApplication(Application $application)
+    public function getApplication()
     {
-        $this->applications->removeElement($application);
-    }
-
-    /**
-     * Get applications
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getApplications()
-    {
-        return $this->applications;
+        return $this->application;
     }
 
     /**
@@ -679,4 +958,244 @@ class Passport
     {
         return $this->departures;
     }
+
+    /**
+     * Set closed
+     *
+     * @param boolean $closed
+     *
+     * @return Passport
+     */
+    public function setClosed($closed)
+    {
+        $this->closed = $closed;
+
+        return $this;
+    }
+
+    /**
+     * Get closed
+     *
+     * @return boolean
+     */
+    public function getClosed()
+    {
+        return $this->closed;
+    }
+
+    /**
+     * Set inStore
+     *
+     * @param boolean $inStore
+     *
+     * @return Passport
+     */
+    public function setInStore($inStore)
+    {
+        $this->inStore = $inStore;
+
+        return $this;
+    }
+
+    /**
+     * Get inStore
+     *
+     * @return boolean
+     */
+    public function getInStore()
+    {
+        return $this->inStore;
+    }
+
+
+    /**
+     * Add control
+     *
+     * @param Control $control
+     *
+     * @return Passport
+     */
+    public function addControl(Control $control)
+    {
+        $this->controls[] = $control;
+
+        return $this;
+    }
+
+    /**
+     * Remove control
+     *
+     * @param Control $control
+     */
+    public function removeControl(Control $control)
+    {
+        $this->controls->removeElement($control);
+    }
+
+    /**
+     * Get controls
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getControls()
+    {
+        return $this->controls;
+    }
+
+
+    /**
+     * Set firstExtension
+     *
+     * @param boolean $firstExtension
+     *
+     * @return Passport
+     */
+    public function setFirstExtension($firstExtension)
+    {
+        $this->firstExtension = $firstExtension;
+
+        return $this;
+    }
+
+    /**
+     * Get firstExtension
+     *
+     * @return boolean
+     */
+    public function getFirstExtension()
+    {
+        return $this->firstExtension;
+    }
+
+    /**
+     * Set firstExtensionDate
+     *
+     * @param \DateTime $firstExtensionDate
+     *
+     * @return Passport
+     */
+    public function setFirstExtensionDate($firstExtensionDate)
+    {
+        $this->firstExtensionDate = $firstExtensionDate;
+
+        return $this;
+    }
+
+    /**
+     * Get firstExtensionDate
+     *
+     * @return \DateTime
+     */
+    public function getFirstExtensionDate()
+    {
+        return $this->firstExtensionDate;
+    }
+
+    /**
+     * Set secondExtension
+     *
+     * @param boolean $secondExtension
+     *
+     * @return Passport
+     */
+    public function setSecondExtension($secondExtension)
+    {
+        $this->secondExtension = $secondExtension;
+
+        return $this;
+    }
+
+    /**
+     * Get secondExtension
+     *
+     * @return boolean
+     */
+    public function getSecondExtension()
+    {
+        return $this->secondExtension;
+    }
+
+    /**
+     * Set secondExtensionDate
+     *
+     * @param \DateTime $secondExtensionDate
+     *
+     * @return Passport
+     */
+    public function setSecondExtensionDate($secondExtensionDate)
+    {
+        $this->secondExtensionDate = $secondExtensionDate;
+
+        return $this;
+    }
+
+    /**
+     * Get secondExtensionDate
+     *
+     * @return \DateTime
+     */
+    public function getSecondExtensionDate()
+    {
+        return $this->secondExtensionDate;
+    }
+
+
+
+    /**********************************************************************************
+     * ********************************************************************************
+     * *
+     * *    PASSPORT'S ADITIONALS METHODS
+     * *
+     * ********************************************************************************
+     **********************************************************************************/
+
+
+
+
+    static function type_AcronimToName($type){
+        switch ($type){
+            case 'COR': return 'Corriente';break;
+            case 'DIP': return 'Diplomático';break;
+            case 'OFI': return 'Oficial';break;
+            case 'SER': return 'Servicio';break;
+            case 'MAR': return 'Marino';break;
+            default: return 'Tipo de Pasaporte No Definido';break;
+        }
+    }
+
+    static function type_NameToAcronim($type){
+        switch ($type){
+            case 'Corriente': return 'COR';break;
+            case 'Diplomático': return 'DIP';break;
+            case 'Oficial': return 'OFI';break;
+            case 'Servicio': return 'SER';break;
+            case 'Marino': return 'MAR';break;
+            default: return 'Tipo de Pasaporte No Definido';break;
+        }
+    }
+
+    static function state_AcronimToName($state){
+        switch ($state){
+            case 'ACT': return 'Activo';break;
+            case 'PPRO': return 'Por Prorrogar';break;
+            case 'RPRO': return 'Requiere Prorrogar';break;
+            case 'PVEN': return 'Por Vencer';break;
+            case 'VEN': return 'Vencido';break;
+            case 'BAJ': return 'Baja';break;
+            default: return 'Estado de Pasaporte No Definido';break;
+        }
+    }
+
+    static function state_NameToAcronim($state){
+        switch ($state){
+            case 'Activo': return 'ACT';break;
+            case 'Por Prorrogar': return 'PPRO';break;
+            case 'Requiere Prorrogar': return 'RPRO';break;
+            case 'Por Vencer': return 'PVEN';break;
+            case 'Vencido': return 'VEN';break;
+            case 'Baja': return 'BAJ';break;
+            default: return 'Estado de Pasaporte No Definido';break;
+        }
+    }
+
 }

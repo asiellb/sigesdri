@@ -407,7 +407,7 @@
 
 {% block vich_file_widget %}
 {% spaceless %}
-    <div class="easyadmin-vich-file">
+    {#<div class="fileinput {{ download_uri|default('') is not empty ? 'fileinput-exists' : 'fileinput-new' }}" data-provides="fileinput" >
         {% if download_uri|default('') is not empty %}
             {% set download_title = download_uri|split('/')|last ?: 'download'|trans({}, 'VichUploaderBundle') %}
             <a href="{{ asset(download_uri) }}">{{ download_title }}</a>
@@ -427,6 +427,30 @@
                 {{ form_row(form.delete, { label: 'action.delete' }) }}
             {% endif %}
         </div>
+    </div>#}
+
+    <div class="fileinput {{ download_uri|default('') is not empty ? 'fileinput-exists' : 'fileinput-new' }}" data-provides="fileinput">
+        <span class="btn-file">
+            <span class="fileinput-new btn blue-dark btn-outline"> Seleccionar Archivo </span>
+            <span class="fileinput-exists btn red btn-outline"> Cambiar </span>
+            {{ form_widget(form.file) }} </span>
+        <span class="fileinput-filename" style="padding: 0 10px;">
+            {% if download_uri|default('') is not empty %}
+                {% set download_title = download_uri|split('/')|last ?: 'download'|trans({}, 'VichUploaderBundle') %}
+                <a href="{{ asset(download_uri) }}" target="_blank">{{ download_title }}</a>
+            {% endif %}
+        </span>
+        <a href="javascript:;" class="close fileinput-exists" data-dismiss="fileinput"> </a>
+        {% if form.delete is defined %}
+            <div class="file-disappear disappear">
+            {{ form_row(form.delete) }}
+            </div>
+            <script>
+                $( document ).on( 'click', '.fileinput-exists .close', function(){
+                    $('.file-disappear.disappear').find('input[type="checkbox"]').prop('checked', true);
+                });
+            </script>
+        {% endif %}
     </div>
 {% endspaceless %}
 {% endblock %}

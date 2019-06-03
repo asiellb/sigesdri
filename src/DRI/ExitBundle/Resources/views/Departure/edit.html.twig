@@ -1,35 +1,189 @@
 {% extends 'DRIExitBundle::layout.exit.html.twig' %}
 
-{% block title %}{{ parent() }} | Editar {% endblock %}
+{% block title %}{{ parent() }} | Modificar | {{ departure.number }} {% endblock %}
+
+{% block page_level_plugins_css %}
+    <link href="{{ asset('assets/global/plugins/bootstrap-select/css/bootstrap-select.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/select2/css/select2.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/select2/css/select2-bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/bootstrap-datepicker/css/bootstrap-datepicker.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.css') }}" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block page_level_plugins_js %}
+    <script src="{{ asset('assets/global/plugins/bootstrap-select/js/bootstrap-select.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/select2/js/select2.full.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/bootstrap-datepicker/locales/bootstrap-datepicker.es.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/jquery-validation/js/jquery.validate.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/jquery-validation/js/localization/messages_es.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/jquery-validation/js/additional-methods.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/pages/scripts/plugins/jquery-validation/additional-methods.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.js') }}" type="text/javascript"></script>
+{% endblock %}
+
+{% block page_level_scrpt %}
+    <script src="{{ asset('assets/pages/scripts/init-form-plugins.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/pages/scripts/departure-form.js') }}" type="text/javascript"></script>
+{% endblock %}
 
 {% block  page_breadcrumb %}
     {{ parent() }}
     <li>
-        <span>Editar </span>
+        <span>Modificar </span>
+        <i class="fa fa-circle"></i>
+        <span># {{ departure.number }} </span>
     </li>
 {% endblock %}
 
 {% block page_title %}
-    {{ parent() }}
-    <small>Editar </small>
 {% endblock %}
 
 {% block page_dashboard %}
-    <h1>Departure edit</h1>
+    <div class="row">
+        <div class="col-md-12">
+            {{ form_start(edit_form, {'attr': {'id':'submit_departure_edit_form','class': 'form-horizontal form-row-seperated', 'role':'form'}}) }}
+            <div class="portlet light bordered">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <i class="icon-plane font-blue-dark"></i>
+                        <span class="caption-subject font-blue-dark bold uppercase">
+                            Modificar Salida
+                            <span class="font-green-sharp"># {{ departure.number }}</span>
+                        </span>
+                    </div>
+                    <div class="actions btn-set">
+                        <a class="btn btn-transparent grey-cascade btn-outline btn-circle btn-sm" href="{{ path('departure_list') }}">
+                            <span class="fa fa-list" aria-hidden="true"></span>
+                            Ir al listado
+                        </a>
+                        <button class="btn btn-transparent grey-cascade btn-outline btn-circle btn-sm" type="reset">
+                            <i class="fa fa-reply"></i> Reset
+                        </button>
+                        <a class="btn btn-transparent grey-cascade btn-outline btn-circle btn-sm" href="{{ path('departure_show', { 'numberSlug':  departure.numberSlug }) }}">
+                            <span class="fa fa-eye" aria-hidden="true"></span>
+                            Ver Detalles
+                        </a>
+                        <button class="btn btn-success btn-circle" type="submit">
+                            <i class="fa fa-check"></i> Guardar
+                        </button>
+                        <a class="btn btn-circle btn-icon-only btn-default fullscreen" href="javascript:;"> </a>
+                    </div>
+                </div>
+                <div class="portlet-body form">
+                    <div class="form-body">
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">Cliente</label>
+                            <div class="col-md-10">
+                                {% if departure.client is null %}
+                                    {{ form_widget(edit_form.client) }}
+                                {% else %}
+                                    <select id="departure-client-selected" class="select2" disabled="disabled">
+                                        <option value="{{ departure.client.id }}">{{ departure.client.fullName }}</option>
+                                    </select>
+                                {% endif %}
+                                <div id="form_client_error"> </div>
+                            </div>
+                            <div id="form_holder_error"> </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">Solicitud Asociada</label>
+                            <div class="col-md-10">
+                                {% if departure.application is null %}
+                                    {{ form_widget(edit_form.application) }}
+                                {% else %}
+                                    <select id="departure-application-selected" class="select2" disabled="disabled">
+                                        <option value="{{ departure.application.id }}">{{ departure.application.number }}</option>
+                                    </select>
+                                {% endif %}
+                                <div id="form_application_error"> </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">Pasaporte</label>
+                            <div class="col-md-10">
+                                {% if departure.passport is null %}
+                                    {{ form_widget(edit_form.passport) }}
+                                {% else %}
+                                    <select id="departure-passport-selected" class="select2" disabled="disabled">
+                                        <option value="{{ departure.passport.id }}">{{ departure.passport.number }}</option>
+                                    </select>
+                                {% endif %}
+                                <div id="form_passport_error"> </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">Fecha de Partida</label>
+                            <div class="col-md-10">
+                                {% if departure.departureDate is null %}
+                                    {{ form_widget(edit_form.departureDate) }}
+                                {% else %}
+                                    <input type="text" class="form-control" value="{{ departure.departureDate | localizeddate("long", "none") }}" disabled>
+                                {% endif %}
+                            </div>
+                        </div>
 
-    {{ form_start(edit_form) }}
-        {{ form_widget(edit_form) }}
-        <input type="submit" value="Edit" />
-    {{ form_end(edit_form) }}
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">Fecha de Entrega del Pasaporte</label>
+                            <div class="col-md-10">
+                                {% if departure.passportDelivery is null %}
+                                    {{ form_widget(edit_form.passportDelivery) }}
+                                {% else %}
+                                    <input type="text" class="form-control" value="{{ departure.passportDelivery | localizeddate("long", "none") }}" disabled>
+                                {% endif %}
+                            </div>
+                        </div>
 
-    <ul>
-        <li>
-            <a href="{{ path('departure_index') }}">Back to the list</a>
-        </li>
-        <li>
-            {{ form_start(delete_form) }}
-                <input type="submit" value="Delete">
-            {{ form_end(delete_form) }}
-        </li>
-    </ul>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">Fecha de Retornoa</label>
+                            <div class="col-md-10">
+                                {{ form_widget(edit_form.returnDate) }}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">Fecha de Recogida del Pasaporte</label>
+                            <div class="col-md-10">
+                                {{ form_widget(edit_form.passportCollection) }}
+                                <div id="form_state_error"> </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">Observaciones</label>
+                            <div class="col-md-10">
+                                {{ form_widget(edit_form.observations) }}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">Resultados</label>
+                            <div class="col-md-10">
+                                {{ form_widget(edit_form.resultsFile) }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <div class="row">
+                            <div class="col-md-offset-2 col-md-10">
+                                <button type="submit" class="btn green button-submit">
+                                    Guardar
+                                    <i class="fa fa-check"></i>
+                                </button>
+                                <a class="btn btn-default" href="{{ path('departure_list') }}">
+                                    Ir al listado
+                                    <i class="fa fa-list"></i>
+                                </a>
+                                <a class="btn btn-default" href="{{ absolute_url(lastPage) }}">
+                                    Cancelar
+                                    <i class="fa fa-close"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{ form_end(edit_form) }}
+        </div>
+    </div>
 {% endblock %}

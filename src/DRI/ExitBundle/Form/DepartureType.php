@@ -26,50 +26,39 @@ use Symfony\Component\Form\FormEvents;
 use Doctrine\ORM\EntityManagerInterface;
 
 use DRI\ExitBundle\Entity\Economic;
-use DRI\ExitBundle\Entity\ExitApplication;
+use DRI\ExitBundle\Entity\Application;
 use DRI\UsefulBundle\Form\DatePickerType;
 use DRI\ClientBundle\Entity\Client;
 use DRI\PassportBundle\Entity\Passport;
 
 class DepartureType extends AbstractType
 {
-    private $em;
-
-    /**
-     * The Type requires the EntityManager as argument in the constructor. It is autowired
-     * in Symfony 3.
-     *
-     * @param EntityManagerInterface $em
-     */
-    public function __construct(EntityManagerInterface $em)
-    {
-        $this->em = $em;
-    }
+    private $currentAction;
 
     /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $this->currentAction = $options['currentAction'];
 
-        if($options['data']->hasClient()) {
-            $applications = $options['applications'];
+        if(!$options['data']->hasClient()) {
             $builder
-                ->add('application', EntityType::class, [
-                    'class' => 'DRIExitBundle:ExitApplication',
-                    'choice_label' => 'number',
+                ->add('client', EntityType::class, [
                     'required'      => true,
-                    'choices' => $applications,
-                    'empty_data' => null,
-                    'attr' => [
+                    'placeholder'   => 'Seleccione el titular ...',
+                    'class'         => 'DRIClientBundle:Client',
+                    'choice_label'  => 'fullName',
+                    'empty_data'    => null,
+                    'attr'          => [
                         'class' => 'select2',
                     ],
-                ])
-            ;
-        }else{
+                ]);
+        }
+        if(!$options['data']->hasApplication()) {
             $builder
                 ->add('application', EntityType::class, [
-                    'class' => 'DRIExitBundle:ExitApplication',
+                    'class' => 'DRIExitBundle:Application',
                     'choice_label' => 'number',
                     'required'      => true,
                     'placeholder' => 'Seleccione la Solicitud ...',
@@ -77,94 +66,45 @@ class DepartureType extends AbstractType
                     'attr' => [
                         'class' => 'select2',
                     ],
+                ]);
+        }
+        if(!$options['data']->hasPassport()) {
+            $builder
+                ->add('passport', EntityType::class, [
+                    'required' => true,
+                    'placeholder' => 'Seleccione el pasaporte ...',
+                    'class' => 'DRIPassportBundle:Passport',
+                    'choice_label' => 'number',
+                    'attr' => [
+                        'class' => 'select2',
+                    ],
+                ]);
+        }
+        if(!$options['data']->hasPassportDelivery()) {
+            $builder
+                ->add('passportDelivery', DatePickerType::class);
+        }
+        if(!$options['data']->hasDepartureDate()) {
+            $builder
+                ->add('departureDate', DatePickerType::class);
+        }
+        if ($this->currentAction == 'edit') {
+            $builder
+                ->add('returnDate', DatePickerType::class, [
+                    'required' => false,
                 ])
-            ;
+                ->add('passportCollection', DatePickerType::class, [
+                    'required' => false,
+                ])
+                ->add('observations', TextareaType::class, [
+                    'required' => false,
+                ])
+                ->add('resultsFile', VichFileType::class, array(
+                    'required' => false,
+                    'allow_delete' => true, // not mandatory, default is true
+                    'download_link' => true, // not mandatory, default is true
+                ));
         }
-
-        $builder
-            ->add('passportDelivery', DatePickerType::class)
-            ->add('departureDate', DatePickerType::class)
-            ->add('returnDate', DatePickerType::class, [
-                'required'      => false,
-            ])
-            ->add('passportCollection', DatePickerType::class, [
-                'required'      => false,
-            ])
-            ->add('observations', TextareaType::class, [
-                'required'      => false,
-            ])
-            ->add('resultsFile', VichFileType::class, array(
-                'required'      => false,
-                'allow_delete'  => true, // not mandatory, default is true
-                'download_link' => true, // not mandatory, default is true
-            ))
-        ;
-
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, array($this, 'onPreSetData'));
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, array($this, 'onPreSubmit'));
-    }
-
-    protected function addElements(FormInterface $form, Client $client = null) {
-        // 4. Add the passport element
-        $form->add('client', EntityType::class, [
-            'required'      => true,
-            'data'          => $client,
-            'placeholder'   => 'Seleccione el titular ...',
-            'class'         => 'DRIClientBundle:Client',
-            'choice_label'  => 'fullName',
-            'empty_data'    => null,
-            'attr'          => [
-                'class' => 'select2',
-            ],
-        ]);
-
-        // Passports empty, unless there is a selected Client (Edit View)
-        $passports = array();
-
-        // If there is a client stored in the Departure entity, load the passports of it
-        if ($client) {
-            // Fetch Passports of the Client if there's a selected client
-            $repoPassport = $this->em->getRepository('DRIPassportBundle:Passport');
-
-            $passports = $repoPassport->createQueryBuilder("q")
-                ->where("q.holder = :clientid")
-                ->setParameter("clientid", $client->getId())
-                ->getQuery()
-                ->getResult();
-        }
-
-        // Add the Passports field with the properly data
-        $form
-            ->add('passport', EntityType::class, [
-                'required' => true,
-                'placeholder' => 'Seleccione el pasaporte ...',
-                'class' => 'DRIPassportBundle:Passport',
-                'choices' => $passports,
-                'attr' => [
-                    'class' => 'select2',
-                ],
-            ])
-        ;
-    }
-
-    function onPreSubmit(FormEvent $event) {
-        $form = $event->getForm();
-        $data = $event->getData();
-
-        // Search for selected Client and convert it into an Entity
-        $client = $this->em->getRepository('DRIClientBundle:Client')->find($data['client']);
-
-        $this->addElements($form, $client);
-    }
-
-    function onPreSetData(FormEvent $event) {
-        $departure = $event->getData();
-        $form = $event->getForm();
-
-        // When you create a new departure, the Client is always empty
-        $client = $departure->getClient() ? $departure->getClient() : null;
-
-        $this->addElements($form, $client);
     }
 
     /**
@@ -174,12 +114,10 @@ class DepartureType extends AbstractType
     {
         $resolver->setDefaults(array(
             'data_class' => 'DRI\ExitBundle\Entity\Departure',
-            'cascade_validation' => true,
-            'error_bubbling' => false,
-            'applications' => null,
+            'currentAction' => null,
         ));
 
-        $resolver->setRequired('applications');
+        $resolver->setRequired('currentAction');
     }
 
     /**
@@ -187,7 +125,7 @@ class DepartureType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'dri_exitbundle_departure';
+        return 'exitbundle_departure';
     }
 
 

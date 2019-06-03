@@ -70,9 +70,9 @@
             {{ action.endHtml|raw }}
         {% else %}
             {{ action.startHtml|raw }}
-            <button type="button"  {{ macros.value(values[actionKey]) }} {{ macros.attributes(action) }} {{ macros.confirm_dialog(action) }}>
+            <a  {{ macros.value(values[actionKey]) }} {{ macros.attributes(action) }} {{ macros.confirm_dialog(action) }}>
                 {{ macros.link_title(action) }}
-            </button>
+            </a>
             {{ action.endHtml|raw }}
         {% endif %}
     {% endif %}

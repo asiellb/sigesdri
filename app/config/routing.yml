@@ -1,24 +1,35 @@
-dri_exit_departure:
-    resource: "@DRIExitBundle/Controller/DepartureController.php"
+dri_exit_manager_travel_plan:
+    resource: "@DRIExitBundle/Controller/ManagerTravelPlanController.php"
     type:     annotation
 
-dri_user_user:
-    resource: "@DRIUserBundle/Controller/UserController.php"
+dri_foreing_student:
+    resource: "@DRIForeingStudentBundle/Controller/"
+    type:     annotation
+    prefix:   /foreing-student
+
+dri_useful_course:
+    resource: "@DRIUsefulBundle/Controller/CourseController.php"
     type:     annotation
 
-_homepage:
+dri_useful_career:
+    resource: "@DRIUsefulBundle/Controller/CareerController.php"
+    type:     annotation
+
+dri_agreement_application:
+    resource: "@DRIAgreementBundle/Controller/ApplicationController.php"
+    type:     annotation
+
+dri_agreement_institution:
+    resource: "@DRIAgreementBundle/Controller/InstitutionController.php"
+    type:     annotation
+
+dri_agreement_institutional:
+    resource: "@DRIAgreementBundle/Controller/InstitutionalController.php"
+    type:     annotation
+
+_dashboard:
     path: /
-    defaults: { _controller: FrameworkBundle:Redirect:redirect, route: homepage }
-
-dri_exit:
-    resource: "@DRIExitBundle/Controller/"
-    type:     annotation
-    prefix:   /exit
-
-dri_passport:
-    resource: "@DRIPassportBundle/Controller/"
-    type:     annotation
-    prefix:   /passport
+    defaults: { _controller: FrameworkBundle:Redirect:redirect, route: dashboard }
 
 dri_system:
     resource: "@DRISystemBundle/Controller/"
@@ -30,10 +41,29 @@ dri_client:
     type:     annotation
     prefix:   /client
 
+dri_passport:
+    resource: "@DRIPassportBundle/Controller/"
+    type:     annotation
+    prefix:   /passport
+
+dri_exit:
+    resource: "@DRIExitBundle/Controller/"
+    type:     annotation
+    prefix:   /exit
+
+dri_agreement:
+    resource: "@DRIAgreementBundle/Controller/"
+    type:     annotation
+    prefix:   /agreement
+
 dri_useful:
     resource: "@DRIUsefulBundle/Controller/"
     type:     annotation
     prefix:   /useful
+
+dri_user_user:
+    resource: "@DRIUserBundle/Controller/UserController.php"
+    type:     annotation
 
 fos_user:
     resource: "@FOSUserBundle/Resources/config/routing/all.xml"

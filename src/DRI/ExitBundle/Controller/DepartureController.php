@@ -2,7 +2,6 @@
 
 namespace DRI\ExitBundle\Controller;
 
-use DRI\ExitBundle\Entity\ExitApplication;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -24,25 +23,45 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 use DRI\ExitBundle\Entity\Departure;
 use DRI\ExitBundle\Datatables\DepartureDatatable;
+use DRI\ClientBundle\Entity\Client;
+use DRI\ExitBundle\Entity\Application;
+use DRI\ExitBundle\Form\ApplicationType;
 use DRI\ExitBundle\Form\DepartureType;
 
 /**
  * Departure controller.
  *
- * @Route("departure")
+ * @Route("/departure")
  */
 class DepartureController extends Controller
 {
     /**
-     * Lists all Departure entities.
+     * Estatistics for Departure entities.
+     *
      * @param Request $request
      *
      * @Route("/index", name="departure_index")
-     * @Method("GET")
      *
      * @return Response
      */
     public function indexAction(Request $request)
+    {
+        return $this->render('@DRIExit/Departure/index.html.twig', array(
+
+        ));
+    }
+
+    /**
+     * Lists all Departure entities.
+     *
+     * @param Request $request
+     *
+     * @Route("/list", name="departure_list")
+     * @Method("GET")
+     *
+     * @return Response
+     */
+    public function listAction(Request $request)
     {
         $isAjax = $request->isXmlHttpRequest();
 
@@ -63,7 +82,7 @@ class DepartureController extends Controller
             return $responseService->getResponse();
         }
 
-        return $this->render('DRIExitBundle:Departure:index.html.twig', array(
+        return $this->render('@DRIExit/Departure/list.html.twig', array(
             'datatable' => $datatable,
         ));
     }
@@ -71,14 +90,20 @@ class DepartureController extends Controller
     /**
      * Creates a new departure entity.
      *
+     * @param Request $request
+     * @param Client $clientset
+     *
      * @Route("/new/{clientset}", name="departure_new")
      * @Method({"GET", "POST"})
-     * @Security("has_role('ROLE_INFO_SPECIALIST')")
+     * @Security("has_role('ROLE_REQUIRE_SPECIALIST')")
+     *
+     * @return Response
      */
     public function newAction(Request $request, $clientset = null)
     {
         $user = null;
         $client = null;
+        $app = null;
 
         if($this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             $user = $this->getUser();  // get $user object
@@ -86,7 +111,7 @@ class DepartureController extends Controller
 
         $em = $this->getDoctrine()->getManager();
         $clientRepo = $em->getRepository('DRIClientBundle:Client');
-        $appRepo = $em->getRepository('DRIExitBundle:ExitApplication');
+        $appRepo = $em->getRepository('DRIExitBundle:Application');
 
         $departure = new Departure();
 
@@ -96,33 +121,118 @@ class DepartureController extends Controller
         if($clientset){
 
             $client = $clientRepo->find($clientset);
-            $applications = $appRepo->findByClient($client);
 
+            if(!$client){
+                throw $this->createNotFoundException("El cliente al que se le intenta crear la Salida no existe.");
+            }
+
+            $departure->setClient($client);
+        }
+
+        $form = $this->createForm('DRI\ExitBundle\Form\DepartureType', $departure, [
+            'currentAction' => 'new'
+        ])->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            if (!($departure->getApplication() == null)){
+                $app = $appRepo->find($departure->getApplication());
+
+                if($app){
+                    $app->setUsed(true);
+                }
+            }
+
+            $em->persist($departure);
+            $em->flush();
+
+            $editLink = $this->generateUrl('departure_edit', array('numberSlug' => $departure->getNumberSlug()));
+            $this->get('session')->getFlashBag()->add('success', "<a href='$editLink'>Se creó una nueva Salida al Exterior.</a>" );
+
+            return $this->redirectToRoute('departure_show', array('numberSlug' => $departure->getNumberSlug()));
+        }
+
+        $lastVisited = $request->server->get('HTTP_REFERER');
+
+        return $this->render('DRIExitBundle:Departure:new.html.twig', array(
+            'lastPage' => $lastVisited,
+            'client' => $client,
+            'application' => $app,
+            'departure' => $departure,
+            'form' => $form->createView(),
+        ));
+    }
+
+    /**
+     * Creates a new Passport from Application entity.
+     *
+     * @param Request $request
+     * @param Application $application
+     *
+     * @Route("/new-from-application/{application}", name="departure_new_from_application")
+     * @Method({"GET", "POST"})
+     * @Security("has_role('ROLE_REQUIRE_SPECIALIST')")
+     *
+     * @return Response
+     */
+    public function newFromApplicationAction(Request $request, $application = null)
+    {
+        $user = null;
+        $client = null;
+        $app    = null;
+        $lastVisited = $request->server->get('HTTP_REFERER');
+
+        if($this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            $user = $this->getUser();  // get $user object
+        }
+
+        $em = $this->getDoctrine()->getManager();
+        $clientRepo = $em->getRepository('DRIClientBundle:Client');
+        $applicationRepo = $em->getRepository('DRIExitBundle:Application');
+
+        $departure = new Departure();
+
+        if ($user){
+            $departure->setCreatedBy($user);
+        }
+        if($application){
+
+            $app    = $applicationRepo->find($application);
+            if(!$app){
+                throw $this->createNotFoundException("El cliente al que se le intenta crear la salida no tiene Solicitudes.");
+            }
+
+            $client = $clientRepo->find($app->getClient());
             if(!$client){
                 throw $this->createNotFoundException("El cliente al que se le intenta crear la salida no existe.");
             }
 
             $departure->setClient($client);
-
-            $form = $this->createForm('DRI\ExitBundle\Form\DepartureType', $departure, [
-                'applications' => $applications
-            ]);
-            $form->handleRequest($request);
-        }else{
-            $form = $this->createForm('DRI\ExitBundle\Form\DepartureType', $departure);
-            $form->handleRequest($request);
+            $departure->setApplication($app);
         }
 
+        $form = $this->createForm(DepartureType::class, $departure, [
+            'currentAction' => 'new'
+        ])->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            $app->setUsed(true);
+
             $em->persist($departure);
             $em->flush();
 
-            return $this->redirectToRoute('departure_show', array('id' => $departure->getId()));
+            $editLink = $this->generateUrl('departure_edit', array('numberSlug' => $departure->getNumberSlug()));
+            $this->get('session')->getFlashBag()->add('success', "<a href='$editLink'>Se creó una nueva Solicitud de Pasaporte.</a>" );
+
+            return $this->redirectToRoute('departure_show', array('numberSlug' => $departure->getNumberSlug()));
         }
 
-        return $this->render('DRIExitBundle:Departure:new.html.twig', array(
-            'departure' => $departure,
+        return $this->render('@DRIExit/Departure/new.html.twig', array(
+            'lastPage' => $lastVisited,
+            'client' => $client,
+            'application' => $app,
+            'Passport' => $departure,
             'form' => $form->createView(),
         ));
     }
@@ -130,8 +240,12 @@ class DepartureController extends Controller
     /**
      * Finds and displays a departure entity.
      *
-     * @Route("/{id}", name="departure_show")
+     * @param Departure $departure
+     *
+     * @Route("/{numberSlug}", name="departure_show")
      * @Method("GET")
+     *
+     * @return Response
      */
     public function showAction(Departure $departure)
     {
@@ -144,36 +258,78 @@ class DepartureController extends Controller
     }
 
     /**
-     * Displays a form to edit an existing departure entity.
+     * Displays a form to edit an existing Departure entity.
      *
-     * @Route("/{id}/edit", name="departure_edit")
+     * @param Request $request
+     * @param Departure $departure
+     *
+     * @Route("/edit/{numberSlug}", name="departure_edit", options = {"expose" = true})
      * @Method({"GET", "POST"})
+     * @Security("has_role('ROLE_REQUIRE_SPECIALIST')")
+     *
+     * @return Response
      */
     public function editAction(Request $request, Departure $departure)
     {
-        $deleteForm = $this->createDeleteForm($departure);
-        $editForm = $this->createForm('DRI\ExitBundle\Form\DepartureType', $departure);
-        $editForm->handleRequest($request);
+        if (!$departure->isClosed()) {
+            $user = null;
 
-        if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            if($this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+                $user = $this->getUser();  // get $user object
+            }
 
-            return $this->redirectToRoute('departure_edit', array('id' => $departure->getId()));
+            if ($user){
+                $departure->setLastUpdateBy($user);
+            }
+
+            $deleteForm = $this->createDeleteForm($departure);
+            $editForm = $this->createForm('DRI\ExitBundle\Form\DepartureType', $departure, [
+                'currentAction' => 'edit'
+            ])->handleRequest($request);
+
+            if ($editForm->isSubmitted() && $editForm->isValid()) {
+                $em = $this->getDoctrine()->getManager();
+                $appRepo = $em->getRepository('DRIExitBundle:Application');
+
+                if (!($departure->getApplication() == null)){
+                    $app = $appRepo->find($departure->getApplication());
+
+                    if($app){
+                        $app->setUsed(true);
+                    }
+                }
+
+                $em->persist($departure);
+                $em->flush();
+
+                $this->get('session')->getFlashBag()->add('success', 'La Salida se editó satisfactoriamente!');
+                return $this->redirectToRoute('departure_show', array('numberSlug' => $departure->getNumberSlug()));
+            }
+
+            $lastVisited = $request->server->get('HTTP_REFERER');
+
+            return $this->render('DRIExitBundle:Departure:edit.html.twig', array(
+                'lastPage' => $lastVisited,
+                'departure' => $departure,
+                'edit_form' => $editForm->createView(),
+                'delete_form' => $deleteForm->createView(),
+            ));
+        }else{
+            $this->get('session')->getFlashBag()->add(
+                'error',
+                'La Salida esta cerrada por lo que no se puede modificar.'
+            );
+
+            return $this->redirectToRoute('exit_application_show', array('numberSlug' => $departure->getNumberSlug()));
         }
-
-        return $this->render('DRIExitBundle:Departure:edit.html.twig', array(
-            'departure' => $departure,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        ));
     }
-
 
     /**
      * Deletes a Departure entity.
      *
      * @Route("/{id}", name="departure_delete")
      * @Method("DELETE")
+     * @Security("has_role('ROLE_ADMIN')")
      */
     public function deleteAction(Request $request, Departure $departure)
     {
@@ -190,7 +346,7 @@ class DepartureController extends Controller
             $this->get('session')->getFlashBag()->add('error', 'Existe un problema para eliminar la Salida');
         }
 
-        return $this->redirectToRoute('departure_index');
+        return $this->redirectToRoute('departure_list');
     }
 
     /**
@@ -212,9 +368,13 @@ class DepartureController extends Controller
     /**
      * Delete Departure by id
      *
-     * @param mixed $id The entity id
+     * @param Departure $departure
+     *
      * @Route("/delete/{id}", name="departure_by_id_delete")
      * @Method("GET")
+     * @Security("has_role('ROLE_ADMIN')")
+     *
+     * @return Response
      */
     public function deleteByIdAction(Departure $departure){
         $em = $this->getDoctrine()->getManager();
@@ -227,7 +387,7 @@ class DepartureController extends Controller
             $this->get('session')->getFlashBag()->add('error', 'Existe un problema para eliminar la Salida');
         }
 
-        return $this->redirect($this->generateUrl('departure_index'));
+        return $this->redirect($this->generateUrl('departure_list'));
 
     }
 
@@ -275,70 +435,77 @@ class DepartureController extends Controller
     }
 
     /**
-     * Returns a JSON string with the passports of the Client with the providen id.
+     * Returns a JSON string with the dependencies of the Client with the providen id.
      *
      * @param Request $request
      *
-     * @Route("/", name="list_passports_client")
-     * @Method({"GET"})
+     * @Route("/list_client_dependencies", name="list_client_dependencies", options={"expose"=true})
+     * @Method({"POST"})
      *
-     * @return JsonResponse
+     * @return JsonResponse|Response
      */
-    public function listPassportsOfClientAction(Request $request)
+    public function listClientDependenciesAction(Request $request)
     {
-        // Get Entity manager and repository
-        $em = $this->getDoctrine()->getManager();
-        $passportsRepository    = $em->getRepository("DRIPassportBundle:Passport");
-        $applicationsRepository = $em->getRepository("DRIExitBundle:ExitApplication");
+        $isAjax = $request->isXmlHttpRequest();
 
-        $client_id = $request->query->get('clientid');
+        if ($isAjax) {
+            $client = $request->request->get('client');
+            $client = (int)$client;
 
-        $client_id = (int)$client_id;
+            if(!$client){
+                throw $this->createNotFoundException("No llego el cliente.");
+            }
 
-        // Search the applications that belongs to the client with the given id as GET parameter "clientid"
-        $applications = $applicationsRepository->createQueryBuilder("q")
-            ->where("q.client = :client_id")
-            ->andWhere("q.state = :state")
-            ->setParameter("client_id", $client_id)
-            ->setParameter("state", "APR")
-            ->getQuery()
-            ->getResult();
+            $em = $this->getDoctrine()->getManager();
+            $applicationsRepository = $em->getRepository("DRIExitBundle:Application");
+            $passportsRepository = $em->getRepository("DRIPassportBundle:Passport");
 
-        // Search the passports that belongs to the client with the given id as GET parameter "clientid"
-        $passports = $passportsRepository->createQueryBuilder("q")
-            ->where("q.holder = :client_id")
-            ->setParameter("client_id", $client_id)
-            ->getQuery()
-            ->getResult();
+            // Search the applications that belongs to the client with the given id as GET parameter "clientid"
+            $applications = $applicationsRepository->createQueryBuilder("q")
+                ->where("q.client = :client")
+                ->andWhere("q.state = :state")
+                ->andWhere("q.used = :used")
+                ->setParameter("client", $client)
+                ->setParameter("state", "APR")
+                ->setParameter("used", false)
+                ->getQuery()
+                ->getResult();
 
-        // Serialize into an array the data that we need, in this case only number and id
-        // Note: you can use a serializer as well, for explanation purposes, we'll do it manually
-        $applicationsList   = array();
-        $passportsList      = array();
+            // Search the passports that belongs to the client with the given id as GET parameter "clientid"
+            $passports = $passportsRepository->createQueryBuilder("q")
+                ->where("q.holder = :client")
+                ->andWhere("q.drop = :drop")
+                ->setParameter("client", $client)
+                ->setParameter("drop", false)
+                ->getQuery()
+                ->getResult();
 
-        foreach($applications as $application){
-            $applicationsList[] = array(
-                "id" => $application->getId(),
-                "number" => $application->getNumber()
+            // Serialize into an array the data that we need, in this case only number and id
+            // Note: you can use a serializer as well, for explanation purposes, we'll do it manually
+            $applicationsList = array();
+            $passportsList = array();
+
+            foreach ($applications as $application) {
+                $applicationsList[] = array(
+                    "id" => $application->getId(),
+                    "number" => $application->getNumber()
+                );
+            }
+
+            foreach ($passports as $passport) {
+                $passportsList[] = array(
+                    "id" => $passport->getId(),
+                    "number" => $passport->getNumber()
+                );
+            }
+
+            // Return array with structure of the passports of the providen client id
+            return new JsonResponse(
+                array(
+                    'applications'  => $applicationsList,
+                    'passports'     => $passportsList
+                )
             );
         }
-
-        foreach($passports as $passport){
-            $passportsList[] = array(
-                "id" => $passport->getId(),
-                "number" => $passport->getNumber()
-            );
-        }
-
-        // Return array with structure of the passports of the providen client id
-        return new JsonResponse(
-            array(
-                'applications'  => $applicationsList,
-                'passports'     => $passportsList
-            )
-        );
-
-        // e.g
-        // [{"id":"3","number":"E252974"},{"id":"4","name":"E387290"}]
     }
 }

@@ -103,8 +103,8 @@
                                                     <td><input type="checkbox" name="ids[]" onclick='bulkSubmitBtnManage();' class="check-all" value="{{area.id}}"/></td>
                             
                         <td><a href="{{ path('area_show', { 'id': area.id }) }}">{{ area.id }}</a></td>
-                        <td>{{ area.nombre }}</td>
-                        <td>{% if area.activa %}Yes{% else %}No{% endif %}</td>
+                        <td>{{ area.name }}</td>
+                        <td>{{ area.leader }}</td>
                         <td class="actions">    <a  onclick="return confirm('Are you sure!');" title="Delete" class="btn btn-danger btn-sm" href="{{ path('area_by_id_delete', { 'id': area.id}) }}">
         <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
     </a>

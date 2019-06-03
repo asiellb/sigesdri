@@ -27,18 +27,26 @@ class AppKernel extends Kernel
             new Knp\Bundle\SnappyBundle\KnpSnappyBundle(),
             new Lexik\Bundle\FormFilterBundle\LexikFormFilterBundle(),
             new Liip\ImagineBundle\LiipImagineBundle(),
-            new Petkopara\TritonCrudBundle\PetkoparaTritonCrudBundle(),
+            new Petkopara\MultiSearchBundle\PetkoparaMultiSearchBundle(),
+            new Petkopara\CrudGeneratorBundle\PetkoparaCrudGeneratorBundle(),
             new Presta\ImageBundle\PrestaImageBundle(),
             new Sg\DatatablesBundle\SgDatatablesBundle(),
             new Vich\UploaderBundle\VichUploaderBundle(),
+            new CMEN\GoogleChartsBundle\CMENGoogleChartsBundle(),
+            new Yectep\PhpSpreadsheetBundle\PhpSpreadsheetBundle(),
+            new Liuggio\ExcelBundle\LiuggioExcelBundle(),
+            new GGGGino\WordBundle\GGGGinoWordBundle(),
+            new FOS\CKEditorBundle\FOSCKEditorBundle(),
 
             new DRI\SystemBundle\DRISystemBundle(),
             new DRI\ClientBundle\DRIClientBundle(),
             new DRI\PassportBundle\DRIPassportBundle(),
             new DRI\ExitBundle\DRIExitBundle(),
+            new DRI\AgreementBundle\DRIAgreementBundle(),
             new DRI\UserBundle\DRIUserBundle(),
             new DRI\UsefulBundle\DRIUsefulBundle(),
             new DRI\DTBundle\DRIDTBundle(),
+            new DRI\ForeingStudentBundle\DRIForeingStudentBundle(),
         ];
 
         if (in_array($this->getEnvironment(), ['dev', 'test'], true)) {

@@ -2,13 +2,24 @@ services:
 #    dri_exit.example:
 #        class: DRI\ExitBundle\Example
 #        arguments: ["@service_id", "plain_value", %parameter%]
-    namer.exit_wps_files:
-        class: DRI\ExitBundle\Service\ExitWPSNamer
+
+    twig.extension.exits:
+        class: DRI\ExitBundle\Twig\Extension\DRIExitExtension
+        tags:
+            - { name: twig.extension }
+
+    namer.ext_app_dco_files:
+        class: DRI\ExitBundle\Service\ExtAppDCONamer
         tags:
             - { name: namer }
 
-    namer.departure_results_files:
-        class: DRI\ExitBundle\Service\DepartureResultsNamer
+    namer.ext_mis_wps_files:
+        class: DRI\ExitBundle\Service\ExtMisWPSNamer
+        tags:
+            - { name: namer }
+
+    namer.ext_dep_res_files:
+        class: DRI\ExitBundle\Service\ExtDepRESNamer
         tags:
             - { name: namer }
 

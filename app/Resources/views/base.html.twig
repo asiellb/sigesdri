@@ -18,14 +18,15 @@
      -------------------------------------------------------------------------------------------------------------------
      --------------------------------------------------------------------------------------------------------------- -->
 
-
     <!-- BEGIN GLOBAL MANDATORY STYLES -->
-    {#<link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&subset=all" rel="stylesheet" type="text/css" />#}
     <link href="{{ asset('assets/global/plugins/font-awesome/css/font-awesome.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/line-awesome/css/line-awesome.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('assets/global/plugins/simple-line-icons/simple-line-icons.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/poppins/poppins.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('assets/global/plugins/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('assets/global/plugins/uniform/css/uniform.default.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('assets/global/plugins/bootstrap-switch/css/bootstrap-switch.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/bootstrap-toastr/toastr.min.css') }}" rel="stylesheet" type="text/css" />
     <!-- END GLOBAL MANDATORY STYLES -->
 
     <!-- BEGIN PAGE LEVEL PLUGINS -->
@@ -36,11 +37,11 @@
 
     <!-- BEGIN THEME GLOBAL STYLES -->
     <link href="{{ asset('assets/global/css/components.min.css') }}" rel="stylesheet" id="style_components" type="text/css" />
-    <link href="{{ asset('assets/global/css/plugins.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/css/plugins.css') }}" rel="stylesheet" type="text/css" />
     <!-- END THEME GLOBAL STYLES -->
 
     <!-- BEGIN PAGE LEVEL STYLES -->
-    {% block page_level_style %}
+    {% block page_custom_style %}
 
     {% endblock %}
     <!-- END PAGE LEVEL STYLES -->
@@ -51,6 +52,10 @@
     <link href="{{ asset('assets/layouts/layout/css/custom.min.css') }}" rel="stylesheet" type="text/css" />
     <!-- END THEME LAYOUT STYLES -->
 
+    {% block page_level_style %}
+
+    {% endblock %}
+
 
     <!-- ---------------------------------------------------------------------------------------------------------------
    --------------------------------------------------------------------------------------------------------------------
@@ -58,13 +63,16 @@
     -------------------------------------------------------------------------------------------------------------------
     --------------------------------------------------------------------------------------------------------------- -->
 
-
     <!--[if lt IE 9]>
     <script src="{{ asset('assets/global/plugins/respond.min.js') }}"></script>
     <script src="{{ asset('assets/global/plugins/excanvas.min.js') }}"></script>
     <![endif]-->
 
     <!-- BEGIN JS CORE PLUGINS -->
+    {#{% javascripts
+        output='js/compiled/core-plugins.js' %}
+        <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}#}
     <script src="{{ asset('assets/global/plugins/jquery.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('assets/global/plugins/moment/moment-with-locales.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('assets/global/plugins/bootstrap/js/bootstrap.min.js') }}" type="text/javascript"></script>
@@ -74,16 +82,26 @@
     <script src="{{ asset('assets/global/plugins/jquery.blockui.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('assets/global/plugins/uniform/jquery.uniform.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('assets/global/plugins/bootstrap-switch/js/bootstrap-switch.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/bootstrap-toastr/toastr.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/moment-precise-range-master/moment-precise-range.js') }}" type="text/javascript"></script>
     <!-- END JS CORE PLUGINS -->
 
     <!-- BEGIN JS PAGE LEVEL PLUGINS -->
-        <script src="{{ asset('assets/global/plugins/counterup/jquery.waypoints.min.js') }}" type="text/javascript"></script>
-        <script src="{{ asset('assets/global/plugins/counterup/jquery.counterup.min.js') }}" type="text/javascript"></script>
     {% block page_level_plugins_js %}
+        {#{% javascripts
+             output='js/compiled/page-lebel-plugins.js' %}
+            <script src="{{ asset_url }}"></script>
+        {% endjavascripts %}#}
+    <script src="{{ asset('assets/global/plugins/counterup/jquery.waypoints.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/counterup/jquery.counterup.min.js') }}" type="text/javascript"></script>
     {% endblock %}
     <!-- END JS PAGE LEVEL PLUGINS -->
 
     <!-- BEGIN THEME GLOBAL SCRIPTS -->
+    {#{% javascripts
+         output='js/compiled/theme-global-script.js' %}
+        <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}#}
     <script src="{{ asset('assets/global/scripts/app.js') }}" type="text/javascript"></script>
     <!-- END THEME GLOBAL SCRIPTS -->
 
@@ -94,10 +112,15 @@
     <!-- END PAGE LEVEL SCRIPTS -->
 
     <!-- BEGIN THEME LAYOUT SCRIPTS -->
+    {#{% javascripts
+         output='js/compiled/theme-layout-scripts.js' %}
+        <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}#}
     <script src="{{ asset('assets/layouts/layout/scripts/layout.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('assets/layouts/layout/scripts/demo.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('assets/layouts/global/scripts/quick-sidebar.min.js') }}" type="text/javascript"></script>
     <!-- END THEME LAYOUT SCRIPTS -->
+
     <script src="{{ asset('bundles/fosjsrouting/js/router.js') }}"></script>
     <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>
     <script type="text/javascript">
@@ -106,7 +129,7 @@
         });
     </script>
 
-    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('favicon.png') }}" />
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
 </head>
 <!-- END HEAD -->
 
@@ -129,38 +152,40 @@
             <div class="page-content">
             {% block page_content %}
                 <!-- BEGIN PAGE HEADER-->
-                <!-- BEGIN PAGE BAR -->
-                <div class="page-bar">
-                    <ul class="page-breadcrumb">
-                        {% block  page_breadcrumb %}
-                        <li>
-                            <a href="{{ path('homepage') }}">Inicio</a>
-                            <i class="fa fa-circle"></i>
-                        </li>
-                        {% endblock %}
-                    </ul>
-                    <div class="page-toolbar">
-                        {% block page_toolbar %}{% endblock %}
-                    </div>
-                </div>
-                <!-- END PAGE BAR -->
-                <!-- BEGIN PAGE TITLE-->
-                <h3 class="page-title">
-                {% block page_title %}
-                    Dashboard
-                    <small>dashboard & statistics</small>
-                {% endblock %}
-                </h3>
 
-                <!-- END PAGE TITLE-->
+                    <!-- BEGIN PAGE BAR -->
+                    <div class="page-bar">
+                        <ul class="page-breadcrumb">
+                            {% block  page_breadcrumb %}
+                            <li>
+                                <a href="{{ path('dashboard') }}">Dashboard</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            {% endblock %}
+                        </ul>
+                        <div class="page-toolbar">
+                            {% block page_toolbar %}{% endblock %}
+                        </div>
+                    </div>
+                    <!-- END PAGE BAR -->
+
+                    <!-- BEGIN PAGE TITLE-->
+                    <h3 class="page-title">
+                    {% block page_title %}{% endblock %}
+                    </h3>
+                    <!-- END PAGE TITLE-->
+
                 <!-- END PAGE HEADER-->
+
                 <!-- BEGIN DASHBOARD -->
                 {% block page_dashboard %}
                 {% endblock %}
                 <!-- END DASHBOARD -->
+
             {% endblock %}
             </div>
             <!-- END CONTENT BODY -->
+
         </div>
         <!-- END CONTENT -->
 
@@ -172,11 +197,15 @@
     {{ include('includes/footer.html.twig') }}
 
     <!-- BEGIN PAGE CUSTOM SCRIPTS -->
-    {% block page_custom_scrpt %}
-
-    {% endblock %}
-
+    {% block page_custom_scrpt %}{% endblock %}
     <!-- END PAGE CUSTOM SCRIPTS -->
+    <script type="text/javascript">
+        {% for type, messages in app.session.flashbag.all() %}
+            {% for message in messages %}
+                toastr.{{ type }}('{{ message|raw }}!', '');
+            {% endfor %}
+        {% endfor %}
+    </script>
 {% endblock %}
 </body>
 </html>

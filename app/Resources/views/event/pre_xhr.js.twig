@@ -3,7 +3,8 @@ function preXhrEvent(e, settings, json, xhr) {
     App.blockUI({
         message: 'Procesando...',
         target: $(selector).find('tbody'),
-        overlayColor: '#000',
-        cenrerY: true
+        //overlayColor: '#000',
+        //cenrerY: true,
+        animate: true
     });
 }

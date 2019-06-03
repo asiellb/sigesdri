@@ -2,6 +2,13 @@
 
 namespace DRI\ExitBundle\Repository;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\AST\Functions\FunctionNode;
+use DRI\ExitBundle\Entity\Departure;
+
+
 /**
  * DepartureRepository
  *
@@ -10,4 +17,35 @@ namespace DRI\ExitBundle\Repository;
  */
 class DepartureRepository extends \Doctrine\ORM\EntityRepository
 {
+    public function getDepsDepartureDate(){
+        $em = $this->getEntityManager();
+
+        $qb = $this->createQueryBuilder('d');
+        $qb
+            ->select('partial d.{id,departureDate}')
+            ->orderBy('d.departureDate','ASC')
+        ;
+
+        $deps = $qb->getQuery()->setHint(Query::HINT_FORCE_PARTIAL_LOAD, true)->getArrayResult();
+
+        return $deps;
+    }
+
+    public function getDepsForMonth($year, $month){
+        $em = $this->getEntityManager();
+
+        $qb = $this->createQueryBuilder('d');
+        $qb->select('d')
+            ->leftJoin('d.application','a')
+            ->where('YEAR(d.departureDate) = :year')
+            ->andWhere('MONTH(d.departureDate) = :month')
+        ;
+
+        $qb->setParameter('year', $year);
+        $qb->setParameter('month', $month);
+
+        $deps = $qb->getQuery()->getResult();
+
+        return $deps;
+    }
 }

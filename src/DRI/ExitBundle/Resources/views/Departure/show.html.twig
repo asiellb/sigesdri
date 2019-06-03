@@ -1,74 +1,247 @@
 {% extends 'DRIExitBundle::layout.exit.html.twig' %}
 
-{% block title %}{{ parent() }} | Listado {% endblock %}
+{% block title %}{{ parent() }} | Salida | {{ departure.number }} {% endblock %}
 
 {% block  page_breadcrumb %}
     {{ parent() }}
     <li>
-        <span>Listado </span>
+        <span>Salida </span>
+        <i class="fa fa-circle"></i>
+        <span># {{ departure.number }} </span>
     </li>
 {% endblock %}
 
 {% block page_title %}
-    {{ parent() }}
-    <small>Listado </small>
 {% endblock %}
 
 {% block page_dashboard %}
-    <h1>Departure</h1>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="portlet light bordered">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <i class="icon-plane font-blue-dark"></i>
+                        <span class="caption-subject font-blue-dark bold uppercase">
+                            Salida
+                            <span class="font-green-sharp">
+                                # {{ departure.number }} |
+                                <small>{{ departure.client.shortName }}</small>
+                            </span>
+                        </span>
+                    </div>
+                    <div class="actions btn-set">
+                        <a class="btn btn-transparent grey-cascade btn-outline btn-circle btn-sm" href="{{ path('departure_list') }}">
+                            <span class="fa fa-list" aria-hidden="true"></span>
+                            Ir al listado
+                        </a>
+                        <a class="btn green btn-circle btn-sm" href="{{ path('departure_new') }}">
+                            <span class="fa fa-plus" aria-hidden="true"></span>
+                            Agregar Salida al Exterior
+                        </a>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <div class="tabbable-line">
+                        <ul class="nav nav-tabs nav-tabs-lg">
+                            <li class="active">
+                                <a href="#tab_1" data-toggle="tab"> Detalles </a>
+                            </li>
+                            <li>
+                                <a href="#tab_2" data-toggle="tab"> Solicitud Asociada </a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="tab_1">
+                                <div class="row">
+                                    <div class="col-md-6 col-sm-12">
+                                        <div class="portlet green-meadow box">
+                                            <div class="portlet-title">
+                                                <div class="caption">
+                                                    <i class="fa fa-book"></i>Detalles de la Salida </div>
+                                                <div class="actions">
+                                                    <a href="{{ path('departure_edit', { 'numberSlug':  departure.numberSlug }) }}" class="btn btn-default btn-sm">
+                                                        <i class="fa fa-pencil"></i> Editar </a>
+                                                </div>
+                                            </div>
+                                            <div class="portlet-body">
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Número #: </div>
+                                                    <div class="col-md-7 value"> {{ departure.number }}</div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> País: </div>
+                                                    <div class="col-md-7 value">
+                                                        {% for mission in departure.application.missions %}
+                                                        <div>
+                                                            <img alt="" class="" style="height: 20px" src="{{ asset(vich_uploader_asset(mission.country, 'flagFile')) }}" />
+                                                            {{ mission.country.spName }}
+                                                        </div>
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Institución que visita: </div>
+                                                    <div class="col-md-7 value">
+                                                        {% for mission in departure.application.missions %}
+                                                            {{ mission.institution }}
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Motivo: </div>
+                                                    <div class="col-md-7 value">
+                                                        {% for mission in departure.application.missions %}
+                                                            {{ fn_mission_concept(mission.concept) }}
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Fecha de Partida: </div>
+                                                    <div class="col-md-7 value"> {{ departure.departureDate | localizeddate('long', 'none') }} </div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Fecha de entrega del Pasaporte: </div>
+                                                    <div class="col-md-7 value"> {{ departure.passportDelivery | localizeddate('long', 'none') }} </div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Fecha de Retorno: </div>
+                                                    {% if departure.returnDate is not null %}
+                                                        <div class="col-md-7 value"> {{ departure.returnDate | localizeddate('long', 'none') }} </div>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Fecha de recogida del Pasaporte: </div>
+                                                    {% if departure.passportCollection is not null %}
+                                                        <div class="col-md-7 value"> {{ departure.passportCollection | localizeddate('long', 'none') }} </div>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Observaciones: </div>
+                                                    {% if departure.observations is defined %}
+                                                        <div class="col-md-7 value"> {{ departure.observations }} </div>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Resultados: </div>
+                                                    {% if departure.results is not null %}
+                                                        <div class="col-md-7 value">
+                                                            <a href="{{ asset(vich_uploader_asset(departure, 'resultsFile', 'DRI\\ExitBundle\\Entity\\Departure')) }}" target="_blank" >Ver Resultados ...</a>
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% if departure.client is not empty  %}
+                                        <div class="col-md-6 col-sm-12">
+                                            <div class="portlet blue-hoki box">
+                                                <div class="portlet-title">
+                                                    <div class="caption">
+                                                        <i class="fa fa-user"></i>Información del Cliente </div>
+                                                    <div class="actions">
+                                                        <a href="{{ path('client_profile', { 'fullNameSlug':  departure.client.fullNameSlug }) }}" class="btn btn-default btn-sm">
+                                                            <i class="fa fa-eye"></i> Ver </a>
+                                                        <a href="{{ path('client_config', { 'fullNameSlug':  departure.client.fullNameSlug }) }}" class="btn btn-default btn-sm">
+                                                            <i class="fa fa-pencil"></i> Editar </a>
+                                                    </div>
+                                                </div>
+                                                <div class="portlet-body">
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Nombre del Titular: </div>
+                                                        <div class="col-md-7 value"> {{ departure.client.fullName }} </div>
+                                                    </div>
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Tipo de Cliente: </div>
+                                                        <div class="col-md-7 value"> {{ departure.client.clientType == 'EST' ? 'Estudiante' : departure.client.clientType == 'DOC' ? 'Docente' : departure.client.clientType == 'NOD' ? 'No Docente' : '' }} </div>
+                                                    </div>
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Email: </div>
+                                                        <div class="col-md-7 value">
+                                                            <a href="mailto:{{ departure.client.email }}">{{ departure.client.email }}</a>
+                                                            {% if departure.client.foreignEmail is not empty %}
+                                                                o
+                                                                <a href="mailto:{{ departure.client.foreignEmail }}">{{ departure.client.foreignEmail }}</a>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Teléfono: </div>
+                                                        <div class="col-md-7 value">
+                                                            {{ departure.client.privatePhone is defined ? departure.client.privatePhone }}
+                                                            {% if departure.client.privatePhone is not empty and departure.client.cellPhone is not empty %} o {% endif %}
+                                                            {{ departure.client.cellPhone is defined ? departure.client.cellPhone }}
+                                                        </div>
+                                                    </div>
+                                                    {% if departure.client.faculty.name is defined %}
+                                                        <div class="row static-info">
+                                                            <div class="col-md-5 name"> Facultad o Centro: </div>
+                                                            <div class="col-md-7 value"> {{ departure.client.faculty.name }} </div>
+                                                        </div>
+                                                    {% endif %}
+                                                    {% if departure.client.workersWorkPlace is defined %}
+                                                        <div class="row static-info">
+                                                            <div class="col-md-5 name"> Lugar de Trabajo: </div>
+                                                            <div class="col-md-7 value"> {{ departure.client.workersWorkPlace }} </div>
+                                                        </div>
+                                                    {% endif %}
+                                                    {% if departure.client.workersWorkPhone %}
+                                                        <div class="row static-info">
+                                                            <div class="col-md-5 name"> Teléfono en Trabajo: </div>
+                                                            <div class="col-md-7 value"> {{ departure.client.workersWorkPhone }} </div>
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="tab_2">
+                                <div class="row">
+                                    <div class="col-md-12 col-sm-12">
+                                        <div class="portlet grey-cascade box">
+                                            <div class="portlet-title">
+                                                <div class="caption">
+                                                    <i class="fa fa-cogs"></i>Solicitud Asociadas a la Salida </div>
+                                                <div class="actions">
+                                                    <a href="javascript:;" class="btn btn-default btn-sm">
+                                                        <i class="fa fa-pencil"></i> Edit </a>
+                                                </div>
+                                            </div>
+                                            <div class="portlet-body">
+                                                <div class="table-responsive">
+                                                    <table class="table table-hover table-bordered table-striped">
+                                                        <thead>
+                                                        <tr>
+                                                            <th> Solicitud </th>
+                                                            <th> Creada el </th>
+                                                            <th> Creada por </th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        {% if departure.application is not empty  %}
+                                                            <tr>
+                                                                <td>
+                                                                    <a href="{{ path('exit_application_show', {'numberSlug' : departure.application.numberSlug}) }}"> {{ departure.application.number }} </a>
+                                                                </td>
+                                                                <td> {{ departure.application.createdAt | localizeddate('long', 'none') }} </td>
+                                                                <td> {{ departure.application.createdBy.firstName }} {{ departure.application.createdBy.lastName }} </td>
+                                                            </tr>
+                                                        {% endif %}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-    <table>
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ departure.id }}</td>
-            </tr>
-            <tr>
-                <th>Passportdelivery</th>
-                <td>{% if departure.passportDelivery %}{{ departure.passportDelivery|date('Y-m-d') }}{% endif %}</td>
-            </tr>
-            <tr>
-                <th>Departuredate</th>
-                <td>{% if departure.departureDate %}{{ departure.departureDate|date('Y-m-d') }}{% endif %}</td>
-            </tr>
-            <tr>
-                <th>Returndate</th>
-                <td>{% if departure.returnDate %}{{ departure.returnDate|date('Y-m-d') }}{% endif %}</td>
-            </tr>
-            <tr>
-                <th>Passportcollection</th>
-                <td>{% if departure.passportCollection %}{{ departure.passportCollection|date('Y-m-d') }}{% endif %}</td>
-            </tr>
-            <tr>
-                <th>Observations</th>
-                <td>{{ departure.observations }}</td>
-            </tr>
-            <tr>
-                <th>Results</th>
-                <td>{{ departure.results }}</td>
-            </tr>
-            <tr>
-                <th>Createdat</th>
-                <td>{% if departure.createdAt %}{{ departure.createdAt|date('Y-m-d H:i:s') }}{% endif %}</td>
-            </tr>
-            <tr>
-                <th>Updatedat</th>
-                <td>{% if departure.updatedAt %}{{ departure.updatedAt|date('Y-m-d H:i:s') }}{% endif %}</td>
-            </tr>
-        </tbody>
-    </table>
+                </div>
+            </div>
 
-    <ul>
-        <li>
-            <a href="{{ path('departure_index') }}">Back to the list</a>
-        </li>
-        <li>
-            <a href="{{ path('departure_edit', { 'id': departure.id }) }}">Edit</a>
-        </li>
-        <li>
-            {{ form_start(delete_form) }}
-                <input type="submit" value="Delete">
-            {{ form_end(delete_form) }}
-        </li>
-    </ul>
+        </div>
+    </div>
 {% endblock %}

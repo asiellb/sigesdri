@@ -1,17 +1,20 @@
 {% extends '::base.html.twig' %}
 
-{% block title %}{{ parent() }} | Salida{% endblock %}
+{% block title %}{{ parent() }} | Salidas al Exterior{% endblock %}
 
 {% block  page_breadcrumb %}
     {{ parent() }}
     <li>
-        <span>Salida</span>
-        <i class="fa fa-circle"></i>
+        {% if '/exit/departure/index' in app.request.getPathInfo() %}
+            <span>Salidas al Exterior</span>
+        {% else %}
+            <a href="{{ path('departure_index') }}" ><span>Salidas al Exterior</span> </a> <i class="fa fa-circle"></i>
+        {% endif %}
     </li>
 {% endblock %}
 
 {% block page_title %}
-    Salida
+    Salidas
 {% endblock %}
 
 {% block page_dashboard %}

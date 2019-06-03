@@ -47,7 +47,7 @@
                 </a>
                 <ul class="sub-menu">
                     <li class="nav-item start active open">
-                        <a href="{{ path('homepage') }}" class="nav-link ">
+                        <a href="{{ path('dashboard') }}" class="nav-link ">
                             <i class="icon-list"></i>
                             <span class="title">Portada</span>
                             <span class="selected"></span>

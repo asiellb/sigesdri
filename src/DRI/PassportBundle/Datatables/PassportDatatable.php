@@ -21,6 +21,8 @@ use Sg\DatatablesBundle\Datatable\Editable\TextareaEditable;
 use Sg\DatatablesBundle\Datatable\Editable\TextEditable;
 use Sg\DatatablesBundle\Datatable\Filter\Select2Filter;
 
+use DRI\PassportBundle\Entity\Passport;
+
 /**
  * Class PassportDatatable
  *
@@ -38,8 +40,7 @@ class PassportDatatable extends AbstractDatatable
         $formatter = function ($line) use ($router) {
             //$route = $router->generate('profile_show', array('id' => $line['createdBy']['id']));
             $line['type'] = $this->formatType($line['type']);
-            $line['state'] = $this->formatState($line['state']);
-            //$line['state'] = $this->formatState($line['state']);
+            $line['state'] = $this->formatState($line['numberSlug']);
 
             return $line;
         };
@@ -62,18 +63,20 @@ class PassportDatatable extends AbstractDatatable
         ));
 
         $this->options->set(array(
-            'classes' => Style::BOOTSTRAP_3_STYLE,
+            'classes' => Style::BASE_STYLE_COMPACT,
             'individual_filtering' => true,
             'individual_filtering_position' => 'head',
             'order_cells_top' => true,
+            'order_classes' => false,
+            'scroll_collapse' => true,
             "order" => [
-                [2, "asc"]
+                [4, "desc"]
             ],
             //'dom' => "<'row' <'col-md-12 pull-left' >> lfrtip",
             'dom' => "<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12' <'table-group-actions pull-right'><>>r>t<'row'<'col-md-8 col-sm-12'pli><'col-md-4 col-sm-12'>>",
             "length_menu"=> [
-                [5, 10, 20, 50, 100, 150, -1],
-                [5, 10, 20, 50, 100, 150, "All"] // change per page values here
+                [10, 50, 100, 150, 200, -1],
+                [10, 50, 100, 150, 200, "Todo"] // change per page values here
             ],
             "paging_type" => "bootstrap_extended",
         ));
@@ -81,6 +84,10 @@ class PassportDatatable extends AbstractDatatable
         $this->features->set(array(
             'paging'     => true,
             'length_change' => true,
+            'auto_width' => true,
+            //'scroll_x'  => true,
+            //'scroll_y'  => 300,
+            //'defer_render'  => true,
         ));
 
         $this->extensions->set(array(
@@ -105,7 +112,7 @@ class PassportDatatable extends AbstractDatatable
                         'button_options' => array(
                             'download' => 'open',
                             'exportOptions' => array(
-                                'columns' => array('1','2', '3', '4', '5', '6',),
+                                'columns' => array('1','2', '3', '4', '5','6','7'),
                             ),
                             'orientation' => 'landscape',
                             'pageSize' => 'LEGAL',
@@ -151,6 +158,7 @@ class PassportDatatable extends AbstractDatatable
         $passports = $this->em->getRepository('DRIPassportBundle:Passport')->findAll();
         $clients = $this->em->getRepository('DRIClientBundle:Client')->findAll();
         $users = $this->em->getRepository('DRIUserBundle:User')->findAll();
+        $area = $this->em->getRepository('DRIUsefulBundle:Area')->findAll();
 
         $this->columnBuilder
             ->add(null,MultiselectColumn::class, array(
@@ -188,7 +196,7 @@ class PassportDatatable extends AbstractDatatable
                 'title' => 'Número',
                 'searchable' => true,
                 'orderable' => true,
-                'width' => '10%',
+                'width' => '12%',
                 'filter' => array(Select2Filter::class, array(
                     'select_options' => array('' => 'Todos') + $this->getOptionsArrayFromEntities($passports, 'number', 'number'),
                     'search_type' => 'eq',
@@ -196,9 +204,37 @@ class PassportDatatable extends AbstractDatatable
                     'classes' => 'form-control'
                 )),
             ))
+            ->add('holder.shortName', Column::class, array(
+                'title' => 'Cliente',
+                'searchable' => true,
+                'orderable' => true,
+                'default_content' => 'No asignado',
+                'width' => '12%',
+                'filter' => array(Select2Filter::class, array(
+                    'select_options' => array('' => 'Todos') + $this->getOptionsArrayFromEntities($clients, 'shortName', 'shortName'),
+                    'search_type' => 'eq',
+                    'cancel_button' => true,
+                    'classes' => 'form-control',
+                )),
+            ))
+            ->add('type', Column::class, array(
+                'title' => 'Tipo',
+                'width' => '12%',
+                'filter' => array(SelectFilter::class,
+                    array(
+                        'search_type' => 'eq',
+                        'multiple' => false,
+                        'select_options' => ['' => 'Ambos'] + Passport::PASSPORT_TYPE,
+                        'cancel_button' => true,
+                        'classes' => 'form-control input-xs input-sm input-inline form-filter bs-select',
+                    ),
+                ),
+            ))
             ->add('issueDate', DateTimeColumn::class, array(
                 'title' => 'Emitido',
-                'width' => '20%',
+                'default_content' => 'No Asignado',
+                'date_format' => 'LL',
+                'width' => '12%',
                 'filter' => array(DateRangeFilter::class,
                     array(
                         'cancel_button' => true,
@@ -207,71 +243,51 @@ class PassportDatatable extends AbstractDatatable
             ))
             ->add('expiryDate', DateTimeColumn::class, array(
                 'title' => 'Vence',
-                'width' => '20%',
+                'default_content' => 'No Asignado',
+                'date_format' => 'LL',
+                'width' => '12%',
                 'filter' => array(DateRangeFilter::class,
                     array(
                         'cancel_button' => true,
                     ),
                 ),
             ))
-            ->add('type', Column::class, array(
-                'title' => 'Tipo',
-                'width' => '2%',
-                'filter' => array(SelectFilter::class,
-                    array(
-                        'search_type' => 'eq',
-                        'multiple' => false,
-                        'select_options' => array(
-                            '' => 'Ambos',
-                            'OFI' => 'Oficial',
-                            'ORD' => 'Ordinario',
-                        ),
-                        'cancel_button' => true,
-                        'classes' => 'form-control input-xs input-sm input-inline form-filter bs-select',
-                    ),
-                ),
-                ))
-            ->add('state', Column::class, array(
+            ->add('holder.faculty.name', Column::class, array(
+                'title' => 'Área',
+                'searchable' => true,
+                'orderable' => true,
+                'default_content' => 'No asignado',
+                'width' => '12%',
+                'filter' => array(Select2Filter::class, array(
+                    'select_options' => array('' => 'Todas') + $this->getOptionsArrayFromEntities($area, 'name', 'name'),
+                    'search_type' => 'eq',
+                    'cancel_button' => true,
+                    'classes' => 'form-control',
+                )),
+            ))
+            ->add('state', VirtualColumn::class, array(
                 'title' => 'Estado',
-                'width' => '2%',
-                'filter' => array(SelectFilter::class,
-                    array(
-                        'search_type' => 'eq',
-                        'multiple' => false,
-                        'select_options' => array(
-                            '' => 'Todos',
-                            'ACT' => 'Activo',
-                            'VEN' => 'Vencido',
-                            'BAJ' => 'Baja',
-                        ),
-                        'cancel_button' => true,
-                        'classes' => 'form-control input-xs input-sm input-inline form-filter bs-select',
-                    ),
-                ),
-                ))
-            ->add('createdAt', DateTimeColumn::class, array(
-                'title' => 'Creado',
-                'width' => '20%',
-                'filter' => array(DateRangeFilter::class,
-                    array(
-                        'cancel_button' => true,
-                    ),
-                ),
-                'timeago' => true,
+                'width' => '12%',
+                'orderable' => true,
+                'order_column' => 'issueDate', // use the 'createdBy.username' column for ordering
+            ))
+            ->add('numberSlug', Column::class, array(
+                'visible' => false,
             ))
             ->add(null, ActionColumn::class, array(
                 'title' => $this->translator->trans('sg.datatables.actions.title'),
+
                 'actions' => array(
                     array(
                         'route' => 'passport_show',
                         'route_parameters' => array(
-                            'id' => 'id'
+                            'numberSlug' => 'numberSlug'
                         ),
-                        'icon' => 'icon-eye',
+                        'icon' => 'la la-ellipsis-h font-lg',
                         'attributes' => array(
                             //'rel' => 'tooltip',
                             //'title' => $this->translator->trans('sg.datatables.actions.show'),
-                            'class' => 'tooltips btn blue btn-outline btn-sm ',
+                            'class' => 'btn btn-circle green btn-icon-only btn-outline',
                             'role' => 'button',
                             'data-container' => 'body',
                             'data-placement' => 'bottom',
@@ -281,14 +297,14 @@ class PassportDatatable extends AbstractDatatable
                     array(
                         'route' => 'passport_edit',
                         'route_parameters' => array(
-                            'id' => 'id'
+                            'numberSlug' => 'numberSlug'
                         ),
 
-                        'icon' => 'icon-settings',
+                        'icon' => 'la la-edit font-lg',
                         'attributes' => array(
                             //'rel' => 'tooltips',
                             //'title' => $this->translator->trans('sg.datatables.actions.edit'),
-                            'class' => 'tooltips btn blue btn-outline btn-sm',
+                            'class' => 'btn btn-circle green btn-icon-only btn-outline',
                             'role' => 'button',
                             'data-container' => 'body',
                             'data-placement' => 'bottom',
@@ -309,9 +325,9 @@ class PassportDatatable extends AbstractDatatable
      */
     private function formatType($type){
         if($type == 'OFI'){
-            return 'Oficial';
-        }elseif ($type == 'ORD'){
-            return 'Ordinario';
+            return '<span class="font-red-mint bold"> <i class="la la-circle"></i> Oficial </span>';
+        }elseif ($type == 'COR'){
+            return '<span class="font-blue-steel bold"> <i class="la la-circle"></i> Corriente </span>';
         }else{
             return '-';
         }
@@ -320,23 +336,36 @@ class PassportDatatable extends AbstractDatatable
     /**
      * Determinate state
      *
-     * @param string $state
+     * @param string $numberSlug
      *
      * @return string
      */
-    private function formatState($state){
-        $type = '';
-        switch ($state){
-            case 'ACT':
-                $type = 'Activo'; break;
-            case 'VEN':
-                $type = 'Vencido'; break;
-            case 'BAJ':
-                $type = 'Baja'; break;
-            default:
-                $type = '-'; break;
+    private function formatState($numberSlug){
+        $em = $this->getEntityManager();
+        $passport = $em->getRepository('DRIPassportBundle:Passport')->findOneByNumberSlug($numberSlug);
+        $state = '';
+
+        if($passport){
+            $aux = $passport->getState();
+
+            switch ($aux){
+                case 'ACT':
+                    $state = '<div class="alert alert-success sbold"> Activo </div>'; break;
+                case 'PVEN':
+                    $state = '<div class="alert alert-warning sbold"> Por Vencer </div>'; break;
+                case 'VEN':
+                    $state = '<div class="alert alert-danger sbold"> Vencido </div>'; break;
+                case 'BAJ':
+                    $state = '<div class="alert alert-info sbold"> Baja </div>'; break;
+                case 'PPRO':
+                    $state = '<div class="alert alert-warning sbold"> Por Prorrogar </div>'; break;
+                case 'RPRO':
+                    $state = '<div class="alert alert-danger sbold"> Requiere Prorrogar </div>'; break;
+                default:
+                    $state = '-'; break;
+            }
         }
-        return $type;
+        return $state;
     }
 
     /**

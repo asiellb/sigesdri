@@ -1,6 +1,6 @@
 {% extends 'DRIClientBundle::layout.client.html.twig' %}
 
-{% block title %}{{ parent() }} | Nuevo {% endblock %}
+{% block title %}{{ parent() }} | Nuevo Cliente {% endblock %}
 
 {% block page_level_plugins_css %}
     <link href="{{ asset('assets/global/plugins/bootstrap-select/css/bootstrap-select.min.css') }}" rel="stylesheet" type="text/css"/>
@@ -20,24 +20,17 @@
 {% block page_level_plugins_js %}
     <script src="{{ asset('assets/global/plugins/bootstrap-select/js/bootstrap-select.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('assets/global/plugins/select2/js/select2.full.min.js') }}" type="text/javascript"></script>
-
     <script src="{{ asset('assets/global/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js') }}" type="text/javascript"></script>
     <script src="{{ asset('assets/global/plugins/bootstrap-datepicker/locales/bootstrap-datepicker.es.min.js') }}" type="text/javascript"></script>
-
     <script src="{{ asset('assets/global/plugins/icheck/icheck.min.js') }}" type="text/javascript"></script>
-
     <script src="{{ asset('assets/global/plugins/jquery-validation/js/jquery.validate.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('assets/global/plugins/jquery-validation/js/localization/messages_es.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('assets/global/plugins/jquery-validation/js/additional-methods.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('assets/pages/scripts/plugins/jquery-validation/additional-methods.js') }}" type="text/javascript"></script>
-
     <script src="{{ asset('assets/global/plugins/bootstrap-wizard/jquery.bootstrap.wizard.min.js') }}" type="text/javascript"></script>
-
     <script src="{{ asset('assets/global/plugins/cropper/dist/cropper.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('assets/bundles/prestaimage/js/cropper.js') }}" type="text/javascript"></script>
-
     <script src="{{ asset('assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.js') }}" type="text/javascript"></script>
-
     <script src="{{ asset('assets/global/plugins/jquery-inputmask/jquery.inputmask.bundle.js') }}" type="text/javascript"></script>
     <script src="{{ asset('assets/global/plugins/jquery-inputmask/inputmask/phone-codes/phone.js') }}" type="text/javascript"></script>
     <script src="{{ asset('assets/pages/scripts/plugins/jquery-inputmask/inputmask/additional-methods.js') }}" type="text/javascript"></script>
@@ -51,12 +44,11 @@
 {% block  page_breadcrumb %}
     {{ parent() }}
     <li>
-        <span>Nuevo </span>
+        <span>Nuevo Cliente</span>
     </li>
 {% endblock %}
 
 {% block page_title %}
-
 {% endblock %}
 
 {% block page_dashboard %}
@@ -118,10 +110,11 @@
                                             TAB 1 - DATOS GENERALES
                                      ############################################################################### #}
                                     <div class="tab-pane active" id="tab1">
-                                        <div class="form-group col-md-2 text-right">
+                                        <div class="form-group col-md-2">
+                                            <label class="control-label">Fotografía</label>
                                             {{ form_widget(form.clientPictureFile) }}
                                         </div>
-                                        <div class=" col-md-9">
+                                        <div class=" col-md-10">
                                             <div class="row">
                                                 <div class="form-group col-md-6">
                                                     <label class="control-label">CI</label>
@@ -199,7 +192,6 @@
                                             </div>
 
                                         </div>
-                                        <div class="col-md-1"></div>
                                     </div>
 
                                     {# ###############################################################################
@@ -295,7 +287,7 @@
                                                 </div>
                                                 <div class="form-group col-md-3">
                                                     <label class="control-label">Reparto</label>
-                                                    {{ form_widget(form.area) }}
+                                                    {{ form_widget(form.district) }}
                                                 </div>
                                             </div>
                                             <div class="row">
@@ -385,75 +377,82 @@
                                                             {{ form_widget(form.studentsPosition) }}
                                                         </div>
                                                         <div class="form-group col-md-6">
+                                                            <label class="control-label">Facultad
+                                                            </label>
+                                                            {{ form_widget(form.studentsFaculty) }}
+                                                        </div>
+                                                        <div class="form-group col-md-6">
                                                             <label class="control-label">Carrera
                                                             </label>
                                                             {{ form_widget(form.studentsCareer) }}
                                                         </div>
-                                                        <div class="form-group col-md-6">
-                                                            <label class="control-label">Facultad
-                                                            </label>
-                                                            {{ form_widget(form.studentsSchool) }}
-                                                        </div>
                                                     </div>
                                                     <div class="tab-trabajador"  style="display: none;">
-                                            <div class="row">
-                                                <div class="form-group col-md-6">
-                                                    <label class="control-label">Ocupación
-                                                    </label>
-                                                    {{ form_widget(form.workersOccupation) }}
-                                                </div>
-                                                <div class="form-group col-md-6">
-                                                    <label class="control-label">Especialidad
-                                                    </label>
-                                                    {{ form_widget(form.workersSpecialty) }}
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="form-group col-md-6">
-                                                    <label class="control-label">Categoría Docente
-                                                    </label>
-                                                    {{ form_widget(form.workersEduCategory) }}
-                                                </div>
-                                                <div class="form-group col-md-6">
-                                                    <label class="control-label">Grado Científico
-                                                    </label>
-                                                    {{ form_widget(form.workersSciGrade) }}
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="form-group col-md-4">
-                                                    <label class="control-label">Facultad
-                                                    </label>
-                                                    {{ form_widget(form.workersSchool) }}
-                                                </div><div class="form-group col-md-4">
-                                                    <label class="control-label">Lugar de trabajo
-                                                    </label>
-                                                    {{ form_widget(form.workersWorkPlace) }}
-                                                </div>
-                                                <div class="form-group col-md-4">
-                                                    <label class="control-label">Teléfono del trabajo
-                                                    </label>
-                                                    {{ form_widget(form.workersWorkPhone) }}
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="form-group col-md-4">
-                                                    <label class="control-label">Cargo
-                                                    </label>
-                                                    {{ form_widget(form.workersPosition) }}
-                                                </div>
-                                                <div class="form-group col-md-4">
-                                                    <label class="control-label">Entrada al centro
-                                                    </label>
-                                                    {{ form_widget(form.workersAdmissionDate) }}
-                                                </div>
-                                                <div class="form-group col-md-4">
-                                                    <label class="control-label">Salario
-                                                    </label>
-                                                    {{ form_widget(form.workersPay) }}
-                                                </div>
-                                            </div>
-                                        </div>
+                                                        <div class="row">
+                                                            <div class="row">
+                                                                <div class="form-group col-md-6">
+                                                                    <label class="control-label">Área
+                                                                    </label>
+                                                                    {{ form_widget(form.workersArea) }}
+                                                                </div>
+                                                                <div class="form-group col-md-6">
+                                                                    <label class="control-label">Facultad
+                                                                    </label>
+                                                                    {{ form_widget(form.workersFaculty) }}
+                                                                </div>
+                                                                <div class="form-group col-md-6">
+                                                                    <label class="control-label">Lugar de trabajo
+                                                                    </label>
+                                                                    {{ form_widget(form.workersWorkPlace) }}
+                                                                </div>
+                                                                <div class="form-group col-md-6">
+                                                                    <label class="control-label">Teléfono del trabajo
+                                                                    </label>
+                                                                    {{ form_widget(form.workersWorkPhone) }}
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group col-md-6">
+                                                                <label class="control-label">Ocupación
+                                                                </label>
+                                                                {{ form_widget(form.workersOccupation) }}
+                                                            </div>
+                                                            <div class="form-group col-md-6">
+                                                                <label class="control-label">Especialidad
+                                                                </label>
+                                                                {{ form_widget(form.workersSpecialty) }}
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="form-group col-md-6">
+                                                                <label class="control-label">Categoría Docente
+                                                                </label>
+                                                                {{ form_widget(form.workersEduCategory) }}
+                                                            </div>
+                                                            <div class="form-group col-md-6">
+                                                                <label class="control-label">Grado Científico
+                                                                </label>
+                                                                {{ form_widget(form.workersSciGrade) }}
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="row">
+                                                            <div class="form-group col-md-4">
+                                                                <label class="control-label">Cargo
+                                                                </label>
+                                                                {{ form_widget(form.workersPosition) }}
+                                                            </div>
+                                                            <div class="form-group col-md-4">
+                                                                <label class="control-label">Entrada al centro
+                                                                </label>
+                                                                {{ form_widget(form.workersAdmissionDate) }}
+                                                            </div>
+                                                            <div class="form-group col-md-4">
+                                                                <label class="control-label">Salario
+                                                                </label>
+                                                                {{ form_widget(form.workersPay) }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="col-md-1"></div>
@@ -627,7 +626,6 @@
                                                                 <p class="form-control-static coma" data-display="clientbundle_client[cpa]"> </p>
                                                                 <p class="form-control-static coma" data-display="clientbundle_client[farm]"> </p>
                                                                 <p class="form-control-static coma" data-display="clientbundle_client[district]"> </p>
-                                                                <p class="form-control-static coma" data-display="clientbundle_client[area]"> </p>
                                                                 <p class="form-control-static coma" data-display="clientbundle_client[town]"> </p>
                                                                 <p class="form-control-static coma" data-display="clientbundle_client[city]"> </p>
                                                                 <p class="form-control-static coma" data-display="clientbundle_client[state]"> </p>
@@ -678,7 +676,7 @@
                                                             <div class="form-group">
                                                                 <label class="control-label">Facultad:</label>
                                                                 <div class="">
-                                                                    <p class="form-control-static" data-display="clientbundle_client[workersSchool]"> </p>
+                                                                    <p class="form-control-static" data-display="clientbundle_client[workersArea]"> </p>
                                                                 </div>
                                                             </div>
                                                             <div class="form-group">
@@ -716,7 +714,7 @@
                                                         <div class="form-group">
                                                             <label class="control-label">Facultad:</label>
                                                             <div class="">
-                                                                <p class="form-control-static " data-display="clientbundle_client[studentsSchool]"> </p>
+                                                                <p class="form-control-static " data-display="clientbundle_client[studentsFaculty]"> </p>
                                                             </div>
                                                         </div>
                                                         <div class="form-group">
@@ -752,7 +750,7 @@
                                             Guardar
                                             <i class="fa fa-check"></i>
                                         </button>
-                                        <a class="btn btn-default" href="{{ path('client_index') }}">
+                                        <a class="btn btn-default" href="{{ path('client_list') }}">
                                             Ir al listado
                                             <i class="fa fa-list"></i>
                                         </a>

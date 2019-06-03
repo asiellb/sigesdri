@@ -5,6 +5,7 @@ namespace DRI\ClientBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use DRI\UsefulBundle\Entity\Career;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\HttpFoundation\File\File;
@@ -12,30 +13,148 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 use DRI\ClientBundle\Entity\Language;
 use DRI\ClientBundle\Entity\Organization;
-use DRI\ExitBundle\Entity\ExitApplication;
 use DRI\PassportBundle\Entity\Passport;
+use DRI\PassportBundle\Entity\Application as PassportApplication;
+use DRI\ExitBundle\Entity\Departure;
+use DRI\ExitBundle\Entity\Application as ExitApplication;
 use DRI\UsefulBundle\Entity\Country;
-use DRI\UsefulBundle\Entity\School;
+use DRI\UsefulBundle\Entity\Area;
 use DRI\UsefulBundle\Useful\Useful;
 use DRI\UserBundle\Entity\User;
 
 /**
  * Client
  *
- * @ORM\Table(name="client")
+ * @ORM\Table(name="cln_client")
  * @ORM\Entity(repositoryClass="DRI\ClientBundle\Repository\ClientRepository")
  * @ORM\HasLifecycleCallbacks()
  *
  * @UniqueEntity("ci")
+ * @UniqueEntity("fullNameSlug")
  * @UniqueEntity("email")
  * @UniqueEntity("foreignEmail")
  * @UniqueEntity("clientPicture")
- * @UniqueEntity("fullNameSlug")
  *
  * @Vich\Uploadable
  */
 class Client
 {
+
+    /**********************************************************************************
+     * ********************************************************************************
+     * *
+     * *    CLIENT'S CONSTANTS
+     * *
+     * ********************************************************************************
+     **********************************************************************************/
+
+    const CLIENT_TYPES = [
+        'dir' => 'Directivo',
+        'cua' => 'Cuadro',
+        'doc' => 'Docente',
+        'nod' => 'No Docente',
+        'est' => 'Estudiante',
+    ];
+
+    const CLIENT_TYPES_CHOICE = [
+        'Directivo'  => 'dir',
+        'Cuadro'     => 'cua',
+        'Docente'    => 'doc',
+        'No Docente' => 'nod',
+        'Estudiante' => 'est',
+    ];
+
+    const GENDER = [
+        'F' => 'Femenino',
+        'M' => 'Masculino',
+    ];
+
+    const GENDER_CHOICE = [
+        'Femenino'  => 'F',
+        'Masculino' => 'M',
+    ];
+
+    const ORGANIZATION_CHOICE = [
+        'CDR' =>'cdr',
+        'CTC' =>'ctc',
+        'FMC' =>'fmc',
+        'UJC' =>'ujc',
+        'PCC' =>'pcc',
+    ];
+
+    const CIVIL_STATE = [
+        'SOL' => 'Soltero(a)',
+        'CAS' => 'Casado(a)',
+        'DIV' => 'Divorciado(a)',
+        'VIU' => 'Viudo(a)',
+    ];
+
+    const CIVIL_STATE_CHOICE = [
+        'Soltero(a)'    =>'SOL',
+        'Casado(a)'     =>'CAS',
+        'Divorciado(a)' =>'DIV',
+        'Viudo(a)'      =>'VIU',
+    ];
+
+    const EYES_COLOR_CHOICE = [
+        'Claros'    =>'Claros',
+        'Negros'    =>'Negros',
+        'Pardos'    =>'Pardos',
+    ];
+
+    const SKIN_COLOR_CHOICE = [
+        'Blanca'    =>'Blanca',
+        'Negra'     =>'Negra',
+        'Amarilla'  =>'Amarilla',
+        'Mulata'    =>'Mulata',
+        'Albina'    =>'Albina',
+    ];
+
+    const HAIR_COLOR_CHOICE = [
+        'Canoso'    =>'Canoso',
+        'Castaño'   =>'Castaño',
+        'Negro'     =>'Negro',
+        'Rojo'      =>'Rojo',
+        'Rubio'     =>'Rubio',
+        'Otros'     =>'Otros',
+    ];
+
+    const TEACHING_CATEGORY = [
+        'ATD' => 'ATD',
+        'ADI' => 'Adiestrado',
+        'INS' => 'Instructor',
+        'ASI' => 'Asistente',
+        'AUX' => 'Auxiliar',
+        'TIT' => 'Titular',
+    ];
+
+    const TEACHING_CATEGORY_CHOICE = [
+        'ATD'         => 'ATD',
+        'Adiestrado'  => 'ADI',
+        'Instructor'  => 'INS',
+        'Asistente'   => 'ASI',
+        'Auxiliar'    => 'AUX',
+        'Titular'     => 'TIT',
+    ];
+
+    const SCIENTIFIC_GRADE = [
+        'LIC' => 'Licenciado(a)',
+        'ING' => 'Ingeniero(a)',
+        'ARQ' => 'Arquitecto(a)',
+        'MSC' => 'Master',
+        'DRC' => 'Doctor(a)',
+    ];
+
+    const SCIENTIFIC_GRADE_CHOICE = [
+        'Licenciado(a)'  => 'LIC',
+        'Ingeniero(a)'   => 'ING',
+        'Arquitecto(a)'  => 'ARQ',
+        'Master'         => 'MSC',
+        'Doctor(a)'      => 'DRC',
+    ];
+
+
+
     /**********************************************************************************
      * ********************************************************************************
      * *
@@ -47,7 +166,7 @@ class Client
     /**
      * @var int
      *
-     * @ORM\Column(name="id", type="integer")
+     * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
@@ -56,7 +175,7 @@ class Client
     /**
      * @var string
      *
-     * @ORM\Column(name="ci", type="string", length=11, unique=true)
+     * @ORM\Column(type="string", length=11, unique=true)
      *
      * @Assert\NotBlank()
      * @Assert\Length(min=11, max=11)
@@ -67,7 +186,7 @@ class Client
     /**
      * @var string
      *
-     * @ORM\Column(name="firstName", type="string", length=20)
+     * @ORM\Column(type="string", length=20)
      *
      * @Assert\NotBlank()
      */
@@ -76,14 +195,14 @@ class Client
     /**
      * @var string
      *
-     * @ORM\Column(name="secondName", type="string", length=20, nullable=true)
+     * @ORM\Column(type="string", length=20, nullable=true)
      */
     private $secondName;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="firstLastName", type="string", length=20)
+     * @ORM\Column(type="string", length=20)
      *
      * @Assert\NotBlank()
      */
@@ -92,7 +211,7 @@ class Client
     /**
      * @var string
      *
-     * @ORM\Column(name="secondLastName", type="string", length=20)
+     * @ORM\Column(type="string", length=20)
      *
      * @Assert\NotBlank()
      */
@@ -101,35 +220,35 @@ class Client
     /**
      * @var string
      *
-     * @ORM\Column(name="fullName", type="string", length=100)
+     * @ORM\Column(type="string", length=100)
      */
     private $fullName;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="fullNameSlug", type="string", length=100)
+     * @ORM\Column(type="string", length=100)
      */
     private $fullNameSlug;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="shortName", type="string", length=100)
+     * @ORM\Column(type="string", length=100)
      */
     private $shortName;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="shortNameSlug", type="string", length=100)
+     * @ORM\Column(type="string", length=100)
      */
     private $shortNameSlug;
 
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="birthday", type="date")
+     * @ORM\Column(type="date")
      *
      * @Assert\NotBlank()
      * @Assert\Date()
@@ -139,7 +258,7 @@ class Client
     /**
      * @var string
      *
-     * @ORM\Column(name="gender", type="string", length=1)
+     * @ORM\Column(type="string", length=1)
      *
      * @Assert\NotBlank()
      * @Assert\Length(min=1, max=1)
@@ -150,7 +269,7 @@ class Client
     /**
      * @var string
      *
-     * @ORM\Column(name="email", type="string", length=100, unique=true)
+     * @ORM\Column(type="string", length=100, unique=true)
      *
      * @Assert\NotBlank()
      * @Assert\Email()
@@ -160,7 +279,7 @@ class Client
     /**
      * @var string
      *
-     * @ORM\Column(name="foreignEmail", type="string", length=100, nullable=true, unique=true)
+     * @ORM\Column(type="string", length=100, nullable=true, unique=true)
      *
      * @Assert\Email()
      */
@@ -169,7 +288,7 @@ class Client
     /**
      * @var string
      *
-     * @ORM\Column(name="privatePhone", type="string", length=14, nullable=true)
+     * @ORM\Column(type="string", length=14, nullable=true)
      *
      * @Assert\Length(min=8, max=14)
      */
@@ -178,7 +297,7 @@ class Client
     /**
      * @var string
      *
-     * @ORM\Column(name="cellPhone", type="string", length=14, nullable=true)
+     * @ORM\Column(type="string", length=14, nullable=true)
      *
      * @Assert\Length(min=8, max=14)
      */
@@ -187,18 +306,18 @@ class Client
     /**
      * @var string
      *
-     * @ORM\Column(name="clientType", type="string", length=3)
+     * @ORM\Column(type="string", length=3)
      *
      * @Assert\NotBlank()
      * @Assert\Length( min=3, max=3)
-     * @Assert\Choice(choices={"EST", "DOC", "NOD"})
+     * @Assert\Choice(choices={"est", "dir", "doc", "nod", "cua"})
      */
     private $clientType;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="clientPicture", type="string", length=255, nullable=true, unique=true)
+     * @ORM\Column(type="string", length=255, nullable=true, unique=true)
      */
     private $clientPicture;
 
@@ -212,24 +331,32 @@ class Client
     /**
      * @var array
      *
-     * @ORM\Column(name="languages", type="array", nullable=true)
+     * @ORM\Column(type="array", nullable=true)
      */
     private $languages;
 
     /**
      * @var array
      *
-     * @ORM\Column(name="organizations", type="array", nullable=true)
+     * @ORM\Column(type="array", nullable=true)
      */
     private $organizations;
 
     /**
-     * @var School
+     * @var Area
      *
-     * @ORM\ManyToOne(targetEntity="DRI\UsefulBundle\Entity\School", cascade={"persist"})
-     * @ORM\JoinColumn(name="school_id", referencedColumnName="id", onDelete="SET NULL")
+     * @ORM\ManyToOne(targetEntity="DRI\UsefulBundle\Entity\Area", cascade={"persist"})
+     * @ORM\JoinColumn(name="area_id", referencedColumnName="id", onDelete="SET NULL")
      */
-    private $school;
+    private $area;
+
+    /**
+     * @var Area
+     *
+     * @ORM\ManyToOne(targetEntity="DRI\UsefulBundle\Entity\Area", cascade={"persist"})
+     * @ORM\JoinColumn(name="faculty_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    private $faculty;
 
 
 
@@ -247,21 +374,21 @@ class Client
     /**
      * @var string
      *
-     * @ORM\Column(name="mothersName", type="string", length=30, nullable=true)
+     * @ORM\Column(type="string", length=30, nullable=true)
      */
     private $mothersName;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="fathersName", type="string", length=30, nullable=true)
+     * @ORM\Column(type="string", length=30, nullable=true)
      */
     private $fathersName;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="civilState", type="string", length=3, nullable=true)
+     * @ORM\Column(type="string", length=3, nullable=true)
      *
      * @Assert\Choice(choices={"SOL", "CAS", "DIV", "VIU"})
      */
@@ -270,21 +397,21 @@ class Client
     /**
      * @var string
      *
-     * @ORM\Column(name="weight", type="decimal", precision=10, scale=2, nullable=true)
+     * @ORM\Column(type="decimal", precision=10, scale=2, nullable=true)
      */
     private $weight;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="height", type="decimal", precision=10, scale=2, nullable=true)
+     * @ORM\Column(type="decimal", precision=10, scale=2, nullable=true)
      */
     private $height;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="eyesColor", type="string", length=10, nullable=true)
+     * @ORM\Column(type="string", length=10, nullable=true)
      *
      * @Assert\Choice(choices={"Claros", "Negros", "Pardos"})
      */
@@ -293,7 +420,7 @@ class Client
     /**
      * @var string
      *
-     * @ORM\Column(name="skinColor", type="string", length=10, nullable=true)
+     * @ORM\Column(type="string", length=10, nullable=true)
      *
      * @Assert\Choice(choices={"Blanca", "Negra", "Amarilla", "Mulata", "Albina"})
      */
@@ -302,7 +429,7 @@ class Client
     /**
      * @var string
      *
-     * @ORM\Column(name="hairColor", type="string", length=10, nullable=true)
+     * @ORM\Column(type="string", length=10, nullable=true)
      *
      * @Assert\Choice(choices={"Canoso", "Castaño", "Negro", "Rojo", "Rubio", "Otros"})
      */
@@ -311,14 +438,14 @@ class Client
     /**
      * @var string
      *
-     * @ORM\Column(name="pvs", type="text", nullable=true)
+     * @ORM\Column(type="text", nullable=true)
      */
     private $pvs;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="citizenship", type="string", length=30, nullable=true)
+     * @ORM\Column(type="string", length=30, nullable=true)
      */
     private $citizenship;
 
@@ -332,21 +459,21 @@ class Client
     /**
      * @var string
      *
-     * @ORM\Column(name="stateBirth", type="string", length=30, nullable=true)
+     * @ORM\Column(type="string", length=30, nullable=true)
      */
     private $stateBirth;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="cityBirth", type="string", length=30, nullable=true)
+     * @ORM\Column(type="string", length=30, nullable=true)
      */
     private $cityBirth;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="foreignCityBirth", type="string", length=30, nullable=true)
+     * @ORM\Column(type="string", length=30, nullable=true)
      */
     private $foreignCityBirth;
 
@@ -367,105 +494,105 @@ class Client
     /**
      * @var string
      *
-     * @ORM\Column(name="city", type="string", length=30, nullable=true)
+     * @ORM\Column(type="string", length=30, nullable=true)
      */
     private $city;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="district", type="string", length=30, nullable=true)
+     * @ORM\Column(type="string", length=30, nullable=true)
      */
     private $district;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="street", type="string", length=50, nullable=true)
+     * @ORM\Column(type="string", length=50, nullable=true)
      */
     private $street;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="highway", type="string", length=50, nullable=true)
+     * @ORM\Column(type="string", length=50, nullable=true)
      */
     private $highway;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="firstBetween", type="string", length=50, nullable=true)
+     * @ORM\Column(type="string", length=50, nullable=true)
      */
     private $firstBetween;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="secongBetween", type="string", length=50, nullable=true)
+     * @ORM\Column(type="string", length=50, nullable=true)
      */
     private $secongBetween;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="number", type="string", length=6, nullable=true)
+     * @ORM\Column(type="string", length=6, nullable=true)
      */
     private $number;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="km", type="string", length=6, nullable=true)
+     * @ORM\Column(type="string", length=6, nullable=true)
      */
     private $km;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="building", type="string", length=6, nullable=true)
+     * @ORM\Column(type="string", length=6, nullable=true)
      */
     private $building;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="apartment", type="string", length=6, nullable=true)
+     * @ORM\Column(type="string", length=6, nullable=true)
      */
     private $apartment;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="cpa", type="string", length=50, nullable=true)
+     * @ORM\Column(type="string", length=50, nullable=true)
      */
     private $cpa;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="farm", type="string", length=50, nullable=true)
+     * @ORM\Column(type="string", length=50, nullable=true)
      */
     private $farm;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="town", type="string", length=50, nullable=true)
+     * @ORM\Column(type="string", length=50, nullable=true)
      */
     private $town;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="area", type="string", length=6, nullable=true)
+     * @ORM\Column(type="string", length=50, nullable=true)
      */
-    private $area;
+    private $circunscription;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="postCode", type="string", length=10, nullable=true)
+     * @ORM\Column(type="string", length=10, nullable=true)
      */
     private $postCode;
 
@@ -475,6 +602,13 @@ class Client
      * @ORM\OneToMany(targetEntity="DRI\PassportBundle\Entity\Passport", mappedBy="holder")
      */
     private $passports;
+
+    /**
+     * @var ArrayCollection
+     *
+     * @ORM\OneToMany(targetEntity="DRI\PassportBundle\Entity\Application", mappedBy="client")
+     */
+    private $passportApplications;
 
 
 
@@ -491,36 +625,37 @@ class Client
     /**
      * @var string
      *
-     * @ORM\Column(name="studentsYear", type="string", length=1, nullable=true)
+     * @ORM\Column(type="string", length=1, nullable=true)
      */
     private $studentsYear;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="studentsPosition", type="string", length=50, nullable=true)
+     * @ORM\Column(type="string", length=50, nullable=true)
      */
     private $studentsPosition;
 
     /**
-     * @var string
+     * @var Area
      *
-     * @ORM\Column(name="studentsCareer", type="string", length=50, nullable=true)
+     * @ORM\ManyToOne(targetEntity="DRI\UsefulBundle\Entity\Career", inversedBy="students", cascade={"persist", "merge"})
+     * @ORM\JoinColumn(name="career_id", referencedColumnName="id")
      */
     private $studentsCareer;
 
     /**
-     * @var School
+     * @var Area
      *
-     * @ORM\ManyToOne(targetEntity="DRI\UsefulBundle\Entity\School", inversedBy="students", cascade={"persist", "merge"})
-     * @ORM\JoinColumn(name="school_id", referencedColumnName="id")
+     * @ORM\ManyToOne(targetEntity="DRI\UsefulBundle\Entity\Area", inversedBy="students", cascade={"persist", "merge"})
+     * @ORM\JoinColumn(name="student_faculty_id", referencedColumnName="id")
      */
-    private $studentsSchool;
+    private $studentsFaculty;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="studentsState", type="string", length=3, nullable=true)
+     * @ORM\Column(type="string", length=3, nullable=true)
      *
      * @Assert\Choice(choices={"ACT", "EGR", "BAJ"})
      */
@@ -529,7 +664,7 @@ class Client
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="studentsLastUpdate", type="datetime", nullable=true)
+     * @ORM\Column(type="datetime", nullable=true)
      *
      * @Assert\Date()
      */
@@ -538,7 +673,7 @@ class Client
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="studentsInactiveAt", type="datetime", nullable=true)
+     * @ORM\Column(type="datetime", nullable=true)
      *
      * @Assert\Date()
      */
@@ -559,21 +694,21 @@ class Client
     /**
      * @var string
      *
-     * @ORM\Column(name="workersOccupation", type="string", length=50, nullable=true)
+     * @ORM\Column(type="string", length=50, nullable=true)
      */
     private $workersOccupation;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="workersSpecialty", type="string", length=50, nullable=true)
+     * @ORM\Column(type="string", length=50, nullable=true)
      */
     private $workersSpecialty;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="workersEduCategory", type="string", length=3, nullable=true)
+     * @ORM\Column(type="string", length=3, nullable=true)
      *
      * @Assert\Choice(choices={"ATD", "ADI", "INS", "ASI", "AUX", "TIT"})
      */
@@ -582,7 +717,7 @@ class Client
     /**
      * @var string
      *
-     * @ORM\Column(name="workersSciGrade", type="string", length=3, nullable=true)
+     * @ORM\Column(type="string", length=3, nullable=true)
      *
      * @Assert\Choice(choices={"LIC", "ING", "ARQ","MSC", "DRC"})
      */
@@ -591,29 +726,37 @@ class Client
     /**
      * @var string
      *
-     * @ORM\Column(name="workersPosition", type="string", length=50, nullable=true)
+     * @ORM\Column(type="string", length=50, nullable=true)
      */
     private $workersPosition;
 
     /**
-     * @var School
+     * @var Area
      *
-     * @ORM\ManyToOne(targetEntity="DRI\UsefulBundle\Entity\School", inversedBy="workers", cascade={"persist", "merge"})
-     * @ORM\JoinColumn(name="school_id", referencedColumnName="id"))
+     * @ORM\ManyToOne(targetEntity="DRI\UsefulBundle\Entity\Area", inversedBy="workers", cascade={"persist", "merge"})
+     * @ORM\JoinColumn(name="worker_area_id", referencedColumnName="id"))
      */
-    private $workersSchool;
+    private $workersArea;
+
+    /**
+     * @var Area
+     *
+     * @ORM\ManyToOne(targetEntity="DRI\UsefulBundle\Entity\Area", inversedBy="profesors", cascade={"persist", "merge"})
+     * @ORM\JoinColumn(name="worker_faculty_id", referencedColumnName="id"))
+     */
+    private $workersFaculty;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="workersWorkPlace", type="string", length=50, nullable=true)
+     * @ORM\Column(type="string", length=50, nullable=true)
      */
     private $workersWorkPlace;
 
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="workersAdmissionDate", type="date", nullable=true)
+     * @ORM\Column(type="date", nullable=true)
      *
      * @Assert\Date()
      */
@@ -622,7 +765,7 @@ class Client
     /**
      * @var string
      *
-     * @ORM\Column(name="workersWorkPhone", type="string", length=14, nullable=true)
+     * @ORM\Column(type="string", length=14, nullable=true)
      *
      * @Assert\Length(min=8, max=14)
      */
@@ -631,14 +774,14 @@ class Client
     /**
      * @var string
      *
-     * @ORM\Column(name="workersPay", type="decimal", precision=10, scale=2, nullable=true)
+     * @ORM\Column(type="decimal", precision=10, scale=2, nullable=true)
      */
     private $workersPay;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="workersState", type="string", length=3, nullable=true)
+     * @ORM\Column(type="string", length=3, nullable=true)
      *
      * @Assert\Choice(choices={"ACT", "BAJ"})
      */
@@ -647,7 +790,7 @@ class Client
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="workersLastUpdate", type="datetime", nullable=true)
+     * @ORM\Column(type="datetime", nullable=true)
      *
      * @Assert\Date()
      */
@@ -656,7 +799,7 @@ class Client
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="workersInactiveAt", type="datetime", nullable=true)
+     * @ORM\Column(type="datetime", nullable=true)
      *
      * @Assert\Date()
      */
@@ -677,28 +820,28 @@ class Client
     /**
      * @var bool
      *
-     * @ORM\Column(name="enabled", type="boolean")
+     * @ORM\Column(type="boolean")
      */
     private $enabled;
 
     /**
      * @var bool
      *
-     * @ORM\Column(name="locked", type="boolean")
+     * @ORM\Column(type="boolean")
      */
     private $locked;
 
     /**
      * @var bool
      *
-     * @ORM\Column(name="expired", type="boolean")
+     * @ORM\Column(type="boolean")
      */
     private $expired;
 
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="expiredAt", type="datetime", nullable=true)
+     * @ORM\Column(type="datetime", nullable=true)
      *
      * @Assert\Date()
      */
@@ -707,7 +850,7 @@ class Client
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="createdAt", type="datetime")
+     * @ORM\Column(type="datetime")
      *
      * @Assert\Date()
      */
@@ -716,7 +859,7 @@ class Client
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="updatedAt", type="datetime")
+     * @ORM\Column(type="datetime")
      *
      * @Assert\Date()
      */
@@ -725,7 +868,8 @@ class Client
     /**
      * @var User
      *
-     * @ORM\ManyToOne(targetEntity="DRI\UserBundle\Entity\User")
+     * @ORM\ManyToOne(targetEntity="DRI\UserBundle\Entity\User", cascade={"persist"})
+     * @ORM\JoinColumn(name="created_user_id", referencedColumnName="id", onDelete="SET NULL")
      */
     private $createdBy;
 
@@ -733,14 +877,14 @@ class Client
      * @var User
      *
      * @ORM\ManyToOne(targetEntity="DRI\UserBundle\Entity\User", cascade={"persist"})
-     * @ORM\JoinColumn(name="update_user_id", referencedColumnName="id", onDelete="SET NULL")
+     * @ORM\JoinColumn(name="updated_user_id", referencedColumnName="id", onDelete="SET NULL")
      */
     private $lastUpdateBy;
 
     /**
      * @var ArrayCollection
      *
-     * @ORM\OneToMany(targetEntity="DRI\ExitBundle\Entity\ExitApplication", mappedBy="client")
+     * @ORM\OneToMany(targetEntity="DRI\ExitBundle\Entity\Application", mappedBy="client")
      */
     private $exitApplications;
 
@@ -756,7 +900,7 @@ class Client
     /**********************************************************************************
      * ********************************************************************************
      * *
-     * *    CONSTRUCTOR & TOSTRING METHODS
+     * *    CONSTRUCTOR & TO_STRING METHODS
      * *
      * ********************************************************************************
      **********************************************************************************/
@@ -776,8 +920,9 @@ class Client
         $this->enabled = true;
         $this->locked = false;
         $this->expired = false;
-        $this->exitApplications = new ArrayCollection();
         $this->passports = new ArrayCollection();
+        $this->passportApplications = new ArrayCollection();
+        $this->exitApplications = new ArrayCollection();
     }
 
     public function __toString()
@@ -998,7 +1143,7 @@ class Client
      */
     public function getShortName()
     {
-        return $this->fullName;
+        return $this->shortName;
     }
 
     /**
@@ -1010,6 +1155,19 @@ class Client
     {
         return $this->shortNameSlug;
     }
+
+    /**
+     * Set shortNameSlug
+     *
+     * @return Client
+     */
+    public function setShortNameSlug($shortNameSlug)
+    {
+        $this->shortNameSlug = $shortNameSlug;
+
+        return $this;
+    }
+
 
     /**
      * Set birthday
@@ -1167,14 +1325,20 @@ class Client
         $this->clientType = $clientType;
 
         switch ($clientType){
-            case 'EST':
+            case 'est':
                 $this->studentsLastUpdate = new \DateTime('now');
                 break;
-            case 'DOC':
+            case 'doc':
                 $this->workersLastUpdate = new \DateTime('now');
                 break;
-            case 'NOD':
-                $this->studentsLastUpdate = new \DateTime('now');
+            case 'nod':
+                $this->workersLastUpdate = new \DateTime('now');
+                break;
+            case 'dir':
+                $this->workersLastUpdate = new \DateTime('now');
+                break;
+            case 'cua':
+                $this->workersLastUpdate = new \DateTime('now');
                 break;
             default:
                 break;
@@ -2050,27 +2214,27 @@ class Client
     }
 
     /**
-     * Set area
+     * Set circunscription
      *
-     * @param string $area
+     * @param string $circunscription
      *
      * @return Client
      */
-    public function setArea($area)
+    public function setCircunscription($circunscription)
     {
-        $this->area = $area;
+        $this->circunscription = $circunscription;
 
         return $this;
     }
 
     /**
-     * Get area
+     * Get circunscription
      *
      * @return string
      */
-    public function getArea()
+    public function getCircunscription()
     {
-        return $this->area;
+        return $this->circunscription;
     }
 
     /**
@@ -2129,6 +2293,40 @@ class Client
     public function getPassports()
     {
         return $this->passports;
+    }
+
+    /**
+     * Add passportApplication
+     *
+     * @param  PassportApplication $passportApplication
+     *
+     * @return Client
+     */
+    public function addPassportApplication(PassportApplication $passportApplication)
+    {
+        $this->passportApplications[] = $passportApplication;
+
+        return $this;
+    }
+
+    /**
+     * Remove passportApplication
+     *
+     * @param PassportApplication $passportApplication
+     */
+    public function removePassportApplication(PassportApplication $passportApplication)
+    {
+        $this->passportApplications->removeElement($passportApplication);
+    }
+
+    /**
+     * Get passportApplications
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getPassportsApplication()
+    {
+        return $this->passportApplications;
     }
 
 
@@ -2196,11 +2394,11 @@ class Client
     /**
      * Set studentsCareer
      *
-     * @param string $studentsCareer
+     * @param Career $studentsCareer
      *
      * @return Client
      */
-    public function setStudentsCareer($studentsCareer)
+    public function setStudentsCareer(Career $studentsCareer = null)
     {
         $this->studentsCareer = $studentsCareer;
 
@@ -2210,7 +2408,7 @@ class Client
     /**
      * Get studentsCareer
      *
-     * @return string
+     * @return Career
      */
     public function getStudentsCareer()
     {
@@ -2218,27 +2416,30 @@ class Client
     }
 
     /**
-     * Set studentsSchool
+     * Set studentsFaculty
      *
-     * @param School $studentsSchool
+     * @param Area $studentsFaculty
      *
      * @return Client
      */
-    public function setStudentsSchool(School $studentsSchool = null)
+    public function setStudentsFaculty(Area $studentsFaculty = null)
     {
-        $this->studentsSchool = $studentsSchool;
+        $this->studentsFaculty = $studentsFaculty;
+
+        $this->faculty = $studentsFaculty;
+        $this->area = $studentsFaculty;
 
         return $this;
     }
 
     /**
-     * Get studentsSchool
+     * Get studentsFaculty
      *
-     * @return School
+     * @return Area
      */
-    public function getStudentsSchool()
+    public function getStudentsFaculty()
     {
-        return $this->studentsSchool;
+        return $this->studentsFaculty;
     }
 
     /**
@@ -2425,27 +2626,55 @@ class Client
     }
 
     /**
-     * Set workersSchool
+     * Set workersFaculty
      *
-     * @param School $workersSchool
+     * @param Area $workersFaculty
      *
      * @return Client
      */
-    public function setWorkersSchool(School $workersSchool = null)
+    public function setWorkersFaculty(Area $workersFaculty = null)
     {
-        $this->workersSchool = $workersSchool;
+        $this->workersFaculty = $workersFaculty;
+
+        $this->faculty = $workersFaculty;
 
         return $this;
     }
 
     /**
-     * Get workersSchool
+     * Get workersFaculty
      *
-     * @return School
+     * @return Area
      */
-    public function getWorkersSchool()
+    public function getWorkersFaculty()
     {
-        return $this->workersSchool;
+        return $this->workersFaculty;
+    }
+
+    /**
+     * Set workersArea
+     *
+     * @param Area $workersArea
+     *
+     * @return Client
+     */
+    public function setWorkersArea(Area $workersArea = null)
+    {
+        $this->workersArea = $workersArea;
+
+        $this->area = $workersArea;
+
+        return $this;
+    }
+
+    /**
+     * Get workersArea
+     *
+     * @return Area
+     */
+    public function getWorkersArea()
+    {
+        return $this->workersArea;
     }
 
     /**
@@ -2910,37 +3139,61 @@ class Client
     }
 
     /**
-     * Set school
+     * Set area
      *
-     * @param \DRI\UsefulBundle\Entity\School $school
+     * @param Area $area
      *
      * @return Client
      */
-    public function setSchool(\DRI\UsefulBundle\Entity\School $school = null)
+    public function setArea(Area $area = null)
     {
-        $this->school = $school;
+        $this->area = $area;
 
         return $this;
     }
 
     /**
-     * Get school
+     * Get area
      *
-     * @return \DRI\UsefulBundle\Entity\School
+     * @return Area
      */
-    public function getSchool()
+    public function getArea()
     {
-        return $this->school;
+        return $this->area;
+    }
+
+    /**
+     * Set faculty
+     *
+     * @param Area $faculty
+     *
+     * @return Client
+     */
+    public function setFaculty(Area $faculty = null)
+    {
+        $this->faculty = $faculty;
+
+        return $this;
+    }
+
+    /**
+     * Get faculty
+     *
+     * @return Area
+     */
+    public function getFaculty()
+    {
+        return $this->faculty;
     }
 
     /**
      * Add departure
      *
-     * @param \DRI\ExitBundle\Entity\Departure $departure
+     * @param Departure $departure
      *
      * @return Client
      */
-    public function addDeparture(\DRI\ExitBundle\Entity\Departure $departure)
+    public function addDeparture(Departure $departure)
     {
         $this->departures[] = $departure;
 
@@ -2950,9 +3203,9 @@ class Client
     /**
      * Remove departure
      *
-     * @param \DRI\ExitBundle\Entity\Departure $departure
+     * @param Departure $departure
      */
-    public function removeDeparture(\DRI\ExitBundle\Entity\Departure $departure)
+    public function removeDeparture(Departure $departure)
     {
         $this->departures->removeElement($departure);
     }
@@ -2966,4 +3219,121 @@ class Client
     {
         return $this->departures;
     }
+
+
+
+    /**********************************************************************************
+     * ********************************************************************************
+     * *
+     * *    ADITIONAL METHODS
+     * *
+     * ********************************************************************************
+     **********************************************************************************/
+
+
+
+    static function clientType_AcronimToName($clientType){
+        switch ($clientType){
+            case 'dir': return 'Directivo';break;
+            case 'cua': return 'Cuadro';break;
+            case 'doc': return 'Docente';break;
+            case 'nod': return 'No Docente';break;
+            case 'est': return 'Estudiante';break;
+            default: return 'Tipo de Cliente No Definido';break;
+        }
+    }
+
+    static function clientType_NameToAcronim($clientType){
+        switch ($clientType){
+            case 'Directivo': return 'dir';break;
+            case 'Cuadro': return 'cua';break;
+            case 'Docente': return 'doc';break;
+            case 'No Docente': return 'nod';break;
+            case 'Estudiante': return 'est';break;
+            default: return 'Tipo de Cliente No Definido';break;
+        }
+    }
+
+    static function gender_AcronimToName($gender){
+        switch ($gender){
+            case 'F': return 'Femenino';break;
+            case 'M': return 'Masculino';break;
+            default: return 'Género No Definido';break;
+        }
+    }
+
+    static function gender_NameToAcronim($gender){
+        switch ($gender){
+            case 'Femenino': return 'F';break;
+            case 'Masculino': return 'M';break;
+            default: return 'Género No Definido';break;
+        }
+    }
+
+    static function civilState_AcronimToName($civilState){
+        switch ($civilState){
+            case 'SOL': return 'Soltero(a)';break;
+            case 'CAS': return 'Casado(a)';break;
+            case 'DIV': return 'Divorciado(a)';break;
+            case 'VIU': return 'Viudo(a)';break;
+            default: return 'Estado Civil No Definido';break;
+        }
+    }
+
+    static function civilState_NameToAcronim($civilState){
+        switch ($civilState){
+            case 'Soltero(a)': return 'SOL';break;
+            case 'Casado(a)': return 'CAS';break;
+            case 'Divorciado(a)': return 'DIV';break;
+            case 'Viudo(a)': return 'VIU';break;
+            default: return 'Estado Civil No Definido';break;
+        }
+    }
+
+    static function teachingCategory_AcronimToName($teachingCategory){
+        switch ($teachingCategory){
+            case 'ATD': return 'ATD';break;
+            case 'ADI': return 'Adiestrado';break;
+            case 'INS': return 'Instructor';break;
+            case 'ASI': return 'Asistente';break;
+            case 'AUX': return 'Auxiliar';break;
+            case 'TIT': return 'Titular';break;
+            default: return 'Categoría Docente No Definida';break;
+        }
+    }
+
+    static function teachingCategory_NameToAcronim($teachingCategory){
+        switch ($teachingCategory){
+            case 'ATD': return 'ATD';break;
+            case 'Adiestrado': return 'ADI';break;
+            case 'Instructor': return 'INS';break;
+            case 'Asistente': return 'ASI';break;
+            case 'Auxiliar': return 'AUX';break;
+            case 'Titular': return 'TIT';break;
+            default: return 'Categoría Docente No Definida';break;
+        }
+    }
+
+    static function scientificGrade_AcronimToName($scientificGrade){
+        switch ($scientificGrade){
+            case 'LIC': return 'Licenciado(a)';break;
+            case 'ING': return 'Ingeniero(a)';break;
+            case 'ARQ': return 'Arquitecto(a)';break;
+            case 'MSC': return 'Master';break;
+            case 'DRC': return 'Doctor(a)';break;
+            default: return 'Grado Científico No Definido';break;
+        }
+    }
+
+    static function scientificGrade_NameToAcronim($scientificGrade){
+        switch ($scientificGrade){
+            case 'Licenciado(a)': return 'LIC';break;
+            case 'Ingeniero(a)': return 'ING';break;
+            case 'Arquitecto(a)': return 'ARQ';break;
+            case 'Master': return 'MSC';break;
+            case 'Doctor(a)': return 'DRC';break;
+            default: return 'Grado Científico No Definido';break;
+        }
+    }
+
 }
