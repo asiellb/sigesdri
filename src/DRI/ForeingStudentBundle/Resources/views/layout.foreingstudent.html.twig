@@ -1,0 +1,23 @@
+{% extends '::base.html.twig' %}
+
+{% block title %}{{ parent() }} | Estudiantes Extranjeros{% endblock %}
+
+{% block  page_breadcrumb %}
+    {{ parent() }}
+    <li>
+    {% if '/foreing-student/index' in app.request.getPathInfo() %}
+        <span>Estudiantes Extranjeros</span>
+    {% else %}
+        <a href="{{ path('foreingstudent_index') }}" ><span>Estudiantes Extranjeros</span> </a> <i class="fa fa-circle"></i>
+    {% endif %}
+    </li>
+{% endblock %}
+
+{% block page_title %}
+    Estudiantes Extranjeros
+{% endblock %}
+
+{% block page_dashboard %}
+
+{% endblock %}
+

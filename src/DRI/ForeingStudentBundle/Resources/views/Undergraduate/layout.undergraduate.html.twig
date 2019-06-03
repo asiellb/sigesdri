@@ -1,0 +1,22 @@
+{% extends 'DRIForeingStudentBundle::layout.foreingstudent.html.twig' %}
+
+{% block title %}{{ parent() }} | Pregrado{% endblock %}
+
+{% block  page_breadcrumb %}
+    {{ parent() }}
+    <li>
+    {% if '/undergraduate/index' in app.request.getPathInfo() %}
+        <span>Pregrado</span>
+    {% else %}
+        <a href="{{ path('undergraduate_index') }}" ><span>Pregrado</span> </a> <i class="fa fa-circle"></i>
+    {% endif %}
+    </li>
+{% endblock %}
+
+{% block page_title %}
+{% endblock %}
+
+{% block page_dashboard %}
+
+{% endblock %}
+

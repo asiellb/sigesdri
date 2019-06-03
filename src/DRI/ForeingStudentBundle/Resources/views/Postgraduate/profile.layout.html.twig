@@ -1,0 +1,86 @@
+{% extends 'DRIForeingStudentBundle:Postgraduate:layout.postgraduate.html.twig' %}
+
+{% block page_toolbar %}
+    <div class="btn-group pull-right">
+        <button type="button" class="btn green btn-sm btn-outline dropdown-toggle" data-toggle="dropdown"> Acciones
+            <i class="fa fa-angle-down"></i>
+        </button>
+        <ul class="dropdown-menu pull-right" role="menu">
+            <li>
+                <a href="{{ path('postgraduate_new') }}">
+                    <i class="icon-user-follow"></i> Agregar Estudiante de Pregrado</a>
+            </li>
+        </ul>
+    </div>
+{% endblock %}
+
+{% block page_dashboard %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="profile-sidebar">
+                <div class="portlet light profile-sidebar-portlet ">
+                    <!-- SIDEBAR USERPIC -->
+                    <div class="profile-userpic">
+                        {% if postgraduate.picture | length() > 0 %}
+                            {% set picture = asset(vich_uploader_asset(postgraduate, 'pictureFile')) %}
+                        {% else %}
+                            {% if postgraduate.gender == "F" %}
+                                {% set picture = asset('assets/pages/media/profile/profile-female.png') %}
+                            {% elseif postgraduate.gender == "M" %}
+                                {% set picture = asset('assets/pages/media/profile/profile-male.png') %}
+                            {% endif %}
+                        {% endif %}
+                        <img src="{{ picture }}" class="img-responsive" alt=""> </div>
+                    <!-- END SIDEBAR USERPIC -->
+                    <!-- SIDEBAR USER TITLE -->
+                    <div class="profile-usertitle">
+                        <div class="profile-usertitle-name"> {{ postgraduate.fullName }} </div>
+                        <div class="profile-usertitle-job"> {{ postgraduate.country.spName }}</div>
+                        <div class="profile-usertitle-job">
+                            {% if postgraduate.courseType == 'DOC' %}{{ 'Doctorado' }}
+                            {% elseif postgraduate.courseType == 'MAE' %} {{ 'Maestría' }}
+                            {% elseif postgraduate.courseType == 'ESP' %} {{ 'Especialidad' }}
+                            {% else %}{{ 'Curso Corto' }}{% endif %}</div>
+                    </div>
+                    <!-- END SIDEBAR USER TITLE -->
+                    <!-- SIDEBAR MENU -->
+                    <div class="profile-usermenu">
+                        <ul class="nav">
+                            <li class="{% if '/postgraduate/profile' in app.request.getPathInfo() %}active{% endif %}">
+                                {% if '/postgraduate/profile' in app.request.getPathInfo() %}
+                                    <a href="#">
+                                        <i class="icon-user"></i> Perfil
+                                    </a>
+                                {% else %}
+                                    <a href="{{ path('postgraduate_show', {'fullNameSlug': postgraduate.fullNameSlug}) }}">
+                                        <i class="icon-user"></i> Perfil
+                                    </a>
+                                {% endif %}
+                            </li>
+                            <li class="{% if '/postgraduate/edit' in app.request.getPathInfo() %}active{% endif %}">
+                                {% if '/postgraduate/edit' in app.request.getPathInfo() %}
+                                    <a href="#">
+                                        <i class="icon-settings"></i> Editar
+                                    </a>
+                                {% else %}
+                                    <a href="{{ path('postgraduate_edit', {'fullNameSlug': postgraduate.fullNameSlug}) }}">
+                                        <i class="icon-settings"></i> Editar
+                                    </a>
+                                {% endif %}
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i class="icon-info"></i> Ayuda </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- END MENU -->
+                </div>
+            </div>
+
+            <div class="profile-content">
+                {% block profile_content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

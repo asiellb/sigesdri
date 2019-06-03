@@ -1,0 +1,138 @@
+{% extends 'PetkoparaCrudGeneratorBundle::base.html.twig' %}
+
+{% block title %}
+{{ parent() }} - undergraduate index
+{% endblock %}
+
+{% block body %}
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="page-header">
+            <h2><a href="{{ path('undergraduate_index') }}">Undergraduate</a></h2>
+        </div>
+    </div>
+</div> <!-- /#top -->
+
+
+<div class="row">
+    <div class="col-md-12">
+        {% for type, flashMessages in app.session.flashbag.all() %} 
+        {% for flashMessage in flashMessages %}
+        <div class="alert alert-{{ type }}">
+            {{ flashMessage|raw }}
+        </div>
+         {% endfor %} 
+         {% endfor %} 
+    </div>
+</div>
+    
+
+<div class="row">
+
+        <div class="table-responsive col-md-12">
+        <form method="POST" id="bulk_form" action="{{ path('undergraduate_bulk_delete') }} ">
+            <table class="table table-striped table-hover table-bordered" cellspacing="0" cellpadding="0">
+                <thead>
+                    <tr>
+                        <th width="20px"><input type="checkbox" class="check-all" onclick="toggleAll(this)"></th>
+
+                {% import "PetkoparaCrudGeneratorBundle::macros/th_sortable.html.twig" as macros %}
+                            <th>{{macros.th_sortable('id',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'undergraduate_index')}}</th>
+                            <th>{{macros.th_sortable('ci',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'undergraduate_index')}}</th>
+                            <th>{{macros.th_sortable('names',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'undergraduate_index')}}</th>
+                            <th>{{macros.th_sortable('lastNames',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'undergraduate_index')}}</th>
+                            <th>{{macros.th_sortable('fullName',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'undergraduate_index')}}</th>
+                            <th>{{macros.th_sortable('fullNameSlug',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'undergraduate_index')}}</th>
+                            <th>{{macros.th_sortable('birthday',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'undergraduate_index')}}</th>
+                            <th>{{macros.th_sortable('gender',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'undergraduate_index')}}</th>
+                            <th>{{macros.th_sortable('email',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'undergraduate_index')}}</th>
+                            <th>{{macros.th_sortable('foreignEmail',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'undergraduate_index')}}</th>
+                            <th>{{macros.th_sortable('cellPhone',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'undergraduate_index')}}</th>
+                            <th>{{macros.th_sortable('type',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'undergraduate_index')}}</th>
+                            <th>{{macros.th_sortable('passportNumber',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'undergraduate_index')}}</th>
+                            <th>{{macros.th_sortable('entryDate',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'undergraduate_index')}}</th>
+                            <th>{{macros.th_sortable('expiryDate',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'undergraduate_index')}}</th>
+                            <th>{{macros.th_sortable('year',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'undergraduate_index')}}</th>
+                            <th>{{macros.th_sortable('picture',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'undergraduate_index')}}</th>
+                            <th>{{macros.th_sortable('createdAt',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'undergraduate_index')}}</th>
+                            <th>{{macros.th_sortable('updatedAt',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'undergraduate_index')}}</th>
+    
+                       
+                        <th width = "130px">List</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for undergraduate in undergraduates %}
+                    <tr>
+                        <td><input type="checkbox" name="ids[]" onclick='bulkSubmitBtnManage();' class="check-all" value="{{undergraduate.id}}"/></td>
+                        <td><a href="{{ path('undergraduate_edit', { 'id': undergraduate.id }) }}">{{ undergraduate.id }}</a></td>
+                        <td>{{ undergraduate.ci }}</td>
+                        <td>{{ undergraduate.names }}</td>
+                        <td>{{ undergraduate.lastNames }}</td>
+                        <td>{{ undergraduate.fullName }}</td>
+                        <td>{{ undergraduate.fullNameSlug }}</td>
+                        <td>{%- if undergraduate.birthday %}{{ undergraduate.birthday|date('Y-m-d') }}{% endif %}</td>
+                        <td>{{ undergraduate.gender }}</td>
+                        <td>{{ undergraduate.email }}</td>
+                        <td>{{ undergraduate.foreignEmail }}</td>
+                        <td>{{ undergraduate.cellPhone }}</td>
+                        <td>{{ undergraduate.type }}</td>
+                        <td>{{ undergraduate.passportNumber }}</td>
+                        <td>{%- if undergraduate.entryDate %}{{ undergraduate.entryDate|date('Y-m-d') }}{% endif %}</td>
+                        <td>{%- if undergraduate.expiryDate %}{{ undergraduate.expiryDate|date('Y-m-d') }}{% endif %}</td>
+                        <td>{{ undergraduate.year }}</td>
+                        <td>{{ undergraduate.picture }}</td>
+                        <td>{%- if undergraduate.createdAt %}{{ undergraduate.createdAt|date('Y-m-d H:i:s') }}{% endif %}</td>
+                        <td>{%- if undergraduate.updatedAt %}{{ undergraduate.updatedAt|date('Y-m-d H:i:s') }}{% endif %}</td>
+    
+                        <td class="actions">
+                            <a  onclick="return confirm('Are you sure!');" title="Delete" class="btn btn-danger btn-sm" href="{{ path('undergraduate_by_id_delete', { 'id': undergraduate.id}) }}">
+                                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                            </a>
+                            <a title='Show' class="btn btn-info btn-sm" href="{{ path('undergraduate_show', { 'id': undergraduate.id }) }}">
+                                <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+                            </a>
+                            <a  title='Edit' class="btn btn-primary btn-sm" href="{{ path('undergraduate_edit', { 'id': undergraduate.id }) }}">
+                                <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                            </a>
+                        </td>
+
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </form>
+
+
+        </div>
+</div> <!-- /#list -->
+
+
+
+
+<div class="row">
+    <div class="col-md-4 pull-left">
+            <div class="pagination form-inline ">
+                <select class = "form-control" name="bulk_action" >
+                    <option value="delete">DELETE</option>
+                </select>
+                <input type="submit" id='bulkSubmitBtn' onclick="return confirm('Are you sure?')" form="bulk_form" class="form-control btn btn-danger btn-sm" disabled>
+            </div>
+    </div>
+    
+    <div class='col-md-3 pagination text-center'>
+         <p>{{totalOfRecordsString}}</p>
+    </div>
+ 
+    <div class="col-md-5 text-right">
+         {{ pagerHtml|raw }} 
+    </div>
+</div> <!-- /#bottom -->
+
+
+
+{% endblock %}
+
