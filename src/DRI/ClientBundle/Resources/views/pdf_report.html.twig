@@ -1,0 +1,151 @@
+{% extends '::pdf/pdf_base.html.twig' %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-md-8">
+            <p>PROPUESTA AL RECTOR PARA SALIDA AL EXTRANJERO POR MISIONES OFICIALES</p>
+        </div>
+        <div class="col-md-3">
+            <img src="{{ absolute_url(asset('assets/pdf/logo_dri.png')) }}" alt="Logo" height="60" style="margin-left: 20px"/>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <p>DATOS GENERALES</p>
+        </div>
+        <div class="col-md-12">
+            <p>Facultad o Centro: {{ client.faculty.name }}</p>
+            <p>Nombre: {{ client.fullName }}</p>
+            <p>Categoría Docente o Investigativa: {{ client.workersEduCategory }}</p>
+            <p>Grado Científico: {{ client.workersSciGrade }}</p>
+            <p>Edad: </p>
+            <p>Años de Trabajo en la UC: </p>
+            <p>Carnet de Identidad: {{ client.ci }}</p>
+            <p>Cargo que ocupa: {{ client.workersPosition }}</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <span>MISIONES EN EL EXTERIOR EN LOS ÚLTIMOS 2 AÑOS</span>
+        </div>
+        <div class="col-md-12">
+            <table class="table">
+                <thead>
+                <tr style="">
+                    <th colspan="4">
+                        <p >
+                            <span>País</span>
+                        </p>
+                    </th>
+                    <th colspan="4">
+                        <p>
+                            <span>Institución</span>
+                        </p>
+                    </th>
+                    <th colspan="6">
+                        <p>
+                            <span>Concepto</span>
+                        </p>
+                    </th>
+                    <th colspan="6">
+                        <p>
+                            <span>Tiempo</span>
+                        </p>
+                    </th>
+                    <th colspan="3">
+                        <p>
+                            <span>Fecha de Salida</span>
+                        </p>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <p>DATOS DE LA MISIÓN PROPUESTA</p>
+        </div>
+        <div class="col-md-12">
+            <p>País: </p>
+            <p>Institución: </p>
+            <p>Tiempo: </p>
+            <p>Desde: </p>
+            <p>Hasta: </p>
+            <p>Concepto de la misión: </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <p>INFORMACIÓN A LA COMISION DE CUADROS</p>
+        </div>
+        <div class="col-md-12">
+            <p>En caso de ser cuadro aclarar sustituto: </p>
+            <p>En caso de tener GOE durante la salida aclarar sustituto: </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <p>INFORMACIÓN ECONÓMICA PARA PROFESORES INVITADOS, PAQUETES DE POSTGRADO O ASESORÍA</p>
+        </div>
+        <div class="col-md-12">
+            <p>Salario Mensual: </p>
+            <p>Salario Total: </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <p>INFORMACIÓN ECONÓMICA PARA OTROS CONCEPTOS DE SALIDA</p>
+        </div>
+        <div class="col-md-12">
+            <table class="table">
+                <thead>
+                <tr style="">
+                    <th>
+                        <p><span></span></p>
+                    </th>
+                    <th>
+                        <p><span>Monto CUC</span></p>
+                    </th>
+                    <th>
+                        <p><span>Fuente de Financiamiento</span></p>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Pasaje</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Viáticos</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Otros</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <p>AROBACIONES</p>
+        </div>
+        <div class="col-md-12">
+            <p>Propone: Cargo: Fecha: Firma: </p>
+            <p>Núcleo del PCC: Fecha: Firma:  </p>
+            <p>Reunión de Salidas: Fecha: Firma:  </p>
+            <p>Aprobación para optar por becas: Vicerrector de Investigaciones: Fecha: Firma:  </p>
+            <p>Constancia que visitó la Oficina Secreta: Fecha: Firma:  </p>
+        </div>
+    </div>
+
+{% endblock %}

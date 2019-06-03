@@ -1,0 +1,101 @@
+{% extends 'DRIClientBundle::layout.client.html.twig' %}
+
+{% block page_toolbar %}
+    <div class="btn-group pull-right">
+        <button type="button" class="btn green btn-sm btn-outline dropdown-toggle" data-toggle="dropdown"> Acciones
+            <i class="fa fa-angle-down"></i>
+        </button>
+        <ul class="dropdown-menu pull-right" role="menu">
+            <li>
+                <a href="{{ path('client_new') }}">
+                    <i class="icon-user-follow"></i> Agregar Cliente</a>
+            </li>
+        </ul>
+    </div>
+{% endblock %}
+
+{% block page_dashboard %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="profile-sidebar">
+                <div class="portlet light profile-sidebar-portlet ">
+                    <!-- SIDEBAR USERPIC -->
+                    <div class="profile-userpic">
+                        {% if client.clientPicture | length() > 0 %}
+                            {% set picture = asset(vich_uploader_asset(client, 'clientPictureFile')) %}
+                        {% else %}
+                            {% if client.gender == "F" %}
+                                {% set picture = asset('assets/pages/media/profile/profile-female.png') %}
+                            {% elseif client.gender == "M" %}
+                                {% set picture = asset('assets/pages/media/profile/profile-male.png') %}
+                            {% endif %}
+                        {% endif %}
+                        <img src="{{ picture }}" class="img-responsive" alt=""> </div>
+                    <!-- END SIDEBAR USERPIC -->
+                    <!-- SIDEBAR USER TITLE -->
+                    <div class="profile-usertitle">
+                        <div class="profile-usertitle-name"> {{ client.shortName }} </div>
+                        <div class="profile-usertitle-job"> {{ client.workersPosition }}</div>
+                        <div class="profile-usertitle-job"> {{ fn_client_type(client.clientType) }}</div>
+                    </div>
+                    <!-- END SIDEBAR USER TITLE -->
+                    <!-- SIDEBAR MENU -->
+                    <div class="profile-usermenu">
+                        <ul class="nav">
+                            <li class="{% if '/client/profile' in app.request.getPathInfo() %}active{% endif %}">
+                                {% if '/client/profile' in app.request.getPathInfo() %}
+                                    <a href="#">
+                                        <i class="icon-user"></i> Perfil
+                                    </a>
+                                {% else %}
+                                    <a href="{{ path('client_profile', {'fullNameSlug': client.fullNameSlug}) }}">
+                                        <i class="icon-user"></i> Perfil
+                                    </a>
+                                {% endif %}
+                            </li>
+                            <li class="{% if '/client/config' in app.request.getPathInfo() %}active{% endif %}">
+                                {% if '/client/config' in app.request.getPathInfo() %}
+                                    <a href="#">
+                                        <i class="icon-settings"></i> Configuración
+                                    </a>
+                                {% else %}
+                                    <a href="{{ path('client_config', {'fullNameSlug': client.fullNameSlug}) }}">
+                                        <i class="icon-settings"></i> Configuración
+                                    </a>
+                                {% endif %}
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i class="icon-info"></i> Ayuda </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- END MENU -->
+                </div>
+
+                <div class="portlet light ">
+                    <!-- STAT -->
+                    <div class="row list-separated profile-stat">
+                        <div class="col-md-4 col-sm-4 col-xs-6">
+                            <div class="uppercase profile-stat-title"> {{ client.passports | length }} </div>
+                            <div class="uppercase profile-stat-text"> Pasaportes </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-xs-6">
+                            <div class="uppercase profile-stat-title"> {{ client.departures | length }} </div>
+                            <div class="uppercase profile-stat-text"> Salidas </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-xs-6">
+                            <div class="uppercase profile-stat-title"> {{ client.exitApplications | length + client.passportsApplication | length }} </div>
+                            <div class="uppercase profile-stat-text"> Trámites </div>
+                        </div>
+                    </div>
+                    <!-- END STAT -->
+                </div>
+            </div>
+
+            <div class="profile-content">
+                {% block profile_content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
