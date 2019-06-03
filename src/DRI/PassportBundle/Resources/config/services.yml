@@ -8,6 +8,10 @@ services:
         tags:
             - { name: twig.extension }
 
+    app.datatable.control:
+        class: DRI\PassportBundle\Datatables\ControlDatatable
+        parent: sg_datatables.datatable.abstract
+
     namer.passports_images:
         class: DRI\PassportBundle\Service\PassportNamer
         tags:

@@ -6,13 +6,14 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
-use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
+use DateTime;
+use Exception;
+
 use DRI\ClientBundle\Entity\Client;
-use DRI\UserBundle\Entity\User;
-use DRI\PassportBundle\Entity\Passport;
 use DRI\UsefulBundle\Useful\Useful;
+use DRI\UserBundle\Entity\User;
 
 /**
  * Passport Application
@@ -37,8 +38,8 @@ class Application
      **********************************************************************************/
 
     const PASSPORT_APPLICATION_REASON = [
-        'CON' => 'Confección',
-        'PRO' => 'Prórroga',
+        "CON" => "Confección",
+        "PRO" => "Prórroga",
     ];
 
     const PASSPORT_APPLICATION_REASON_CHOICE = [
@@ -126,7 +127,7 @@ class Application
     private $reason;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="date")
      *
@@ -187,7 +188,7 @@ class Application
     private $state;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime", nullable=true)
      *
@@ -196,7 +197,7 @@ class Application
     private $sendDate;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime", nullable=true)
      *
@@ -205,7 +206,7 @@ class Application
     private $confirmDate;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime", nullable=true)
      *
@@ -235,7 +236,7 @@ class Application
     private $used;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime")
      *
@@ -244,7 +245,7 @@ class Application
     private $createdAt;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime", nullable=true)
      *
@@ -296,8 +297,8 @@ class Application
         $this->state                = 'CON';
         $this->closed               = false;
         $this->used                 = false;
-        $this->createdAt            = new \DateTime('now');
-        $this->updatedAt            = new \DateTime('now');
+        $this->createdAt            = new DateTime('now');
+        $this->updatedAt            = new DateTime('now');
     }
 
     public function __toString()
@@ -483,7 +484,7 @@ class Application
     /**
      * Set applicationDate
      *
-     * @param \DateTime $applicationDate
+     * @param DateTime $applicationDate
      *
      * @return Application
      */
@@ -497,7 +498,7 @@ class Application
     /**
      * Get applicationDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getApplicationDate()
     {
@@ -606,6 +607,8 @@ class Application
      * @param string $state
      *
      * @return Application
+     *
+     * @throws Exception
      */
     public function setState($state)
     {
@@ -613,14 +616,14 @@ class Application
 
         switch ($state){
             case 'ENV':
-                $this->sendDate = new \DateTime('now');
+                $this->sendDate = new DateTime('now');
                 break;
             case 'CNF':
-                $this->confirmDate = new \DateTime('now');
+                $this->confirmDate = new DateTime('now');
                 $this->closed = true;
                 break;
             case 'REC':
-                $this->rejectDate = new \DateTime('now');
+                $this->rejectDate = new DateTime('now');
                 $this->closed = true;
                 break;
             default:
@@ -643,7 +646,7 @@ class Application
     /**
      * Set sendDate
      *
-     * @param \DateTime $sendDate
+     * @param DateTime $sendDate
      *
      * @return Application
      */
@@ -657,7 +660,7 @@ class Application
     /**
      * Get sendDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getSendDate()
     {
@@ -667,7 +670,7 @@ class Application
     /**
      * Set confirmDate
      *
-     * @param \DateTime $confirmDate
+     * @param DateTime $confirmDate
      *
      * @return Application
      */
@@ -681,7 +684,7 @@ class Application
     /**
      * Get confirmDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getConfirmDate()
     {
@@ -691,7 +694,7 @@ class Application
     /**
      * Set rejectDate
      *
-     * @param \DateTime $rejectDate
+     * @param DateTime $rejectDate
      *
      * @return Application
      */
@@ -705,7 +708,7 @@ class Application
     /**
      * Get rejectDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getRejectDate()
     {
@@ -790,10 +793,12 @@ class Application
      * @ORM\PrePersist
      *
      * @return Application
+     *
+     * @throws Exception
      */
     public function setCreatedAt()
     {
-        $this->createdAt = new \DateTime('now');
+        $this->createdAt = new DateTime('now');
 
         return $this;
     }
@@ -801,7 +806,7 @@ class Application
     /**
      * Get createdAt
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getCreatedAt()
     {
@@ -814,10 +819,12 @@ class Application
      * @ORM\PreUpdate
      *
      * @return Application
+     *
+     * @throws Exception
      */
     public function setUpdatedAt()
     {
-        $this->updatedAt = new \DateTime('now');
+        $this->updatedAt = new DateTime('now');
 
         return $this;
     }
@@ -825,7 +832,7 @@ class Application
     /**
      * Get updatedAt
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getUpdatedAt()
     {
@@ -915,8 +922,10 @@ class Application
      **********************************************************************************/
 
 
-
-
+    /**
+     * @param $reason
+     * @return string
+     */
     static function reason_AcronimToName($reason){
         switch ($reason){
             case 'CON': return 'Confección';break;
@@ -925,6 +934,10 @@ class Application
         }
     }
 
+    /**
+     * @param $reason
+     * @return string
+     */
     static function reason_NameToAcronim($reason){
         switch ($reason){
             case 'Confección': return 'CON';break;
@@ -933,6 +946,10 @@ class Application
         }
     }
 
+    /**
+     * @param $type
+     * @return string
+     */
     static function type_AcronimToName($type){
         switch ($type){
             case 'REG': return 'Regular';break;
@@ -941,6 +958,10 @@ class Application
         }
     }
 
+    /**
+     * @param $type
+     * @return string
+     */
     static function type_NameToAcronim($type){
         switch ($type){
             case 'Regular': return 'REG';break;
@@ -949,6 +970,10 @@ class Application
         }
     }
 
+    /**
+     * @param $state
+     * @return string
+     */
     static function state_AcronimToName($state){
         switch ($state){
             case 'CON': return 'Confeccionada';break;
@@ -959,6 +984,10 @@ class Application
         }
     }
 
+    /**
+     * @param $state
+     * @return string
+     */
     static function state_NameToAcronim($state){
         switch ($state){
             case 'Confeccionada': return 'CON';break;

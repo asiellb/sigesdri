@@ -2,32 +2,20 @@
 
 namespace DRI\PassportBundle\Controller;
 
+use Symfony\Component\HttpFoundation\Request,
+    Symfony\Component\HttpFoundation\Response,
+    Symfony\Component\Routing\Annotation\Route,
+    Symfony\Component\Form\FormInterface,
+    Symfony\Component\Security\Acl\Exception\Exception,
+    Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-use DRI\PassportBundle\Datatables\ControlDatatable;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
-use PhpParser\Node\Scalar\String_;
-use Sg\DatatablesBundle\Datatable\DatatableInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Symfony\Component\Security\Acl\Exception\Exception;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
-use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
-use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
-use DRI\PassportBundle\Entity\Control;
-use DRI\PassportBundle\Form\ControlType;
-use DRI\PassportBundle\Datatables\ApplicationDatatable;
-use DRI\UsefulBundle\Useful\Useful;
+use DRI\PassportBundle\Entity\Control,
+    DRI\PassportBundle\Form\ControlType,
+    DRI\PassportBundle\Entity\Passport;
 
 /**
  * Control controller.
@@ -38,24 +26,21 @@ class ControlController extends Controller
 {
     /**
      * Lists all Application entities.
+     *
      * @param Request $request
      *
-     * @Route("/index", name="passport_control_index")
-     * @Method("GET")
+     * @Route("/index", name="passport_control_index", methods={"GET"})
      *
      * @return Response
+     *
+     * @throws \Exception
      */
     public function indexAction(Request $request)
     {
         $isAjax = $request->isXmlHttpRequest();
 
         // Get your Datatable ...
-        //$datatable = $this->get('app.datatable.client');
-        //$datatable->buildDatatable();
-
-        // or use the DatatableFactory
-        /** @var DatatableInterface $datatable */
-        $datatable = $this->get('sg_datatables.factory')->create(ControlDatatable::class);
+        $datatable = $this->get('app.datatable.control');
         $datatable->buildDatatable();
 
         if ($isAjax) {
@@ -74,11 +59,15 @@ class ControlController extends Controller
     /**
      * Displays a form to create a new Control entity.
      *
-     * @Route("/new/{passport}", name="passport_control_new")
-     * @Method({"GET", "POST"})
+     * @param Request $request
+     * @param Passport $passport
+     *
+     * @Route("/new/{passport}", name="passport_control_new", methods={"GET", "POST"})
      * @Security("has_role('ROLE_INFO_SPECIALIST')")
+     *
+     * @return Response
      */
-    public function newAction(Request $request, $passport = null)
+    public function newAction(Request $request, Passport $passport = null)
     {
 
         $user = null;
@@ -107,7 +96,7 @@ class ControlController extends Controller
             $control->setPassport($pass);
         }
 
-        $form   = $this->createForm('DRI\PassportBundle\Form\ControlType', $control, [
+        $form   = $this->createForm(ControlType::class, $control, [
             'currentAction' => 'new'
         ])->handleRequest($request);
 
@@ -145,8 +134,11 @@ class ControlController extends Controller
     /**
      * Finds and displays a Control entity.
      *
-     * @Route("/{numberSlug}", name="passport_control_show")
-     * @Method("GET")
+     * @param Control $control
+     *
+     * @Route("/{numberSlug}", name="passport_control_show", methods={"GET"})
+     *
+     * @return Response
      */
     public function showAction(Control $control)
     {
@@ -160,9 +152,13 @@ class ControlController extends Controller
     /**
      * Displays a form to edit an existing Control entity.
      *
-     * @Route("/edit/{numberSlug}", name="passport_control_edit")
-     * @Method({"GET", "POST"})
+     * @param Request $request
+     * @param Control $control
+     *
+     * @Route("/edit/{numberSlug}", name="passport_control_edit", methods={"GET", "POST"})
      * @Security("has_role('ROLE_INFO_SPECIALIST')")
+     *
+     * @return Response
      */
     public function editAction(Request $request, Control $control)
     {
@@ -178,7 +174,7 @@ class ControlController extends Controller
             }
 
             $deleteForm = $this->createDeleteForm($control);
-            $editForm = $this->createForm('DRI\PassportBundle\Form\ControlType', $control, [
+            $editForm = $this->createForm(ControlType::class, $control, [
                 'currentAction' => 'edit'
             ])->handleRequest($request);
 
@@ -222,9 +218,13 @@ class ControlController extends Controller
     /**
      * Deletes a Control entity.
      *
-     * @Route("/{id}", name="passport_control_delete")
-     * @Method("DELETE")
+     * @param Request $request
+     * @param Control $control
+     *
+     * @Route("/{id}", name="passport_control_delete", methods={"DELETE"})
      * @Security("has_role('ROLE_ADMIN')")
+     *
+     * @return Response
      */
     public function deleteAction(Request $request, Control $control)
     {
@@ -249,7 +249,7 @@ class ControlController extends Controller
      *
      * @param Control $control The Control entity
      *
-     * @return \Symfony\Component\Form\Form The form
+     * @return FormInterface
      */
     private function createDeleteForm(Control $control)
     {
@@ -263,10 +263,12 @@ class ControlController extends Controller
     /**
      * Delete Control by id
      *
-     * @param mixed $id The entity id
-     * @Route("/delete/{id}", name="passport_control_by_id_delete")
-     * @Method("GET")
+     * @param mixed $control The entity id
+     *
+     * @Route("/delete/{control}", name="passport_control_by_id_delete", methods={"GET"})
      * @Security("has_role('ROLE_ADMIN')")
+     *
+     * @return Response
      */
     public function deleteByIdAction(Control $control){
         $em = $this->getDoctrine()->getManager();
@@ -285,10 +287,14 @@ class ControlController extends Controller
     
 
     /**
-    * Bulk Action
-    * @Route("/bulk/delete", name="passport_control_bulk_action")
-     * @Method({"GET", "POST"})
+     * Bulk Action
+     *
+     * @param Request $request
+     *
+     * @Route("/bulk/delete", name="passport_control_bulk_action", methods={"GET", "POST"})
      * @Security("has_role('ROLE_ADMIN')")
+     *
+     * @return Response
     */
     public function bulkAction(Request $request)
     {
