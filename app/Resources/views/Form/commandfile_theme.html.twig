@@ -1,0 +1,20 @@
+
+{% block commandfile_type_widget %}
+    <div>
+        <div style="padding-bottom: 15px">
+            <label class="control-label">1.	Acciones a desarrollar en la esfera del Trabajo Político Ideológico</label>
+            {{ form_widget(form.ipwActions) }}
+        </div>
+        <div style="padding-bottom: 15px">
+            <label class="control-label">2.	Acciones para el cumplimiento de los objetivos de trabajo de la misión encomendada</label>
+            {{ form_widget(form.mwoActions) }}
+        </div>
+        <div>
+            <label class="control-label">3.	Acciones para identificar las tendencias de la educación superior y el desarrollo de las nuevas tecnologías</label>
+            {{ form_widget(form.ittActions) }}
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block commandfile_type_label %}{% endblock %}

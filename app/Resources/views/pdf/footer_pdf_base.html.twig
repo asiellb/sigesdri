@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Contactos</title>
+    <link href="{{ absolute_url(asset('assets/global/plugins/font-awesome/css/font-awesome.min.css')) }}" rel="stylesheet" type="text/css" />
+    <link href="{{ absolute_url(asset('assets/global/plugins/line-awesome/css/line-awesome.min.css')) }}" rel="stylesheet" type="text/css" />
+    <link href="{{ absolute_url(asset('assets/global/plugins/simple-line-icons/simple-line-icons.min.css')) }}" rel="stylesheet" type="text/css" />
+    <link href="{{ absolute_url(asset('assets/global/plugins/poppins/poppins.css')) }}" rel="stylesheet" type="text/css" />
+    <link href="{{ absolute_url(asset('assets/global/plugins/bootstrap/css/bootstrap.min.css')) }}" rel="stylesheet" type="text/css" />
+    <script>
+        /* page counter */
+        function subst() {
+            var vars={};
+            var x=document.location.search.substring(1).split('&');
+            for (var i in x) {var z=x[i].split('=',2);vars[z[0]] = unescape(z[1]);}
+            var x=['topage','page'];
+            for (var i in x) {
+                var y = document.getElementsByClassName(x[i]);
+                for (var j=0; j<y.length; ++j) y[j].textContent = vars[x[i]];
+            }
+        }
+    </script>
+</head>
+<body onload="subst()">
+    <footer style="border-top: 1px #0097c5 solid; padding-top: 5px">
+        <div class="row">
+            <div class="image-footer">
+                <br>
+                <img src="{{ absolute_url(asset('assets/pdf/logo_dri.png')) }}" alt="Logo" height="60" style="margin-left: 20px"/>
+            </div>
+            <div class="address-footer">
+                <p>Circunvalación Norte, entre Camino Viejo de Nuevitas y Ave. Ignacio Agramonte, Camagüey, Cuba.</p>
+                <p>C.P. 74650 Camagüey, Cuba</p>
+            </div>
+            <div class="contact-footer">
+                <p>(53) (32) 261776 <br>(53) (32) 234217<br>(53) (32) 266839</p>
+                <p><a href="mailto:driuc@reduc.edu.cu"> driuc@reduc.edu.cu </a></p>
+            </div>
+            <div class="pagenumber-footer">
+                <br><br>
+                <div style="text-align: center;color: #3aaadc;font-weight: bold">{{ "now"|date("Y") }}</div>
+                <div style="text-align: center;color: #3aaadc;font-weight: bold">
+                    <span class="page"></span>/<span class="topage"></span>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

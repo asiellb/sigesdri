@@ -1,0 +1,131 @@
+{% block form_label_class ' ' %}
+{% block form_group_class ' ' %}
+
+
+{% block collection_widget %}
+    {% spaceless %}
+        {% if prototype is defined %}
+            {% set attr = attr|merge({'data-prototype': form_row(prototype)}) %}
+            {% set attr = attr|merge({'data-prototype-name': prototype.vars.name}) %}
+        {% endif %}
+        {% set attr = attr|merge({'data-allow-add': allow_add ? 1 : 0}) %}
+        {% set attr = attr|merge({'data-allow-remove': allow_delete ? 1 : 0 }) %}
+        {% set attr = attr|merge({'data-name-prefix': full_name}) %}
+
+        {{ form_errors(form) }}
+
+        <div {{ block('widget_attributes') }}>
+            {% for item in form %}
+                {{ form_widget(item) }}
+            {% endfor %}
+        </div>
+    {% endspaceless %}
+{% endblock collection_widget %}
+
+{% block mission_type_label %}{% endblock %}
+{% block mission_type_errors %}{% endblock %}
+
+{% block mission_type_row %}
+    <div class="col-md-12"
+         style="">
+        {{ form_label(form) }}
+        {{ form_errors(form) }}
+        {{ form_widget(form) }}
+    </div>
+{% endblock %}
+
+{% block mission_type_widget %}
+<div {{ block('widget_attributes') }}>
+    <div class="col-md-6" style="padding-bottom: 15px">
+        <label class="control-label">País</label>
+        {{ form_widget(form.country) }}</div>
+    <div class="col-md-6" style="padding-bottom: 15px">
+        <label class="control-label">Provincia</label>
+        {{ form_widget(form.provinceCountry) }}</div>
+    <div class="col-md-4" style="padding-bottom: 15px">
+        <label class="control-label">Institución</label>
+        {{ form_widget(form.institution) }}</div>
+    <div class="col-md-4" style="padding-bottom: 15px">
+        <label class="control-label">Nombre de la Persona que Invita</label>
+        {{ form_widget(form.personWhoInvitesName) }}</div>
+    <div class="col-md-4" style="padding-bottom: 15px">
+        <label class="control-label">Cargo de la Persona que Invita</label>
+        {{ form_widget(form.personWhoInvitesPosition) }}</div>
+    <div class="col-md-4" style="padding-bottom: 15px">
+        <label class="control-label">Desde</label>
+        {{ form_widget(form.fromDate) }}</div>
+    <div class="col-md-4" style="padding-bottom: 15px">
+        <label class="control-label">Hasta</label>
+        {{ form_widget(form.untilDate) }}</div>
+    <div class="col-md-4" style="padding-bottom: 15px">
+        <label class="control-label">Cantidad de Tiempo (dias)</label>
+        {{ form_widget(form.timeAmount) }}</div>
+    <div class="col-md-12" style="padding-bottom: 15px">
+        <label class="control-label">Objetivos</label>
+        {{ form_widget(form.objetives) }}</div>
+    <div class="col-md-3" style="padding-bottom: 15px">
+        <label class="control-label">Concepto de Salida</label>
+        {{ form_widget(form.concept) }}</div>
+    <div class="col-md-3" style="padding-bottom: 15px">
+        <label class="control-label">Salario Mensual</label>
+        {{ form_widget(form.monthlyPay) }}</div>
+    <div class="col-md-3" style="padding-bottom: 15px">
+        <label class="control-label">Salario Total</label>
+        {{ form_widget(form.totalPay) }}</div>
+    <div class="col-md-3" style="padding-bottom: 15px">
+        <label class="control-label">Copia del Plan de Trabajo</label>
+        <div>{{ form_widget(form.workPlanSynthesisFile) }}</div></div>
+    <div class="col-md-12 bg-grey-cararra bg-font-grey-cararra" style="padding-bottom: 15px">
+        <label class="control-label">Información Económica</label>
+        <div class="row">
+            <div class="col-md-2"><label class="control-label">Tipo</label></div>
+            <div class="col-md-2"><label class="control-label">Costo</label></div>
+            <div class="col-md-2"><label class="control-label">Moneda</label></div>
+            <div class="col-md-2"><label class="control-label">Financiamiento</label></div>
+            <div class="col-md-2"><label class="control-label">Cuenta Eventualidades</label></div>
+            <div class="col-md-2"><label class="control-label">Acciones</label></div>
+        </div>
+        {{ form_widget(form.economics) }}
+    </div>
+    <div class="col-md-12 exitbundle_application_missions-parent-actions" style="padding: 15px;border-bottom: 1px solid #e7ecf1 !important;margin-bottom: 15px">
+        <a href="#" class="btn btn-info exitbundle_application_missions-parent-add exitbundle_application_missions-parent-action">
+            <span class="glyphicon glyphicon-plus-sign"></span> Agregar Misión</a>
+        <a href="#" class="btn btn-info exitbundle_application_missions-parent-remove exitbundle_application_missions-parent-action">
+            <span class="glyphicon glyphicon-trash"></span> Eliminar Misión</a>
+        <a href="#" class="btn btn-info exitbundle_application_missions-parent-up exitbundle_application_missions-parent-action-disabled exitbundle_application_missions-parent-action">
+            <span class="glyphicon glyphicon-arrow-up"></span> Mover Arriba</a>
+        <a href="#" class="btn btn-info exitbundle_application_missions-parent-down exitbundle_application_missions-parent-action">
+            <span class="glyphicon glyphicon-arrow-down"></span> Mover Abajo</a>
+    </div>
+</div>
+{% endblock mission_type_widget %}#}
+
+
+{% block economic_type__row %}
+    <div class="col-md-12">
+        {{ form_label(form) }}
+        {{ form_errors(form) }}
+        {{ form_widget(form) }}
+    </div>
+{% endblock economic_type__row %}
+
+
+{% block economic_type_widget %}
+<div  {{ block('widget_attributes') }}>
+    <div class="col-md-2">{{ form_widget(form.type) }}</div>
+    <div class="col-md-2">{{ form_widget(form.amount) }}</div>
+    <div class="col-md-2">{{ form_widget(form.currency) }}</div>
+    <div class="col-md-2">{{ form_widget(form.source) }}</div>
+    <div class="col-md-2">{{ form_widget(form.eventAcount) }}</div>
+    <div class="col-md-2">
+        <div class="">
+            <a href="#" class="collection-add btn btn-default" title="Add element"><span class="glyphicon glyphicon-plus-sign"></span></a>
+            <a href="#" class="collection-remove btn btn-default" title="Delete element"><span class="glyphicon glyphicon-trash"></span></a>
+        </div>
+    </div>
+</div>
+{% endblock economic_type_widget %}
+
+
+{% block economic_type_label %}{% endblock %}
+
