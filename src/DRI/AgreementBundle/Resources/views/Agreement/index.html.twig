@@ -1,0 +1,71 @@
+
+{% extends '::base.html.twig' %}
+
+{% block title %}{{ parent() }} | Convenios{% endblock %}
+
+{% block body_class %}{% endblock %}
+
+{% block  page_breadcrumb %}
+    {{ parent() }}
+    <li>
+    {% if '/agreement/index' in app.request.getPathInfo() %}
+        <span>Convenios</span>
+    {% else %}
+        <a href="{{ path('agreement_index') }}" ><span>Convenios</span> </a> <i class="fa fa-circle"></i>
+    {% endif %}
+    </li>
+{% endblock %}
+
+{% block page_title %}
+    Convenios
+{% endblock %}
+
+{% block page_dashboard %}
+    <div class="portlet box red">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="fa fa-cogs"></i>Basic Bootstrap 3.0 Responsive Table </div>
+            <div class="tools">
+                <a href="javascript:;" class="collapse"> </a>
+                <a href="#portlet-config" data-toggle="modal" class="config"> </a>
+                <a href="javascript:;" class="reload"> </a>
+                <a href="javascript:;" class="remove"> </a>
+            </div>
+        </div>
+        <div class="portlet-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th> # </th>
+                        <th> Logo </th>
+                        <th> Institución </th>
+                        <th> Pais </th>
+                        <th> URL </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for agreement in agreements %}
+                        <tr>
+                            <td>{{ agreement.id }}</td>
+                            <td>
+                                <div style="height: 100px;width: 100px;">
+                                    {% if agreement.institution.logo is null %}
+                                        <img src="{{ asset(vich_uploader_asset(agreement.institution.country, 'flagFile')) }}" class="img-responsive" alt="">
+                                    {% else %}
+                                        <img src="{{ asset(vich_uploader_asset(agreement.institution, 'logoFile')) }}" class="img-responsive" alt="">
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>{{ agreement.institution.name }}</td>
+                            <td>{{ agreement.institution.country.spName }}</td>
+                            <td>{{ agreement.institution.url }}</a></td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

@@ -1,0 +1,19 @@
+services:
+#    dri_agreement.example:
+#        class: DRI\AgreementBundle\Example
+#        arguments: ["@service_id", "plain_value", %parameter%]
+
+    twig.extension.agreements:
+        class: DRI\AgreementBundle\Twig\Extension\DRIAgreementExtension
+        tags:
+            - { name: twig.extension }
+
+    namer.institutions_logos:
+        class: DRI\AgreementBundle\Service\InstitutionLogoNamer
+        tags:
+            - { name: namer }
+
+    namer.agr_int_dco_files:
+        class: DRI\AgreementBundle\Service\AgrIntDCONamer
+        tags:
+            - { name: namer }

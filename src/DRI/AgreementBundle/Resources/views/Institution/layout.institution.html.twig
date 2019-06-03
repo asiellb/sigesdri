@@ -1,0 +1,23 @@
+{% extends '::base.html.twig' %}
+
+{% block title %}{{ parent() }} | Institución Extranjera{% endblock %}
+
+{% block  page_breadcrumb %}
+    {{ parent() }}
+    <li>
+    {% if '/institution/index' in app.request.getPathInfo() %}
+        <span>Institución Extranjera</span>
+    {% else %}
+        <a href="{{ path('institution_index') }}" ><span>Institución Extranjera</span> </a> <i class="fa fa-circle"></i>
+    {% endif %}
+    </li>
+{% endblock %}
+
+{% block page_title %}
+    Institución Extranjera
+{% endblock %}
+
+{% block page_dashboard %}
+
+{% endblock %}
+

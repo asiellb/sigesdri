@@ -1,0 +1,321 @@
+{% extends 'DRIAgreementBundle:Application:layout.application.html.twig' %}
+
+{% block title %}{{ parent() }} | Ficha | {{ application.number }} {% endblock %}
+
+{% block  page_breadcrumb %}
+    {{ parent() }}
+    <li>
+        <span>Ficha </span>
+        <i class="fa fa-circle"></i>
+        <span># {{ application.number }} </span>
+    </li>
+{% endblock %}
+
+{% block page_title %}
+{% endblock %}
+
+{% block page_dashboard %}
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="portlet light bordered">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <i class="icon-layers font-blue-dark"></i>
+                        <span class="caption-subject font-blue-dark bold uppercase">
+                            Ficha
+                            <span class="font-green-sharp">
+                                # {{ application.number }} |
+                                <small>
+                                    {% if application.createdAt %}{{ application.createdAt | localizeddate('long', 'none') }}{% endif %}
+                                </small>
+                            </span>
+                        </span>
+                    </div>
+                    <div class="actions btn-set">
+                        <a class="btn btn-transparent grey-cascade btn-outline btn-circle btn-sm" href="{{ path('agreement_application_edit', {'id' : application.id}) }}">
+                            <span class="fa fa-pencil" aria-hidden="true"></span>
+                            Editar Solicitud
+                        </a>
+                        <a class="btn btn-transparent grey-cascade btn-outline btn-circle btn-sm" href="{{ path('agreement_application_index') }}">
+                            <span class="fa fa-list" aria-hidden="true"></span>
+                            Ir al listado
+                        </a>
+                        <a class="btn green btn-circle btn-sm" href="{{ path('agreement_application_new') }}">
+                            <span class="fa fa-plus" aria-hidden="true"></span>
+                            Crear Ficha de Consulta
+                        </a>
+                        <div class="btn-group">
+                            <a class="btn red btn-outline btn-circle" href="javascript:;" data-toggle="dropdown">
+                                <i class="fa fa-share"></i>
+                                <span class="hidden-xs"> Herramientas </span>
+                                <i class="fa fa-angle-down"></i>
+                            </a>
+                            <ul class="dropdown-menu pull-right">
+                                <li>
+                                    <a href="{{ path('agreement_application_to_word', {'id' : application.id}) }}" class="tool-action">
+                                        <i class="fa fa-file-word-o"></i> MS WORD</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <div class="tabbable-line">
+                        <ul class="nav nav-tabs nav-tabs-lg">
+                            <li class="active">
+                                <a href="#tab_1" data-toggle="tab"> Detalles </a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="tab_1">
+                                <div class="row">
+                                    <div class="col-md-6 col-sm-12">
+                                        <div class="portlet green-meadow box">
+                                            <div class="portlet-title">
+                                                <div class="caption">
+                                                    <i class="fa fa-book"></i>Detalles de la Ficha de Consulta </div>
+                                                <div class="actions">
+                                                    <a href="{{ path('agreement_application_edit', { 'id':  application.id }) }}" class="btn btn-default btn-sm">
+                                                        <i class="fa fa-pencil"></i> Editar </a>
+                                                    {% if application.state == 'APR' %}
+                                                    <a href="{{ path('agreement_institutional_new', { 'application':  application.id }) }}" class="btn btn-default btn-sm">
+                                                        <i class="fa fa-pencil"></i> Agregar Convenio </a>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <div class="portlet-body">
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Número #: </div>
+                                                    <div class="col-md-7 value"> {{ application.number }}</div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Antecedentes: </div>
+                                                    <div class="col-md-7 value"> {{ application.background }}</div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Objetivos: </div>
+                                                    <div class="col-md-7 value"> {{ application.objetives }}</div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Fundamentación: </div>
+                                                    <div class="col-md-7 value"> {{ application.basement }}</div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Compromisos Contraidos: </div>
+                                                    <div class="col-md-7 value"> {{ application.commitments }}</div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Vigencia: </div>
+                                                    <div class="col-md-7 value"> {{ application.validity }}</div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Integrante Parte Cubana: </div>
+                                                    <div class="col-md-7 value"> {{ application.memberForCubanPart }}</div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Integrante Parte Extranjera: </div>
+                                                    <div class="col-md-7 value"> {{ application.memberForForeignPart }}</div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Resultados que se esperan: </div>
+                                                    <div class="col-md-7 value"> {{ application.results }}</div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Gastos por salidas al exterior: </div>
+                                                    <div class="col-md-7 value"> $ {{ application.expenses }}</div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Estado: </div>
+                                                    <div class="col-md-7 value">
+                                                        <span class="label {{ application.state == 'CON' ? 'bg-blue-dark' : application.state ==  'APR' ? 'label-success' : application.state == 'REC' ? 'label-danger' : ''}}">
+                                                            {{ application.state == 'CON' ? 'Confeccionada' : application.state == 'APR' ? 'Aprobada' : application.state == 'REC' ? 'Rechazada' : ''}}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                {% if application.confirmDate is not null %}
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Confirmada el: </div>
+                                                        <div class="col-md-7 value">
+                                                            {{ application.confirmDate | localizeddate('long', 'none') }}
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                                {% if application.rejectDate is not null %}
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Rechazada el: </div>
+                                                        <div class="col-md-7 value">
+                                                            {{ application.rejectDate | localizeddate('long', 'none') }}
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                                {% if application.rejectReasons is not null %}
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Razones del rechazo: </div>
+                                                        <div class="col-md-7 value">
+                                                            {{ application.rejectReasons }}
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                                {% if application.closed %}
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Ficha: </div>
+                                                        <div class="col-md-7 value">
+                                                            <span class="label label-danger"> Cerrada</span>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                                {% if application.used %}
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Ficha: </div>
+                                                        <div class="col-md-7 value">
+                                                            <span class="label label-success"> Usada</span>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% if application.institution is not empty  %}
+                                        <div class="col-md-6 col-sm-12">
+                                            <div class="portlet blue-hoki box">
+                                                <div class="portlet-title">
+                                                    <div class="caption">
+                                                        <i class="fa fa-user"></i>Información de la Institución Extranjera </div>
+                                                    <div class="actions">
+                                                        <a href="{{ path('institution_show', { 'id':  application.institution.id }) }}" class="btn btn-default btn-sm">
+                                                            <i class="fa fa-eye"></i> Ver </a>
+                                                        <a href="{{ path('institution_edit', { 'id':  application.institution.id }) }}" class="btn btn-default btn-sm">
+                                                            <i class="fa fa-pencil"></i> Editar </a>
+                                                    </div>
+                                                </div>
+                                                <div class="portlet-body">
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Nombre: </div>
+                                                        <div class="col-md-7 value"> {{ application.institution.name }}</div>
+                                                    </div>
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Siglas: </div>
+                                                        <div class="col-md-7 value"> {{ application.institution.acronym }}</div>
+                                                    </div>
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Logo: </div>
+                                                        <div class="col-md-7 value">
+                                                            <a href="{{ asset(vich_uploader_asset(application.institution, 'logoFile', 'DRI\\AgreementBundle\\Entity\\Institution')) }}" target="_blank" >
+                                                                <img src="{{ asset(vich_uploader_asset(application.institution, 'logoFile', 'DRI\\AgreementBundle\\Entity\\Institution')) }}" class="img-responsive" alt="" style="max-width: 150px">
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> URL: </div>
+                                                        <div class="col-md-7 value"> <a href="{{ application.institution.url }}"><i class="la la-link"></i> {{ application.institution.url }}</a></div>
+                                                    </div>
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> País: </div>
+                                                        <div class="col-md-7 value">{{ application.institution.country.spName }}</div>
+                                                    </div>
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Dirección: </div>
+                                                        <div class="col-md-7 value">
+                                                            {% if application.institution.countryState %}
+                                                                {{ application.institution.countryState }}{% if application.institution.province or application.institution.city %}, {% endif %}
+                                                            {% endif %}
+                                                            {% if application.institution.province and application.institution.city %}
+                                                                {{ application.institution.province }}, {{ application.institution.city }}
+                                                            {% elseif application.institution.province %}
+                                                                {{ application.institution.province }}
+                                                            {% elseif application.institution.city %}
+                                                                {{ application.institution.city }}
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                    {% if application.institutional is not empty  %}
+                                        <div class="col-md-6 col-sm-12">
+                                            <div class="portlet blue-hoki box">
+                                                <div class="portlet-title">
+                                                    <div class="caption">
+                                                        <i class="fa fa-user"></i>Convenio Asociado </div>
+                                                    <div class="actions">
+                                                        <a href="{{ path('agreement_institutional_show', { 'id':  application.institutional.id }) }}" class="btn btn-default btn-sm">
+                                                            <i class="fa fa-pencil"></i> Ver </a>
+                                                        <a href="{{ path('agreement_institutional_edit', { 'id':  application.institutional.id }) }}" class="btn btn-default btn-sm">
+                                                            <i class="fa fa-pencil"></i> Editar </a>
+                                                    </div>
+                                                </div>
+                                                <div class="portlet-body">
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Número #: </div>
+                                                        <div class="col-md-7 value"> {{ application.institutional.number }}</div>
+                                                    </div>
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Fecha de Inicio: </div>
+                                                        <div class="col-md-7 value">
+                                                            {% if application.institutional.startDate %}{{ application.institutional.startDate|localizeddate('long', 'none') }}{% endif %}
+                                                        </div>
+                                                    </div>
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Fecha de Final: </div>
+                                                        <div class="col-md-7 value">
+                                                            {% if application.institutional.endDate %}{{ application.institutional.endDate|localizeddate('long', 'none') }}{% endif %}
+                                                        </div>
+                                                    </div>
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Copia Digital: </div>
+                                                        <div class="col-md-7 value">
+                                                            {% if application.institutional.digitalCopy %}
+                                                                <a class="bold" href="{{ asset(vich_uploader_asset(application.institutional, 'digitalCopyFile', 'DRI\\AgreementBundle\\Entity\\Institutional')) }}" target="_blank" >
+                                                                    <i class="la la-download"></i> Descargar ...
+                                                                </a>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Aprobación del MES: </div>
+                                                        <div class="col-md-7 value">
+                                                            {% if application.institutional.mesApproval %}
+                                                                <span class="font-green bold"><i class="la la-check"></i> Si</span>
+                                                            {% else %}
+                                                                <span class="font-red bold"><i class="la la-times"></i> No</span>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Áreas Beneficiadas: </div>
+                                                        <div class="col-md-7 value">
+                                                            {% for area in application.institutional.benefitedAreas %}
+                                                                <span class="font-grey-gallery"><i class="icon-check"></i> {{ area.name }}</span> <br/>
+                                                            {% endfor %}
+                                                        </div>
+                                                    </div>
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Estado: </div>
+                                                        <div class="col-md-7 value">
+                                                            {% if  application.institutional.state == "VEN" %}
+                                                                <span class="label label-danger">Vencido</span>
+                                                            {% elseif  application.institutional.state == "PVEN" %}
+                                                                <span class="label label-warning">Por Vencer</span>
+                                                            {% elseif  application.institutional.state == "ACT" %}
+                                                                <span class="label label-success">Activo</span>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+

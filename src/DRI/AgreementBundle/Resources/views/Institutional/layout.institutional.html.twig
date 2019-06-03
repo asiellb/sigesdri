@@ -1,0 +1,22 @@
+{% extends 'DRIAgreementBundle::layout.agreement.html.twig' %}
+
+{% block title %}{{ parent() }} | Institucionales{% endblock %}
+
+{% block  page_breadcrumb %}
+    {{ parent() }}
+    <li>
+    {% if '/institutional/index' in app.request.getPathInfo() %}
+        <span>Institucionales</span>
+    {% else %}
+        <a href="{{ path('agreement_institutional_index') }}" ><span>Institucionales</span> </a> <i class="fa fa-circle"></i>
+    {% endif %}
+    </li>
+{% endblock %}
+
+{% block page_title %}
+{% endblock %}
+
+{% block page_dashboard %}
+
+{% endblock %}
+

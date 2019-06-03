@@ -1,0 +1,115 @@
+{% extends 'DRIAgreementBundle:Institution:layout.institution.html.twig' %}
+
+{% block title %}{{ parent() }} | Institución Extranjera | {{ institution.acronym }} {% endblock %}
+
+{% block  page_breadcrumb %}
+    {{ parent() }}
+    <li>
+        <span> {{ institution.acronym }} </span>
+    </li>
+{% endblock %}
+
+{% block page_title %}
+{% endblock %}
+
+{% block page_dashboard %}
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="portlet light bordered">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <i class="icon-layers font-blue-dark"></i>
+                        <span class="caption-subject font-blue-dark bold uppercase">
+                            Institución Extranjera
+                            <span class="font-green-sharp">
+                                 {{ institution.acronym }}
+                            </span>
+                        </span>
+                    </div>
+                    <div class="actions btn-set">
+                        <a class="btn btn-transparent grey-cascade btn-outline btn-circle btn-sm" href="{{ path('institution_index') }}">
+                            <span class="fa fa-list" aria-hidden="true"></span>
+                            Ir al listado
+                        </a>
+                        <a class="btn green btn-circle btn-sm" href="{{ path('institution_new') }}">
+                            <span class="fa fa-plus" aria-hidden="true"></span>
+                            Agregar Institución Extranjera
+                        </a>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <div class="tabbable-line">
+                        <ul class="nav nav-tabs nav-tabs-lg">
+                            <li class="active">
+                                <a href="#tab_1" data-toggle="tab"> Detalles </a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="tab_1">
+                                <div class="row">
+                                    <div class="col-md-6 col-sm-12">
+                                        <div class="portlet green-meadow box">
+                                            <div class="portlet-title">
+                                                <div class="caption">
+                                                    <i class="fa fa-book"></i>Detalles de la Institución Internacional </div>
+                                                <div class="actions">
+                                                    <a href="{{ path('institution_edit', { 'id':  institution.id }) }}" class="btn btn-default btn-sm">
+                                                        <i class="fa fa-pencil"></i> Editar </a>
+                                                </div>
+                                            </div>
+                                            <div class="portlet-body">
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Nombre: </div>
+                                                    <div class="col-md-7 value"> {{ institution.name }}</div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Siglas: </div>
+                                                    <div class="col-md-7 value"> {{ institution.acronym }}</div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Logo: </div>
+                                                    <div class="col-md-7 value">
+                                                        <a href="{{ asset(vich_uploader_asset(institution, 'logoFile', 'DRI\\AgreementBundle\\Entity\\Institution')) }}" target="_blank" >
+                                                            <img src="{{ asset(vich_uploader_asset(institution, 'logoFile', 'DRI\\AgreementBundle\\Entity\\Institution')) }}" class="img-responsive" alt="" style="max-width: 150px">
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> URL: </div>
+                                                    <div class="col-md-7 value"> <a href="{{ institution.url }}"><i class="la la-link"></i> {{ institution.url }}</a></div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> País: </div>
+                                                    <div class="col-md-7 value">{{ institution.country.spName }}</div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Dirección: </div>
+                                                    <div class="col-md-7 value">
+                                                        {% if institution.countryState %}
+                                                            {{ institution.countryState }}{% if institution.province or institution.city %}, {% endif %}
+                                                        {% endif %}
+                                                        {% if institution.province and institution.city %}
+                                                            {{ institution.province }}, {{ institution.city }}
+                                                        {% elseif institution.province %}
+                                                            {{ institution.province }}
+                                                        {% elseif institution.city %}
+                                                            {{ institution.city }}
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+

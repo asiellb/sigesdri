@@ -1,0 +1,23 @@
+{% extends 'DRIAgreementBundle::layout.agreement.html.twig' %}
+
+{% block title %}{{ parent() }} | Ficha de Consulta{% endblock %}
+
+{% block  page_breadcrumb %}
+    {{ parent() }}
+    <li>
+    {% if '/agreement/application/index' in app.request.getPathInfo() %}
+        <span>Ficha de Consulta</span> </a> <i class="fa fa-circle"></i>
+    {% else %}
+        <a href="{{ path('agreement_application_index') }}" ><span>Ficha de Consulta</span> </a> <i class="fa fa-circle"></i>
+    {% endif %}
+    </li>
+{% endblock %}
+
+{% block page_title %}
+    Ficha de Consulta
+{% endblock %}
+
+{% block page_dashboard %}
+
+{% endblock %}
+
