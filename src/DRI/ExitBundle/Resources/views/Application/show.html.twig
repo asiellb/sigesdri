@@ -1,0 +1,434 @@
+{% extends 'DRIExitBundle:Application:layout.application.html.twig' %}
+
+{% block title %}{{ parent() }} | Solicitud de {{ clientType }} | {{ exitApplication.number }} {% endblock %}
+
+{% block  page_breadcrumb %}
+    {{ parent() }}
+    <li>
+        <span>Solicitud  de {{ clientType }}</span>
+        <i class="fa fa-circle"></i>
+        <span># {{ exitApplication.number }} </span>
+    </li>
+{% endblock %}
+
+{% block page_title %}
+{% endblock %}
+
+{% block page_dashboard %}
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="portlet light bordered">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <i class="icon-layers font-blue-dark"></i>
+                        <span class="caption-subject font-blue-dark bold uppercase">
+                            Solicitud para {{ clientType }}
+                            <span class="font-green-sharp">
+                                # {{ exitApplication.number }} |
+                                <small>
+                                    {% if exitApplication.createdAt %}{{ exitApplication.createdAt | localizeddate('long', 'none') }}{% endif %}
+                                </small>
+                            </span>
+                        </span>
+                    </div>
+                    <div class="actions btn-set">
+                        <a class="btn btn-transparent grey-cascade btn-outline btn-circle btn-sm" href="{{ path('exit_application_index') }}">
+                            <span class="fa fa-list" aria-hidden="true"></span>
+                            Ir al listado
+                        </a>
+                        <div class="btn-group">
+                            <a class="btn green btn-outline btn-circle" href="javascript:;" data-toggle="dropdown">
+                                <i class="fa fa-plus"></i>
+                                <span class="hidden-xs"> Crear Solicitud de Salida </span>
+                                <i class="fa fa-angle-down"></i>
+                            </a>
+                            <ul class="dropdown-menu pull-right">
+                                <li>
+                                    <a href="{{ path('exit_application_new', {'type' : 'dir'}) }}" class="tool-action">
+                                        <i class="fa fa-user"></i> Directivo </a>
+                                </li>
+                                <li>
+                                    <a href="{{ path('exit_application_new', {'type' : 'doc'}) }}" class="tool-action">
+                                        <i class="fa fa-user"></i> Docente</a>
+                                </li>
+                                <li>
+                                    <a href="{{ path('exit_application_new', {'type' : 'nod'}) }}" class="tool-action">
+                                        <i class="fa fa-user"></i> No Docente</a>
+                                </li>
+                                <li>
+                                    <a href="{{ path('exit_application_new', {'type' : 'est'}) }}" class="tool-action">
+                                        <i class="fa fa-user"></i> Estudiante</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="btn-group">
+                            <a class="btn red btn-outline btn-circle" href="javascript:;" data-toggle="dropdown">
+                                <i class="fa fa-share"></i>
+                                <span class="hidden-xs"> Herramientas </span>
+                                <i class="fa fa-angle-down"></i>
+                            </a>
+                            <ul class="dropdown-menu pull-right">
+                                <li>
+                                    <a href="{{ path('exit_official_file_to_word', {'id' : exitApplication.id}) }}" class="tool-action">
+                                        <i class="fa fa-file-word-o"></i> Ficha de Solicitud UC</a>
+                                </li>
+                                {% if exitApplication.commandFile is not null  %}
+                                <li>
+                                    <a href="{{ path('exit_command_file_to_word', {'id' : exitApplication.id}) }}" class="tool-action">
+                                        <i class="fa fa-file-word-o"></i> Ficha de Mandatos</a>
+                                </li>
+                                {% endif %}
+                                {% if exitApplication.client.clientType == 'dir'  %}
+                                <li>
+                                    <a href="{{ path('exit_cc_nomenclature_file_to_word', {'id' : exitApplication.id}) }}" class="tool-action">
+                                        <i class="fa fa-file-word-o"></i> Ficha de Nomenclatura CC</a>
+                                </li>
+                                {% endif %}
+                                {% for cf in consultFile %}
+                                    <li>
+                                        <a href="{{ path('exit_consult_bol_nic_ven_file_to_word', {'id':cf.id}) }}" class="tool-action">
+                                            <i class="fa fa-file-word-o"></i> Ficha de Consulta {{ cf.country.spName }}</a>
+                                    </li>
+                                {% endfor %}
+                                {% for rt in rtFile %}
+                                    <li>
+                                        <a href="{{ path('exit_rt_nomenclature_file_to_word', {'id':rt.id}) }}" class="tool-action">
+                                            <i class="fa fa-file-word-o"></i> Ficha de Nomenclatura RT {{ rt.country.spName }}</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <div class="tabbable-line">
+                        <ul class="nav nav-tabs nav-tabs-lg">
+                            <li class="active">
+                                <a href="#tab_1" data-toggle="tab"> Detalles </a>
+                            </li>
+                            {% if exitApplication.commandFile is not null  %}
+                            <li class="">
+                                <a href="#tab_2" data-toggle="tab"> Ficha de Mandatos </a>
+                            </li>
+                            {% endif %}
+                            {% if exitApplication.client is not empty  %}
+                            <li class="">
+                                <a href="#tab_3" data-toggle="tab"> Información del Solicitante </a>
+                            </li>
+                            {% endif %}
+                            {% if exitApplication.departure is not empty  %}
+                            <li class="">
+                                <a href="#tab_4" data-toggle="tab"> Salida Asociada </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="tab_1">
+                                <div class="portlet green-meadow box">
+                                    <div class="portlet-title">
+                                        <div class="caption">
+                                            <i class="fa fa-book"></i>Detalles de la Solicitud de Salida al Exterior </div>
+                                        <div class="actions">
+                                            <a href="{{ path('exit_application_edit', { 'numberSlug':  exitApplication.numberSlug }) }}" class="btn btn-default btn-sm">
+                                                <i class="fa fa-pencil"></i> Editar </a>
+                                            <a href="{{ path('departure_new_from_application', { 'application':  exitApplication.id }) }}" class="btn btn-default btn-sm">
+                                                <i class="fa fa-plus"></i> Agregar Salida al Exterior </a>
+                                        </div>
+                                    </div>
+                                    <div class="portlet-body">
+                                        <div class="row">
+                                            <div class="col-md-6 col-sm-12">
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Número #: </div>
+                                                    <div class="col-md-7 value"> {{ exitApplication.number }}</div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Propuesta por: </div>
+                                                    <div class="col-md-7 value"> {{ exitApplication.proposedBy }}</div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Fecha de salida: </div>
+                                                    <div class="col-md-7 value"> {{ exitApplication.exitDate | localizeddate('long', 'none') }} </div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Fecha de retorno: </div>
+                                                    <div class="col-md-7 value"> {{ exitApplication.arrivalDate | localizeddate('long', 'none') }} </div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Aprovación PCC: </div>
+                                                    <div class="col-md-7 value">
+                                                        {% if exitApplication.pccApproval %}Si{% else %}No{% endif %}
+                                                        {% if exitApplication.pccApprovalDate %} | {{ exitApplication.pccApprovalDate| localizeddate('long', 'none') }}{% endif %}
+                                                    </div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Aprovación VRI: </div>
+                                                    <div class="col-md-7 value">
+                                                        {% if exitApplication.vriApproval %}Si{% else %}No{% endif %}
+                                                        {% if exitApplication.vriApprovalDate %} | {{ exitApplication.vriApprovalDate| localizeddate('long', 'none') }}{% endif %}
+                                                    </div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Aprovación CC: </div>
+                                                    <div class="col-md-7 value">
+                                                        {% if exitApplication.rsApproval %}Si{% else %}No{% endif %}
+                                                        {% if exitApplication.rsApprovalDate %} | {{ exitApplication.rsApprovalDate| localizeddate('long', 'none') }}{% endif %}
+                                                    </div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Aprovación OS: </div>
+                                                    <div class="col-md-7 value">
+                                                        {% if exitApplication.osApproval %}Si{% else %}No{% endif %}
+                                                        {% if exitApplication.osApprovalDate %} | {{ exitApplication.osApprovalDate| localizeddate('long', 'none') }}{% endif %}
+                                                    </div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Estado: </div>
+                                                    <div class="col-md-7 value">
+                                                    <span class="label {{ exitApplication.state == 'CON' ? 'bg-blue-dark' : exitApplication.state ==  'APR' ? 'label-success' : exitApplication.state == 'REC' ? 'label-danger' : ''}}">
+                                                        {{ exitApplication.state == 'CON' ? 'Confeccionada' : exitApplication.state == 'APR' ? 'Aprobada' : exitApplication.state == 'REC' ? 'Rechazada' : ''}}
+                                                    </span>
+                                                    </div>
+                                                </div>
+                                                {% if exitApplication.agreement is not null %}
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Acuerdo #: </div>
+                                                        <div class="col-md-7 value">
+                                                            {{ exitApplication.agreement }}
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                                {% if exitApplication.approvalObservations is not null %}
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Observaciones: </div>
+                                                        <div class="col-md-7 value">
+                                                            {{ exitApplication.approvalObservations }}
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                                {% if exitApplication.rejectReason is not null %}
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Razones del rechazo: </div>
+                                                        <div class="col-md-7 value">
+                                                            {{ exitApplication.rejectReason }}
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                            <div class="col-md-6 col-sm-12">
+                                                <h5>Misiones:</h5>
+                                                <div class="mt-element-list">
+                                                    <div class="mt-list-container list-todo">
+                                                        <div class="list-todo-line"></div>
+                                                        <ul>
+                                                            {% for mission in exitApplication.missions %}
+                                                                <li class="mt-list-item">
+                                                                    <div class="list-todo-icon bg-white">
+                                                                        <i class="fa fa-plane"></i>
+                                                                    </div>
+                                                                    <div class="list-todo-item dark">
+                                                                        <a class="list-toggle-container" data-toggle="collapse" href="#task-1" aria-expanded="false">
+                                                                            <div class="list-toggle done uppercase">
+                                                                                <div class="list-toggle-title bold">{{ mission.country }} {{ mission.fromDate|date('d/m/Y') }} - {{ mission.untilDate|date('d/m/Y') }}</div>
+                                                                            </div>
+                                                                        </a>
+                                                                        <div class="task-list panel-collapse collapse in" id="task-1">
+                                                                            <ul>
+                                                                                <li class="task-list-item">
+                                                                                    <div class="task-icon">
+                                                                                        <a href="javascript:;">
+                                                                                            <i class="fa fa-map-marker"></i>
+                                                                                        </a>
+                                                                                    </div>
+                                                                                    <div class="task-content">
+                                                                                        <h4 class="uppercase bold">
+                                                                                            Provincia / Institución
+                                                                                        </h4>
+                                                                                        <p>{{ mission.provinceCountry }} / {{ mission.institution }}</p>
+                                                                                    </div>
+                                                                                </li>
+                                                                                <li class="task-list-item">
+                                                                                    <div class="task-icon">
+                                                                                        <a href="javascript:;">
+                                                                                            <i class="fa fa-user"></i>
+                                                                                        </a>
+                                                                                    </div>
+                                                                                    <div class="task-content">
+                                                                                        <h4 class="uppercase bold">
+                                                                                            Persona que invita
+                                                                                        </h4>
+                                                                                        <p>{{ mission.personWhoInvitesName }} / {{ mission.personWhoInvitesPosition }}</p>
+                                                                                    </div>
+                                                                                </li>
+                                                                                <li class="task-list-item">
+                                                                                    <div class="task-icon">
+                                                                                        <a href="javascript:;">
+                                                                                            <i class="fa fa-list-ul"></i>
+                                                                                        </a>
+                                                                                    </div>
+                                                                                    <div class="task-content">
+                                                                                        <h4 class="uppercase bold">Concepto / Objetivos</h4>
+                                                                                        <p>{{ fn_mission_concept(mission.concept) }}</p>
+                                                                                        <p>{{ mission.objetives }}</p>
+                                                                                    </div>
+                                                                                </li>
+                                                                                {% if mission.workPlanSynthesis is not null %}
+                                                                                    <li class="task-list-item">
+                                                                                        <div class="task-icon">
+                                                                                            <a href="javascript:;">
+                                                                                                <i class="fa fa-download"></i>
+                                                                                            </a>
+                                                                                        </div>
+                                                                                        <div class="task-content">
+                                                                                            <h4 class="uppercase bold">
+                                                                                                Plan de Trabajo
+                                                                                            </h4>
+                                                                                            <p><a href="{{ asset(vich_uploader_asset(mission, 'workPlanSynthesisFile', 'DRI\\ExitBundle\\Entity\\Mission')) }}" target="_blank" >Ver Plan de Trabajo ...</a></p>
+                                                                                        </div>
+                                                                                    </li>
+                                                                                {% endif %}
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                </li>
+                                                            {% endfor %}
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% if exitApplication.commandFile is not null  %}
+                            <div class="tab-pane" id="tab_2">
+                                <div class="portlet blue-hoki box">
+                                    <div class="portlet-title">
+                                        <div class="caption">
+                                            <i class="fa fa-file"></i>Ficha de Mandatos </div>
+                                    </div>
+                                    <div class="portlet-body">
+                                        <div class="row static-info">
+                                            <div class="col-md-12 name"> 1. Acciones a desarrollar en la esfera del Trabajo Político Ideológico </div>
+                                            <div class="col-md-12 value"> {{ exitApplication.commandFile.ipwActions | raw }} </div>
+                                        </div>
+                                        <div class="row static-info">
+                                            <div class="col-md-12 name"> 2. Acciones para el cumplimiento de los objetivos de trabajo de la misión encomendada </div>
+                                            <div class="col-md-12 value"> {{ exitApplication.commandFile.mwoActions | raw }} </div>
+                                        </div>
+                                        <div class="row static-info">
+                                            <div class="col-md-12 name"> 3. Acciones para identificar las tendencias de la educación superior y el desarrollo de las nuevas tecnologías </div>
+                                            <div class="col-md-12 value"> {{ exitApplication.commandFile.ittActions | raw }} </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if exitApplication.client is not empty  %}
+                            <div class="tab-pane" id="tab_3">
+                                <div class="portlet blue-hoki box">
+                                    <div class="portlet-title">
+                                        <div class="caption">
+                                            <i class="fa fa-user"></i>Información del Solicitante </div>
+                                        <div class="actions">
+                                            <a href="{{ path('client_profile', { 'fullNameSlug':  exitApplication.client.fullNameSlug }) }}" class="btn btn-default btn-sm">
+                                                <i class="fa fa-eye"></i> Ver </a>
+                                            <a href="{{ path('client_config', { 'fullNameSlug':  exitApplication.client.fullNameSlug }) }}" class="btn btn-default btn-sm">
+                                                <i class="fa fa-pencil"></i> Editar </a>
+                                        </div>
+                                    </div>
+                                    <div class="portlet-body">
+                                        <div class="row static-info">
+                                            <div class="col-md-5 name"> Nombre del Solicitante: </div>
+                                            <div class="col-md-7 value"> {{ exitApplication.client.fullName }} </div>
+                                        </div>
+                                        <div class="row static-info">
+                                            <div class="col-md-5 name"> Tipo de Cliente: </div>
+                                            <div class="col-md-7 value"> {{ exitApplication.client.clientType == 'EST' ? 'Estudiante' : exitApplication.client.clientType == 'DOC' ? 'Docente' : exitApplication.client.clientType == 'NOD' ? 'No Docente' : '' }} </div>
+                                        </div>
+                                        <div class="row static-info">
+                                            <div class="col-md-5 name"> Email: </div>
+                                            <div class="col-md-7 value">
+                                                <a href="mailto:{{ exitApplication.client.email }}">{{ exitApplication.client.email }}</a>
+                                                {% if exitApplication.client.foreignEmail is not empty %}
+                                                    o
+                                                    <a href="mailto:{{ exitApplication.client.foreignEmail }}">{{ exitApplication.client.foreignEmail }}</a>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="row static-info">
+                                            <div class="col-md-5 name"> Teléfono: </div>
+                                            <div class="col-md-7 value">
+                                                {{ exitApplication.client.privatePhone is defined ? exitApplication.client.privatePhone }}
+                                                {% if exitApplication.client.privatePhone is not empty and exitApplication.client.cellPhone is not empty %} o {% endif %}
+                                                {{ exitApplication.client.cellPhone is defined ? exitApplication.client.cellPhone }}
+                                            </div>
+                                        </div>
+                                        {% if exitApplication.client.faculty.name is defined %}
+                                            <div class="row static-info">
+                                                <div class="col-md-5 name"> Facultad o Centro: </div>
+                                                <div class="col-md-7 value"> {{ exitApplication.client.faculty.name }} </div>
+                                            </div>
+                                        {% endif %}
+                                        {% if exitApplication.client.workersWorkPlace is defined %}
+                                            <div class="row static-info">
+                                                <div class="col-md-5 name"> Lugar de Trabajo: </div>
+                                                <div class="col-md-7 value"> {{ exitApplication.client.workersWorkPlace }} </div>
+                                            </div>
+                                        {% endif %}
+                                        {% if exitApplication.client.workersWorkPhone %}
+                                            <div class="row static-info">
+                                                <div class="col-md-5 name"> Teléfono en Trabajo: </div>
+                                                <div class="col-md-7 value"> {{ exitApplication.client.workersWorkPhone }} </div>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if exitApplication.departure is not empty  %}
+                            <div class="tab-pane" id="tab_4">
+                                <div class="portlet blue-hoki box">
+                                    <div class="portlet-title">
+                                        <div class="caption">
+                                            <i class="fa fa-user"></i>Salida Asociada </div>
+                                        <div class="actions">
+                                            <a href="{{ path('departure_show', { 'numberSlug':  exitApplication.departure.numberSlug }) }}" class="btn btn-default btn-sm">
+                                                <i class="fa fa-pencil"></i> Ver </a>
+                                            <a href="{{ path('departure_edit', { 'numberSlug':  exitApplication.departure.numberSlug }) }}" class="btn btn-default btn-sm">
+                                                <i class="fa fa-pencil"></i> Editar </a>
+                                        </div>
+                                    </div>
+                                    <div class="portlet-body">
+                                        <div class="row static-info">
+                                            <div class="col-md-5 name"> Número de Salida: </div>
+                                            <div class="col-md-7 value"> {{ exitApplication.departure.number }} </div>
+                                        </div>
+                                        <div class="row static-info">
+                                            <div class="col-md-5 name"> Fecha de Partida: </div>
+                                            <div class="col-md-7 value">
+                                                {{ exitApplication.departure.departureDate | localizeddate('long', 'none') }}
+                                            </div>
+                                        </div>
+                                        <div class="row static-info">
+                                            <div class="col-md-5 name"> Fecha de entrega del pasaporte: </div>
+                                            <div class="col-md-7 value">
+                                                {{ exitApplication.departure.passportDelivery | localizeddate('long', 'none') }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

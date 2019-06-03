@@ -1,0 +1,167 @@
+{% extends '::pdf/pdf_base.html.twig' %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-md-8">
+            <p>PROPUESTA AL RECTOR PARA SALIDA AL EXTRANJERO POR MISIONES OFICIALES</p>
+        </div>
+        <div class="col-md-3">
+            <img src="{{ absolute_url(asset('assets/pdf/logo_dri.png')) }}" alt="Logo" height="60" style="margin-left: 20px"/>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <p>DATOS GENERALES</p>
+        </div>
+        <div class="col-md-12">
+            <p>Facultad o Centro: {{ app.client.faculty.name }}</p>
+            <p>Nombre: {{ app.client.fullName }}</p>
+            <p>Categoría Docente o Investigativa: {{ app.client.workersEduCategory }}</p>
+            <p>Grado Científico: {{ app.client.workersSciGrade }}</p>
+            <p>Edad: </p>
+            <p>Años de Trabajo en la UC: </p>
+            <p>Carnet de Identidad: {{ app.client.ci }}</p>
+            <p>Cargo que ocupa: {{ app.client.workersPosition }}</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <span>MISIONES EN EL EXTERIOR EN LOS ÚLTIMOS 2 AÑOS</span>
+        </div>
+        <div class="col-md-12">
+            <table class="table">
+                <thead>
+                <tr style="">
+                    <th colspan="4">
+                        <p >
+                            <span>País</span>
+                        </p>
+                    </th>
+                    <th colspan="4">
+                        <p>
+                            <span>Institución</span>
+                        </p>
+                    </th>
+                    <th colspan="6">
+                        <p>
+                            <span>Concepto</span>
+                        </p>
+                    </th>
+                    <th colspan="6">
+                        <p>
+                            <span>Tiempo</span>
+                        </p>
+                    </th>
+                    <th colspan="3">
+                        <p>
+                            <span>Fecha de Salida</span>
+                        </p>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <p>DATOS DE LA MISIÓN PROPUESTA</p>
+        </div>
+        <div class="col-md-12">
+            <p>País: {{ app.country.spName }}</p>
+            <p>Institución: {{ app.institution }}</p>
+            <p>Tiempo: {{ app.lapsed }}</p>
+            <p>Desde: {{ app.exitDate | localizeddate('short', 'none') }}</p>
+            <p>Hasta: {{ app.arrivalDate | localizeddate('short', 'none') }}</p>
+            <p>Concepto de la misión:
+                {% if  app.concept == "MOF" %}
+                    Misión Oficial
+                {% elseif  app.concept == "IAC" %}
+                    Intercambio Académico
+                {% elseif  app.concept == "IES" %}
+                    Intercambio Estudiantil
+                {% elseif  app.concept == "ICU" %}
+                    Intercambio Cultural
+                {% elseif  app.concept == "EVE" %}
+                    Evento
+                {% elseif  app.concept == "BMA" %}
+                    Beca Maestría
+                {% elseif  app.concept == "BPR" %}
+                    Beca Predoctoral
+                {% elseif  app.concept == "BPO" %}
+                    Beca Postdoctoral
+                {% elseif  app.concept == "PIN" %}
+                    Proyecto Internacional
+                {% elseif  app.concept == "ATE" %}
+                    Asistencia Técnica Exportada
+                {% elseif  app.concept == "COM" %}
+                    Comercialización
+                {% endif %}
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <p>INFORMACIÓN A LA COMISION DE CUADROS</p>
+        </div>
+        <div class="col-md-12">
+            <p>En caso de ser cuadro aclarar sustituto: {{ app.directiveSubstitute }}</p>
+            <p>En caso de tener GOE durante la salida aclarar sustituto: {{ app.goeSubstitute }} </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <p>INFORMACIÓN ECONÓMICA PARA PROFESORES INVITADOS, PAQUETES DE POSTGRADO O ASESORÍA</p>
+        </div>
+        <div class="col-md-12">
+            <p>Salario Mensual: {{ app.monthlyPay }} </p>
+            <p>Salario Total: {{ app.totalPay }}</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <p>INFORMACIÓN ECONÓMICA PARA OTROS CONCEPTOS DE SALIDA</p>
+        </div>
+        <div class="col-md-12">
+            <table class="table">
+                <thead>
+                <tr style="">
+                    <th>
+                        <p><span></span></p>
+                    </th>
+                    <th>
+                        <p><span>Monto CUC</span></p>
+                    </th>
+                    <th>
+                        <p><span>Fuente de Financiamiento</span></p>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                    {% for economic in app.economics %}
+                        <tr>
+                            <td>{{ economic.type }}</td>
+                            <td>{{ economic.amount }}</td>
+                            <td>{{ economic.source }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <p>AROBACIONES</p>
+        </div>
+        <div class="col-md-12">
+            <p>Propone: {{ app.proposedBy }}    Cargo: {{ app.proposedBy.workersPosition }} Fecha:  Firma: </p>
+            <p>Núcleo del PCC: Fecha: Firma:  </p>
+            <p>Reunión de Salidas: Fecha: Firma:  </p>
+            <p>Aprobación para optar por becas: Vicerrector de Investigaciones: Fecha: Firma:  </p>
+            <p>Constancia que visitó la Oficina Secreta: Fecha: Firma:  </p>
+        </div>
+    </div>
+
+{% endblock %}

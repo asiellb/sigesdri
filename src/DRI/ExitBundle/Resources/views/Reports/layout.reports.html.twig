@@ -1,0 +1,20 @@
+{% extends 'DRIExitBundle::layout.exit.html.twig' %}
+
+{% block title %}{{ parent() }} | Reporte{% endblock %}
+
+{% block  page_breadcrumb %}
+    {{ parent() }}
+    <li>
+    {% if '/exit/report' in app.request.getPathInfo() %}
+        <span>Reporte</span>
+    {% endif %}
+    </li>
+{% endblock %}
+
+{% block page_title %}
+{% endblock %}
+
+{% block page_dashboard %}
+
+{% endblock %}
+

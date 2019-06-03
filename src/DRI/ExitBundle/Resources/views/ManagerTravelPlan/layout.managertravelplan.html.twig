@@ -1,0 +1,22 @@
+{% extends 'DRIExitBundle::layout.exit.html.twig' %}
+
+{% block title %}{{ parent() }} | Plan de Viaje de Directivos {% endblock %}
+
+{% block  page_breadcrumb %}
+    {{ parent() }}
+    <li>
+    {% if '/managertravelplan/index' in app.request.getPathInfo() %}
+        <span>Plan de Viaje de Directivos</span>
+    {% else %}
+        <a href="{{ path('exit_managertravelplan_index') }}" ><span>Plan de Viaje de Directivos</span> </a> <i class="fa fa-circle"></i>
+    {% endif %}
+    </li>
+{% endblock %}
+
+{% block page_title %}
+{% endblock %}
+
+{% block page_dashboard %}
+
+{% endblock %}
+

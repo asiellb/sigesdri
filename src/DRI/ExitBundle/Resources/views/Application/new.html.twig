@@ -1,0 +1,310 @@
+{% extends 'DRIExitBundle:Application:layout.application.html.twig' %}
+
+{% block title %}{{ parent() }} | Nueva Solicitud de {{ clientType }}{% endblock %}
+
+{% block page_level_plugins_css %}
+    <link href="{{ asset('assets/global/plugins/bootstrap-select/css/bootstrap-select.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/select2/css/select2.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/select2/css/select2-bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/icheck/skins/all.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/bootstrap-datepicker/css/bootstrap-datepicker.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/bootstrap-toggle/css/bootstrap-toggle.min.css') }}" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block page_level_plugins_js %}
+    <script src="{{ asset('assets/global/plugins/bootstrap-select/js/bootstrap-select.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/select2/js/select2.full.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/bootstrap-datepicker/locales/bootstrap-datepicker.es.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/icheck/icheck.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/jquery-validation/js/jquery.validate.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/jquery-validation/js/localization/messages_es.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/jquery-validation/js/additional-methods.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/pages/scripts/plugins/jquery-validation/additional-methods.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/symfony-collection/jquery.collection.js') }}"></script>
+    <script src="{{ asset('assets/global/plugins/bootstrap-toggle/js/bootstrap-toggle.min.js') }}" type="text/javascript"></script>
+{% endblock %}
+
+{% block page_level_scrpt %}
+    <script src="{{ asset('assets/pages/scripts/init-form-plugins.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/pages/scripts/exit-application-form.js') }}" type="text/javascript"></script>
+{% endblock %}
+
+{% block  page_breadcrumb %}
+    {{ parent() }}
+    <li>
+        <span>Nueva Solicitud  de {{ clientType }}</span>
+    </li>
+{% endblock %}
+
+{% block page_title %}
+{% endblock %}
+
+{% block page_dashboard %}
+
+    <div class="row">
+        <div class="col-md-12">
+            {%
+                form_theme form
+                'form/mission_collection_theme.html.twig'
+                'form/commandfile_theme.html.twig'
+            %}
+            {{ form_start(form, {'attr': {'id':'submit_exit_application_form','class': 'form-horizontal form-row-seperated', 'role':'form'}}) }}
+            <div class="portlet light bordered">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <i class="fa fa-cogs font-blue-dark"></i>
+                        <span class="caption-subject font-blue-dark bold uppercase"> Solicitud de Salida al Exterior para {{ clientType }}
+                            </span>
+                    </div>
+                    <div class="actions btn-set">
+                        <a class="btn btn-transparent grey-cascade btn-outline btn-circle btn-sm" href="{{ absolute_url(lastPage) }}">
+                            <i class="fa fa-angle-left"></i> Volver
+                        </a>
+                        <a class="btn btn-transparent grey-cascade btn-outline btn-circle btn-sm" href="{{ path('exit_application_index') }}">
+                            <span class="fa fa-list" aria-hidden="true"></span>
+                            Ir al listado
+                        </a>
+                        <button class="btn btn-transparent grey-cascade btn-outline btn-circle btn-sm" type="reset">
+                            <i class="fa fa-reply"></i> Reset
+                        </button>
+                        <button class="btn btn-success btn-circle" type="submit">
+                            <i class="fa fa-check"></i> Guardar
+                        </button>
+                        <a class="btn btn-circle btn-icon-only btn-default fullscreen" href="javascript:;"> </a>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <div class="tabbable-line">
+                        <ul class="nav nav-tabs nav-tabs-lg">
+                            <li class="active">
+                                <a href="#tab_1" data-toggle="tab"> Solicitud </a>
+                            </li>
+                            <li>
+                                <a href="#tab_2" data-toggle="tab"> Misiones </a>
+                            </li>
+                            {% if form.commandFile is defined %}
+                            <li>
+                                <a href="#tab_3" data-toggle="tab"> Ficha de Mandatos </a>
+                            </li>
+                            {% endif %}
+                            <li>
+                                <a href="#tab_4" data-toggle="tab"> Consumo Interno </a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="tab_1">
+                                <div class="form form-body">
+                                    <h5 class="font-blue col-md-offset-2 col-md-10">DATOS DEL SOLICITANTE</h5>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label">{{ clientType }} que solicita</label>
+                                        <div class="col-md-10">
+                                            {% if client is null %}
+                                                {{ form_widget(form.client) }}
+                                            {% else %}
+                                                <input type="text" class="form-control" value="{{ client.fullName }}" disabled>
+                                            {% endif %}
+                                            <div id="form_client_error"></div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label">Propuesto por</label>
+                                        <div class="col-md-10">
+                                            {{ form_widget(form.proposedBy) }}
+                                            <div id="form_proposedby_error"></div>
+                                        </div>
+                                    </div>
+
+                                    <h5 class="font-blue col-md-offset-2 col-md-10">TIEMPO EN EL EXTERIOR</h5>
+
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label">Fecha de Salida</label>
+                                        <div class="col-md-10">
+                                            {{ form_widget(form.exitDate) }}
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label">Fecha de Retorno</label>
+                                        <div class="col-md-10">
+                                            {{ form_widget(form.arrivalDate) }}
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label">Cantidad de tiempo</label>
+                                        <div class="col-md-10">
+                                            {{ form_widget(form.lapsed) }}
+                                        </div>
+                                    </div>
+
+                                    {% if (form.directiveSubstitute is defined) and (form.goeSubstitute is defined) %}
+                                    <h5 class="font-blue col-md-offset-2 col-md-10">INFORMACIÓN A LA COMISION DE CUADROS</h5>
+
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label">Cuadro Sustituto</label>
+                                        <div class="col-md-10">
+                                            {{ form_widget(form.directiveSubstitute) }}
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label">Sustituto de GOE</label>
+                                        <div class="col-md-10">
+                                            {{ form_widget(form.goeSubstitute) }}
+                                        </div>
+                                    </div>
+                                    {% endif %}
+
+                                    <h5 class="font-blue col-md-offset-2 col-md-10">COPIA DE LA FICHA</h5>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label">Copia Digital</label>
+                                        <div class="col-md-10">
+                                            {{ form_widget(form.digitalCopyFile) }}
+                                        </div>
+                                    </div>
+
+                                    <h5 class="font-blue col-md-offset-2 col-md-10">APROBACIONES</h5>
+
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label">Aprobación PCC</label>
+                                        <div class="col-md-10">
+                                            <div class="row">
+                                                <div class="col-md-1">
+                                                    {{ form_widget(form.pccApproval) }}
+                                                </div>
+                                                <div class="col-md-11">
+                                                    {{ form_widget(form.pccApprovalDate) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label">Aprobación VRI</label>
+                                        <div class="col-md-10">
+                                            <div class="row">
+                                                <div class="col-md-1">
+                                                    {{ form_widget(form.vriApproval) }}
+                                                </div>
+                                                <div class="col-md-11">
+                                                    {{ form_widget(form.vriApprovalDate) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label">Aprobación RS</label>
+                                        <div class="col-md-10">
+                                            <div class="row">
+                                                <div class="col-md-1">
+                                                    {{ form_widget(form.rsApproval) }}
+                                                </div>
+                                                <div class="col-md-11">
+                                                    {{ form_widget(form.rsApprovalDate) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label">Aprobación OS</label>
+                                        <div class="col-md-10">
+                                            <div class="row">
+                                                <div class="col-md-1">
+                                                    {{ form_widget(form.osApproval) }}
+                                                </div>
+                                                <div class="col-md-11">
+                                                    {{ form_widget(form.osApprovalDate) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="tab_2">
+                                <div><h5 class="font-blue">DATOS DE LAS MISIONES</h5></div>
+                                {{ form_widget(form.missions) }}
+                                <div id="form_missions_error"></div>
+                            </div>
+
+                            {% if form.commandFile is defined %}
+                            <div class="tab-pane" id="tab_3">
+                                <div><h5 class="font-blue">DATOS PARA LA FICHA DE MANDATOS</h5></div>
+                                {{ form_widget(form.commandFile) }}
+                                <div id="form_missions_error"></div>
+                            </div>
+                            {% endif %}
+                            <div class="tab-pane" id="tab_4">
+                                <h5 class="font-blue col-md-offset-2 col-md-10">DATOS PARA CONSUMO INTERNO</h5>
+                                <div class="form-group">
+                                    <label class="col-md-2 control-label">Estado</label>
+                                    <div class="col-md-10">
+                                        {{ form_widget(form.state) }}
+                                        <div id="form_state_error"></div>
+                                    </div>
+                                </div>
+                                <div class="approved" style="display: none;">
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label">Número de Acuerdo</label>
+                                        <div class="col-md-10">
+                                            {{ form_widget(form.agreement) }}
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label">Fecha de Aprobado</label>
+                                        <div class="col-md-10">
+                                            {{ form_widget(form.approvalDate) }}
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label">Observaciones</label>
+                                        <div class="col-md-10">
+                                            {{ form_widget(form.approvalObservations) }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="rejected" style="display: none;">
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label">Fecha de Rechazo</label>
+                                        <div class="col-md-10">
+                                            {{ form_widget(form.rejectDate) }}
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label">Razones</label>
+                                        <div class="col-md-10">
+                                            {{ form_widget(form.rejectReason) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                    <div class="row">
+                        <div class="col-md-offset-2 col-md-10">
+                            <button type="submit" class="btn green button-submit">
+                                Guardar
+                                <i class="fa fa-check"></i>
+                            </button>
+                            <a class="btn btn-default" href="{{ path('exit_application_index') }}">
+                                Ir al listado
+                                <i class="fa fa-list"></i>
+                            </a>
+                            <a class="btn btn-default" href="{{ absolute_url(lastPage) }}">
+                                Cancelar
+                                <i class="fa fa-close"></i>
+                            </a>
+                        </div>
+                    </div>
+            </div>
+                    </div>
+                </div>
+            </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}
