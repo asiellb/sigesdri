@@ -1,0 +1,133 @@
+{% extends "DRIPassportBundle::layout.passport.html.twig" %}
+
+{% block page_level_plugins_css %}
+
+{% endblock %}
+
+{% block page_level_plugins_js %}
+    <script src="{{ asset('assets/global/plugins/amcharts4/core.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/amcharts4/charts.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/amcharts4/themes/animated.js') }}" type="text/javascript"></script>
+{% endblock %}
+
+{% block page_dashboard %}
+    <div id="chartdiv" style="width: 100%;
+  max-height: 200px;
+  height: 100vh;"></div>
+
+{% endblock %}
+
+{% block page_custom_scrpt %}
+
+    <script type="text/javascript">
+        am4core.useTheme(am4themes_animated);
+
+        var chart = am4core.create("chartdiv", am4charts.XYChart);
+
+        chart.data = {{ chartData|json_encode|raw }}
+
+        chart.padding(40, 40, 40, 40);
+
+        var categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+        categoryAxis.renderer.grid.template.location = 0;
+        categoryAxis.renderer.ticks.template.disabled = true;
+        categoryAxis.renderer.line.opacity = 0;
+        categoryAxis.renderer.grid.template.disabled = true;
+        categoryAxis.renderer.minGridDistance = 40;
+        categoryAxis.dataFields.category = "tipo";
+
+        var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+        valueAxis.tooltip.disabled = true;
+        valueAxis.renderer.line.opacity = 0;
+        valueAxis.renderer.ticks.template.disabled = true;
+        valueAxis.min = 0;
+
+        var columnSeries = chart.series.push(new am4charts.ColumnSeries());
+        columnSeries.dataFields.categoryX = "tipo";
+        columnSeries.dataFields.valueY = "cantidad";
+        columnSeries.tooltipText = "Total: {valueY.value}";
+        columnSeries.sequencedInterpolation = true;
+        columnSeries.defaultState.transitionDuration = 1500;
+
+        var columnTemplate = columnSeries.columns.template;
+        columnTemplate.column.cornerRadiusTopLeft = 10;
+        columnTemplate.column.cornerRadiusTopRight = 10;
+        columnTemplate.strokeWidth = 1;
+        columnTemplate.strokeOpacity = 1;
+        columnTemplate.stroke = columnSeries.fill;
+
+        var desaturateFilter = new am4core.DesaturateFilter();
+        desaturateFilter.saturation = 0.5;
+
+        columnTemplate.filters.push(desaturateFilter);
+
+        // first way - get properties from data. but can only be done with columns, as they are separate objects.
+        columnTemplate.propertyFields.strokeDasharray = "stroke";
+        columnTemplate.propertyFields.fillOpacity = "opacity";
+
+        // add some cool saturation effect on hover
+        var desaturateFilterHover = new am4core.DesaturateFilter();
+        desaturateFilterHover.saturation = 1;
+
+        var hoverState = columnTemplate.states.create("hover");
+        hoverState.transitionDuration = 2000;
+        hoverState.filters.push(desaturateFilterHover);
+
+        var lineSeries = chart.series.push(new am4charts.LineSeries());
+        lineSeries.dataFields.categoryX = "tipo";
+        lineSeries.dataFields.valueY = "activos";
+        lineSeries.tooltipText = "Activos: {valueY.value}";
+        lineSeries.sequencedInterpolation = true;
+        lineSeries.defaultState.transitionDuration = 1500;
+        lineSeries.stroke = chart.colors.getIndex(11);
+        lineSeries.fill = lineSeries.stroke;
+        lineSeries.strokeWidth = 2;
+
+        // second way - add axis range.
+
+        var bullet = lineSeries.bullets.push(new am4charts.CircleBullet());
+        bullet.fill = lineSeries.stroke;
+        bullet.circle.radius = 4;
+
+        var lineSeries1 = chart.series.push(new am4charts.LineSeries());
+        lineSeries1.dataFields.categoryX = "tipo";
+        lineSeries1.dataFields.valueY = "vencidos";
+        lineSeries1.tooltipText = "Vencidos: {valueY.value}";
+        lineSeries1.sequencedInterpolation = true;
+        lineSeries1.defaultState.transitionDuration = 1500;
+        lineSeries1.stroke = chart.colors.getIndex(12);
+        lineSeries1.fill = lineSeries1.stroke;
+        lineSeries1.strokeWidth = 2;
+
+        // second way - add axis range.
+
+        var bullet1 = lineSeries1.bullets.push(new am4charts.CircleBullet());
+        bullet1.fill = lineSeries1.stroke;
+        bullet1.circle.radius = 4;
+
+        var lineSeries2 = chart.series.push(new am4charts.LineSeries());
+        lineSeries2.dataFields.categoryX = "tipo";
+        lineSeries2.dataFields.valueY = "porvencer";
+        lineSeries2.tooltipText = "Por Vencer: {valueY.value}";
+        lineSeries2.sequencedInterpolation = true;
+        lineSeries2.defaultState.transitionDuration = 1500;
+        lineSeries2.stroke = chart.colors.getIndex(13);
+        lineSeries2.fill = lineSeries2.stroke;
+        lineSeries2.strokeWidth = 2;
+
+        // second way - add axis range.
+
+        var bullet2 = lineSeries2.bullets.push(new am4charts.CircleBullet());
+        bullet2.fill = lineSeries2.stroke;
+        bullet2.circle.radius = 4;
+
+        chart.cursor = new am4charts.XYCursor();
+        chart.cursor.behavior = "none";
+        chart.cursor.lineX.opacity = 0;
+        chart.cursor.lineY.opacity = 0;
+
+        columnSeries.columns.template.adapter.add("fill", function (fill, target) {
+            return chart.colors.getIndex(target.dataItem.index);
+        });
+    </script>
+{% endblock %}

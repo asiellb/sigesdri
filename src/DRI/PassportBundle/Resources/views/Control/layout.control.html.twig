@@ -1,0 +1,22 @@
+{% extends 'DRIPassportBundle::layout.passport.html.twig' %}
+
+{% block title %}{{ parent() }} | Controles{% endblock %}
+
+{% block  page_breadcrumb %}
+    {{ parent() }}
+    <li>
+    {% if '/control/index' in app.request.getPathInfo() %}
+        <span>Control</span>
+    {% else %}
+        <a href="{{ path('passport_control_index') }}" ><span>Controles</span> </a> <i class="fa fa-circle"></i>
+    {% endif %}
+    </li>
+{% endblock %}
+
+{% block page_title %}
+{% endblock %}
+
+{% block page_dashboard %}
+
+{% endblock %}
+

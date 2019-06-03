@@ -1,0 +1,161 @@
+{% extends 'DRIPassportBundle:Application:layout.application.html.twig' %}
+
+{% block title %}{{ parent() }} | Control | {{ control.number }} {% endblock %}
+
+{% block  page_breadcrumb %}
+    {{ parent() }}
+    <li>
+        <span>Control </span>
+        <i class="fa fa-circle"></i>
+        <span># {{ control.number }} </span>
+    </li>
+{% endblock %}
+
+{% block page_title %}
+{% endblock %}
+
+{% block page_dashboard %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="portlet light bordered">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <i class="icon-layers font-blue-dark"></i>
+                        <span class="caption-subject font-blue-dark bold uppercase">
+                            Control
+                            <span class="font-green-sharp">
+                                # {{ control.number }}
+                            </span>
+                        </span>
+                    </div>
+                    <div class="actions btn-set">
+                        <a class="btn btn-transparent grey-cascade btn-outline btn-circle btn-sm" href="{{ path('passport_control_index') }}">
+                            <span class="fa fa-list" aria-hidden="true"></span>
+                            Ir al listado
+                        </a>
+                        <a class="btn green btn-circle btn-sm" href="{{ path('passport_control_new') }}">
+                            <span class="fa fa-plus" aria-hidden="true"></span>
+                            Crear Control de Pasaporte
+                        </a>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <div class="tabbable-line">
+                        <ul class="nav nav-tabs nav-tabs-lg">
+                            <li class="active">
+                                <a href="#tab_1" data-toggle="tab"> Detalles </a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="tab_1">
+                                <div class="row">
+                                    <div class="col-md-6 col-sm-12">
+                                        <div class="portlet green-meadow box">
+                                            <div class="portlet-title">
+                                                <div class="caption">
+                                                    <i class="fa fa-book"></i>Detalles del Control de Pasaporte </div>
+                                                <div class="actions">
+                                                    <a href="{{ path('passport_control_edit', { 'numberSlug':  control.numberSlug }) }}" class="btn btn-default btn-sm">
+                                                        <i class="fa fa-pencil"></i> Editar </a>
+                                                </div>
+                                            </div>
+                                            <div class="portlet-body">
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Número #: </div>
+                                                    <div class="col-md-7 value"> {{ control.number }}</div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Fecha de entrega: </div>
+                                                    <div class="col-md-7 value">
+                                                        {{ control.deliveryDate | localizeddate('long', 'none') }}
+                                                    </div>
+                                                </div>
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Especialista que recibe: </div>
+                                                    <div class="col-md-7 value">
+                                                        {{ control.receivesSpecialist.firstName }} {{ control.receivesSpecialist.lastName }}
+                                                    </div>
+                                                </div>
+                                                {% if control.pickUpDate %}
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Fecha de recogida: </div>
+                                                    <div class="col-md-7 value"> {{ control.pickUpDate | localizeddate('long', 'none') }} </div>
+                                                </div>
+                                                {% endif %}
+
+                                                {% if control.deliversSpecialist %}
+                                                <div class="row static-info">
+                                                    <div class="col-md-5 name"> Especialista que entrega: </div>
+                                                    <div class="col-md-7 value">
+                                                        {{ control.deliversSpecialist.firstName }} {{ control.deliversSpecialist.lastName }}
+                                                    </div>
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% if control.passport is not empty  %}
+                                        <div class="col-md-6 col-sm-12">
+                                            <div class="portlet blue-hoki box">
+                                                <div class="portlet-title">
+                                                    <div class="caption">
+                                                        <i class="fa fa-user"></i>Pasaporte Asociado </div>
+                                                    <div class="actions">
+                                                        <a href="{{ path('passport_show', { 'numberSlug':  control.passport.numberSlug }) }}" class="btn btn-default btn-sm">
+                                                            <i class="fa fa-pencil"></i> Ver </a>
+                                                        <a href="{{ path('passport_edit', { 'numberSlug':  control.passport.numberSlug }) }}" class="btn btn-default btn-sm">
+                                                            <i class="fa fa-pencil"></i> Editar </a>
+                                                    </div>
+                                                </div>
+                                                <div class="portlet-body">
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Número del Pasaporte: </div>
+                                                        <div class="col-md-7 value"> {{ control.passport.number }} </div>
+                                                    </div>
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Tipo de Pasaporte: </div>
+                                                        <div class="col-md-7 value"> {{ fn_passport_type(control.passport.type) }} </div>
+                                                    </div>
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Emitido el: </div>
+                                                        <div class="col-md-7 value">
+                                                            {{ control.passport.issueDate | localizeddate('long', 'none') }}
+                                                        </div>
+                                                    </div>
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Vence el: </div>
+                                                        <div class="col-md-7 value">
+                                                            {{ control.passport.expiryDate | localizeddate('long', 'none') }}
+                                                        </div>
+                                                    </div>
+                                                    <div class="row static-info">
+                                                        <div class="col-md-5 name"> Estado: </div>
+                                                        <div class="col-md-7 value">
+                                                            <span class="label
+                                                                {{ control.passport.active ? 'label-success' :
+                                                                    control.passport.expired ? 'label-danger' :
+                                                                    control.passport.forExpiring ? 'label-warning' :
+                                                                    control.passport.drop ? 'label-info' }}">
+                                                                {{ control.passport.active ? 'Activo' :
+                                                                        control.passport.expired ? 'Vencido' :
+                                                                        control.passport.forExpiring ? 'Por vencer' :
+                                                                        control.passport.drop ? 'Baja' }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}
+

@@ -1,0 +1,15 @@
+{% extends 'DRIClientBundle::layout.client.html.twig' %}
+
+{% block page_toolbar %}
+    <div class="btn-group pull-right">
+        <button type="button" class="btn green btn-sm btn-outline dropdown-toggle" data-toggle="dropdown"> Acciones
+            <i class="fa fa-angle-down"></i>
+        </button>
+        <ul class="dropdown-menu pull-right" role="menu">
+            <li>
+                <a href="{{ path('passport_new') }}">
+                    <i class="icon-user-follow"></i> Agregar Pasaporte</a>
+            </li>
+        </ul>
+    </div>
+{% endblock %}
