@@ -1,0 +1,132 @@
+#delete_form .empty.collection-empty{
+    display: none;
+}
+
+.input-icon .bootstrap-select.form-control{
+    padding-left: 0;
+
+}
+.input-icon .bootstrap-select button{
+    padding-left: 33px;
+    color: color:#999;
+    opacity:1;
+}
+
+.portlet > .portlet-title > .caption > i {
+    float: left;
+    margin-top: 3px;
+    display: inline-block;
+    font-size: 15px;
+    margin-right: 5px;
+    color: #666;
+}
+.control-label .required, .form-group .required {
+    color: inherit;
+    font-size: inherit;
+    padding-left: inherit;
+}
+
+/*table.dataTable td.row-selected{
+    background: #eef1f5 !important;
+    border-color: #FFF !important;
+}*/
+
+.disappear {
+    display: none !important;
+}
+
+.control-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+.thumbnail {
+    border: 1px solid #c2cad8;
+}
+
+table.dataTable thead th, table.dataTable thead td {
+    padding: 8px;
+}
+
+.select2-selection__rendered,
+.sg-datatables-individual-filtering{
+    font-weight: normal;
+}
+table.dataTable tbody > tr.selected, table.dataTable tbody > tr > .selected {
+    background-color: rgba(0,0,0,.15);
+}
+
+.text-right {
+    text-align: right;
+    text-align: -moz-right;
+    text-align: -webkit-right;
+}
+
+.text-left {
+    text-align: left;
+    text-align: -moz-left;
+    text-align: -webkit-left;
+}
+
+.text-center {
+    text-align: center;
+    text-align: -moz-center;
+    text-align: -webkit-center;
+}
+.form-control-static {
+    color: #777;
+}
+
+.page-container-bg-solid .action-top,
+.page-content-white .action-top {
+
+    position: absolute;
+    margin-top: 30px;
+    margin-right: 20px;
+    right: 0;
+
+}
+.action-top {
+
+    width: 420px;
+    margin-top: -13px;
+    margin-right: 0;
+    z-index: 100;
+    float: right;
+    position: relative;
+
+}
+
+.action-top > .action {
+
+    right: 0;
+    position: absolute;
+    background: url(../img/icon-color.png) center no-repeat #536881;
+    border-radius: 4px;
+
+}
+.action-top > .action, .action-top > .action-close {
+
+    padding: 20px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    -ms-border-radius: 4px;
+    -o-border-radius: 4px;
+    top: 4px;
+    cursor: pointer;
+
+}
+
+.checkbox label .toggle, .checkbox-inline .toggle {
+    margin-left: 0px;
+    margin-right: 5px;
+}
+
+
+#annual-report.table th.aling-center,
+#annual-report.table td.aling-center{
+    text-align: center !important;
+}
+#annual-report.table th{
+    font-weight: bold !important;
+}
