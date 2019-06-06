@@ -9,19 +9,11 @@
 namespace DRI\ClientBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
-use Symfony\Component\Form\Extension\Core\Type\MoneyType;
-use Symfony\Component\Form\Extension\Core\Type\NumberType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\LanguageType;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Doctrine\ORM\EntityRepository;
-
 
 use DRI\ClientBundle\Entity\Client;
 use DRI\UsefulBundle\Form\DatePickerType;
@@ -39,7 +31,9 @@ class ClientGeneralInfoType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            //Datos Generales
+            /*
+             * DATOS GENERALES
+             */
             ->add('ci', TextType::class,[
                 'label' => 'CI',
                 'attr' => [
@@ -86,7 +80,7 @@ class ClientGeneralInfoType extends AbstractType
                 'label_attr' => [
                     'class' => 'radio-inline'
                 ],
-                'choices'  => Client::GENDER_CHOICE,
+                'choices'  => Client::$GENDER_CHOICE,
                 'attr' => array(
                     'class'=>'radio-list',
                 ),
@@ -130,7 +124,7 @@ class ClientGeneralInfoType extends AbstractType
                 'label_attr' => [
                     'class' => 'radio-inline'
                 ],
-                'choices'  => Client::CLIENT_TYPES_CHOICE,
+                'choices'  => Client::$CLIENT_TYPES_CHOICE,
                 'attr' => array(
                     'class'=>'radio-list',
                 ),
@@ -152,7 +146,7 @@ class ClientGeneralInfoType extends AbstractType
                 'attr' => [
                     'class' => 'select2-multiple'
                 ],
-                'choices'  => Client::ORGANIZATION_CHOICE,
+                'choices'  => Client::$ORGANIZATION_CHOICE,
                 'multiple'=> true,
             ])
         ;

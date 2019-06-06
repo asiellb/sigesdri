@@ -2,17 +2,21 @@
 
 namespace DRI\ClientBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-use DRI\UsefulBundle\Entity\Career;
+
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\HttpFoundation\File\File;
+
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
-use DRI\ClientBundle\Entity\Language;
-use DRI\ClientBundle\Entity\Organization;
+use DateTime;
+use Exception;
+
+use DRI\UsefulBundle\Entity\Career;
 use DRI\PassportBundle\Entity\Passport;
 use DRI\PassportBundle\Entity\Application as PassportApplication;
 use DRI\ExitBundle\Entity\Departure;
@@ -48,7 +52,7 @@ class Client
      * ********************************************************************************
      **********************************************************************************/
 
-    const CLIENT_TYPES = [
+    public static $CLIENT_TYPES = [
         'dir' => 'Directivo',
         'cua' => 'Cuadro',
         'doc' => 'Docente',
@@ -56,7 +60,7 @@ class Client
         'est' => 'Estudiante',
     ];
 
-    const CLIENT_TYPES_CHOICE = [
+    public static $CLIENT_TYPES_CHOICE = [
         'Directivo'  => 'dir',
         'Cuadro'     => 'cua',
         'Docente'    => 'doc',
@@ -64,17 +68,17 @@ class Client
         'Estudiante' => 'est',
     ];
 
-    const GENDER = [
+    public static $GENDER = [
         'F' => 'Femenino',
         'M' => 'Masculino',
     ];
 
-    const GENDER_CHOICE = [
+    public static $GENDER_CHOICE = [
         'Femenino'  => 'F',
         'Masculino' => 'M',
     ];
 
-    const ORGANIZATION_CHOICE = [
+    public static $ORGANIZATION_CHOICE = [
         'CDR' =>'cdr',
         'CTC' =>'ctc',
         'FMC' =>'fmc',
@@ -82,27 +86,27 @@ class Client
         'PCC' =>'pcc',
     ];
 
-    const CIVIL_STATE = [
+    public static $CIVIL_STATE = [
         'SOL' => 'Soltero(a)',
         'CAS' => 'Casado(a)',
         'DIV' => 'Divorciado(a)',
         'VIU' => 'Viudo(a)',
     ];
 
-    const CIVIL_STATE_CHOICE = [
+    public static $CIVIL_STATE_CHOICE = [
         'Soltero(a)'    =>'SOL',
         'Casado(a)'     =>'CAS',
         'Divorciado(a)' =>'DIV',
         'Viudo(a)'      =>'VIU',
     ];
 
-    const EYES_COLOR_CHOICE = [
+    public static $EYES_COLOR_CHOICE = [
         'Claros'    =>'Claros',
         'Negros'    =>'Negros',
         'Pardos'    =>'Pardos',
     ];
 
-    const SKIN_COLOR_CHOICE = [
+    public static $SKIN_COLOR_CHOICE = [
         'Blanca'    =>'Blanca',
         'Negra'     =>'Negra',
         'Amarilla'  =>'Amarilla',
@@ -110,7 +114,7 @@ class Client
         'Albina'    =>'Albina',
     ];
 
-    const HAIR_COLOR_CHOICE = [
+    public static $HAIR_COLOR_CHOICE = [
         'Canoso'    =>'Canoso',
         'Castaño'   =>'Castaño',
         'Negro'     =>'Negro',
@@ -119,7 +123,7 @@ class Client
         'Otros'     =>'Otros',
     ];
 
-    const TEACHING_CATEGORY = [
+    public static $TEACHING_CATEGORY = [
         'ATD' => 'ATD',
         'ADI' => 'Adiestrado',
         'INS' => 'Instructor',
@@ -128,7 +132,7 @@ class Client
         'TIT' => 'Titular',
     ];
 
-    const TEACHING_CATEGORY_CHOICE = [
+    public static $TEACHING_CATEGORY_CHOICE = [
         'ATD'         => 'ATD',
         'Adiestrado'  => 'ADI',
         'Instructor'  => 'INS',
@@ -137,7 +141,7 @@ class Client
         'Titular'     => 'TIT',
     ];
 
-    const SCIENTIFIC_GRADE = [
+    public static $SCIENTIFIC_GRADE = [
         'LIC' => 'Licenciado(a)',
         'ING' => 'Ingeniero(a)',
         'ARQ' => 'Arquitecto(a)',
@@ -145,7 +149,7 @@ class Client
         'DRC' => 'Doctor(a)',
     ];
 
-    const SCIENTIFIC_GRADE_CHOICE = [
+    public static $SCIENTIFIC_GRADE_CHOICE = [
         'Licenciado(a)'  => 'LIC',
         'Ingeniero(a)'   => 'ING',
         'Arquitecto(a)'  => 'ARQ',
@@ -246,7 +250,7 @@ class Client
     private $shortNameSlug;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="date")
      *
@@ -637,7 +641,7 @@ class Client
     private $studentsPosition;
 
     /**
-     * @var Area
+     * @var Career
      *
      * @ORM\ManyToOne(targetEntity="DRI\UsefulBundle\Entity\Career", inversedBy="students", cascade={"persist", "merge"})
      * @ORM\JoinColumn(name="career_id", referencedColumnName="id")
@@ -662,7 +666,7 @@ class Client
     private $studentsState;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime", nullable=true)
      *
@@ -671,7 +675,7 @@ class Client
     private $studentsLastUpdate;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime", nullable=true)
      *
@@ -754,7 +758,7 @@ class Client
     private $workersWorkPlace;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="date", nullable=true)
      *
@@ -788,7 +792,7 @@ class Client
     private $workersState;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime", nullable=true)
      *
@@ -797,7 +801,7 @@ class Client
     private $workersLastUpdate;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime", nullable=true)
      *
@@ -839,7 +843,7 @@ class Client
     private $expired;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime", nullable=true)
      *
@@ -848,7 +852,7 @@ class Client
     private $expiredAt;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime")
      *
@@ -857,7 +861,7 @@ class Client
     private $createdAt;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime")
      *
@@ -915,8 +919,8 @@ class Client
     {
         $this->languages = array();
         $this->organizations = array();
-        $this->createdAt = new \DateTime('now');
-        $this->updatedAt = new \DateTime('now');
+        $this->createdAt = new DateTime('now');
+        $this->updatedAt = new DateTime('now');
         $this->enabled = true;
         $this->locked = false;
         $this->expired = false;
@@ -1159,6 +1163,7 @@ class Client
     /**
      * Set shortNameSlug
      *
+     * @param string $shortNameSlug
      * @return Client
      */
     public function setShortNameSlug($shortNameSlug)
@@ -1172,7 +1177,7 @@ class Client
     /**
      * Set birthday
      *
-     * @param \DateTime $birthday
+     * @param DateTime $birthday
      *
      * @return Client
      */
@@ -1186,7 +1191,7 @@ class Client
     /**
      * Get birthday
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getBirthday()
     {
@@ -1317,8 +1322,8 @@ class Client
      * Set clientType
      *
      * @param string $clientType
-     *
      * @return Client
+     * @throws Exception
      */
     public function setClientType($clientType)
     {
@@ -1326,21 +1331,10 @@ class Client
 
         switch ($clientType){
             case 'est':
-                $this->studentsLastUpdate = new \DateTime('now');
-                break;
-            case 'doc':
-                $this->workersLastUpdate = new \DateTime('now');
-                break;
-            case 'nod':
-                $this->workersLastUpdate = new \DateTime('now');
-                break;
-            case 'dir':
-                $this->workersLastUpdate = new \DateTime('now');
-                break;
-            case 'cua':
-                $this->workersLastUpdate = new \DateTime('now');
+                $this->studentsLastUpdate = new DateTime('now');
                 break;
             default:
+                $this->workersLastUpdate = new DateTime('now');
                 break;
         }
 
@@ -1382,9 +1376,11 @@ class Client
     }
 
     /**
-     * @param File|\Symfony\Component\HttpFoundation\File\UploadedFile $clientPicture
+     * Set clientPictureFile
      *
+     * @param File|UploadedFile $clientPicture
      * @return Client
+     * @throws Exception
      */
     public function setClientPictureFile(File $clientPicture = null)
     {
@@ -1393,7 +1389,7 @@ class Client
         if ($clientPicture) {
             // It is required that at least one field changes if you are using doctrine
             // otherwise the event listeners won't be called and the file is lost
-            $this->updatedAt = new \DateTime('now');
+            $this->updatedAt = new DateTime('now');
         }
 
         return $this;
@@ -1408,6 +1404,8 @@ class Client
     }
 
     /**
+     * Add language
+     *
      * @param Language $language
      * @return $this
      */
@@ -1419,6 +1417,8 @@ class Client
     }
 
     /**
+     * Remove language
+     *
      * @param Language $language
      * @return $this
      */
@@ -2288,7 +2288,7 @@ class Client
     /**
      * Get passports
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection
      */
     public function getPassports()
     {
@@ -2322,7 +2322,7 @@ class Client
     /**
      * Get passportApplications
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection
      */
     public function getPassportsApplication()
     {
@@ -2448,16 +2448,17 @@ class Client
      * @param string $studentsState
      *
      * @return Client
+     * @throws Exception
      */
     public function setStudentsState($studentsState)
     {
         $this->studentsState = $studentsState;
         if ($studentsState){
-            $this->studentsLastUpdate = new \DateTime('now');
+            $this->studentsLastUpdate = new DateTime('now');
         }
 
         if ($studentsState == 'EGR' || $studentsState == 'BAJ'){
-            $this->studentsInactiveAt = new \DateTime('now');
+            $this->studentsInactiveAt = new DateTime('now');
         }
 
         return $this;
@@ -2476,7 +2477,7 @@ class Client
     /**
      * Get studentsLastUpdate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getStudentsLastUpdate()
     {
@@ -2486,7 +2487,7 @@ class Client
     /**
      * Get studentsInactiveAt
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getStudentsInactiveAt()
     {
@@ -2704,7 +2705,7 @@ class Client
     /**
      * Set workersAdmissionDate
      *
-     * @param \DateTime $workersAdmissionDate
+     * @param DateTime $workersAdmissionDate
      *
      * @return Client
      */
@@ -2718,7 +2719,7 @@ class Client
     /**
      * Get workersAdmissionDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getWorkersAdmissionDate()
     {
@@ -2779,17 +2780,18 @@ class Client
      * @param string $workersState
      *
      * @return Client
+     * @throws Exception
      */
     public function setWorkersState($workersState)
     {
         $this->workersState = $workersState;
 
         if ($workersState){
-            $this->workersLastUpdate = new \DateTime('now');
+            $this->workersLastUpdate = new DateTime('now');
         }
 
         if ($workersState == 'BAJ'){
-            $this->workersInactiveAt = new \DateTime('now');
+            $this->workersInactiveAt = new DateTime('now');
         }
 
         return $this;
@@ -2808,7 +2810,7 @@ class Client
     /**
      * Get workersLastUpdate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getWorkersLastUpdate()
     {
@@ -2818,7 +2820,7 @@ class Client
     /**
      * Get workersInactiveAt
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getWorkersInactiveAt()
     {
@@ -2891,13 +2893,14 @@ class Client
      * @param boolean $expired
      *
      * @return Client
+     * @throws Exception
      */
     public function setExpired($expired)
     {
         $this->expired = $expired;
 
         if ($expired){
-            $this->expiredAt = new \DateTime('now');
+            $this->expiredAt = new DateTime('now');
         }
 
         return $this;
@@ -2916,7 +2919,7 @@ class Client
     /**
      * Get expiredAt
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getExpiredAt()
     {
@@ -2929,10 +2932,11 @@ class Client
      * @ORM\PrePersist
      *
      * @return Client
+     * @throws Exception
      */
     public function setCreatedAt()
     {
-        $this->createdAt = new \DateTime('now');
+        $this->createdAt = new DateTime('now');
 
         return $this;
     }
@@ -2940,7 +2944,7 @@ class Client
     /**
      * Get createdAt
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getCreatedAt()
     {
@@ -2953,10 +2957,11 @@ class Client
      * @ORM\PreUpdate
      *
      * @return Client
+     * @throws Exception
      */
     public function setUpdatedAt()
     {
-        $this->updatedAt = new \DateTime('now');
+        $this->updatedAt = new DateTime('now');
 
         return $this;
     }
@@ -2964,7 +2969,7 @@ class Client
     /**
      * Get updatedAt
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getUpdatedAt()
     {
@@ -3013,7 +3018,7 @@ class Client
     /**
      * Set studentsLastUpdate
      *
-     * @param \DateTime $studentsLastUpdate
+     * @param DateTime $studentsLastUpdate
      *
      * @return Client
      */
@@ -3027,7 +3032,7 @@ class Client
     /**
      * Set studentsInactiveAt
      *
-     * @param \DateTime $studentsInactiveAt
+     * @param DateTime $studentsInactiveAt
      *
      * @return Client
      */
@@ -3041,7 +3046,7 @@ class Client
     /**
      * Set workersLastUpdate
      *
-     * @param \DateTime $workersLastUpdate
+     * @param DateTime $workersLastUpdate
      *
      * @return Client
      */
@@ -3055,7 +3060,7 @@ class Client
     /**
      * Set workersInactiveAt
      *
-     * @param \DateTime $workersInactiveAt
+     * @param DateTime $workersInactiveAt
      *
      * @return Client
      */
@@ -3069,7 +3074,7 @@ class Client
     /**
      * Set expiredAt
      *
-     * @param \DateTime $expiredAt
+     * @param DateTime $expiredAt
      *
      * @return Client
      */
@@ -3131,7 +3136,7 @@ class Client
     /**
      * Get exitApplications
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection
      */
     public function getExitApplications()
     {
@@ -3213,7 +3218,7 @@ class Client
     /**
      * Get departures
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection
      */
     public function getDepartures()
     {
@@ -3231,7 +3236,10 @@ class Client
      **********************************************************************************/
 
 
-
+    /**
+     * @param $clientType
+     * @return string
+     */
     static function clientType_AcronimToName($clientType){
         switch ($clientType){
             case 'dir': return 'Directivo';break;
@@ -3243,6 +3251,10 @@ class Client
         }
     }
 
+    /**
+     * @param $clientType
+     * @return string
+     */
     static function clientType_NameToAcronim($clientType){
         switch ($clientType){
             case 'Directivo': return 'dir';break;
@@ -3254,6 +3266,10 @@ class Client
         }
     }
 
+    /**
+     * @param $gender
+     * @return string
+     */
     static function gender_AcronimToName($gender){
         switch ($gender){
             case 'F': return 'Femenino';break;
@@ -3262,6 +3278,10 @@ class Client
         }
     }
 
+    /**
+     * @param $gender
+     * @return string
+     */
     static function gender_NameToAcronim($gender){
         switch ($gender){
             case 'Femenino': return 'F';break;
@@ -3270,6 +3290,10 @@ class Client
         }
     }
 
+    /**
+     * @param $civilState
+     * @return string
+     */
     static function civilState_AcronimToName($civilState){
         switch ($civilState){
             case 'SOL': return 'Soltero(a)';break;
@@ -3280,6 +3304,10 @@ class Client
         }
     }
 
+    /**
+     * @param $civilState
+     * @return string
+     */
     static function civilState_NameToAcronim($civilState){
         switch ($civilState){
             case 'Soltero(a)': return 'SOL';break;
@@ -3290,6 +3318,10 @@ class Client
         }
     }
 
+    /**
+     * @param $teachingCategory
+     * @return string
+     */
     static function teachingCategory_AcronimToName($teachingCategory){
         switch ($teachingCategory){
             case 'ATD': return 'ATD';break;
@@ -3302,6 +3334,10 @@ class Client
         }
     }
 
+    /**
+     * @param $teachingCategory
+     * @return string
+     */
     static function teachingCategory_NameToAcronim($teachingCategory){
         switch ($teachingCategory){
             case 'ATD': return 'ATD';break;
@@ -3314,6 +3350,10 @@ class Client
         }
     }
 
+    /**
+     * @param $scientificGrade
+     * @return string
+     */
     static function scientificGrade_AcronimToName($scientificGrade){
         switch ($scientificGrade){
             case 'LIC': return 'Licenciado(a)';break;
@@ -3325,6 +3365,10 @@ class Client
         }
     }
 
+    /**
+     * @param $scientificGrade
+     * @return string
+     */
     static function scientificGrade_NameToAcronim($scientificGrade){
         switch ($scientificGrade){
             case 'Licenciado(a)': return 'LIC';break;

@@ -8,22 +8,17 @@
 
 namespace DRI\ClientBundle\Form;
 
-use Doctrine\ORM\Mapping\Entity;
-use DRI\ClientBundle\Entity\Client;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
-use Symfony\Component\Form\Extension\Core\Type\NumberType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+
 use Doctrine\ORM\EntityRepository;
 
-
+use DRI\ClientBundle\Entity\Client;
 use DRI\UsefulBundle\Form\DatePickerType;
 
 /**
@@ -39,8 +34,9 @@ class ClientDataAtCenterType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            //Datos en la UC
-                //Estudiantes
+            /*
+             * ESTUDIANTES
+             */
             ->add('studentsYear', TextType::class, [
                 'required' => false,
                 'attr' => [
@@ -77,7 +73,9 @@ class ClientDataAtCenterType extends AbstractType
                 'required' => false
             ])
 
-            //Trabajadores
+            /*
+             * TRABAJADORES
+             */
             ->add('workersOccupation', TextType::class, [
                 'required' => false,
                 'attr' => [
@@ -93,7 +91,7 @@ class ClientDataAtCenterType extends AbstractType
             ->add('workersEduCategory', ChoiceType::class, array(
                 'placeholder' => 'Selecciones la categoría docente',
                 'label' => 'Categoría Docente',
-                'choices'  => Client::TEACHING_CATEGORY_CHOICE,
+                'choices'  => Client::$TEACHING_CATEGORY_CHOICE,
                 'attr' => array(
                     'class'=>'bs-select',
                 ),
@@ -101,7 +99,7 @@ class ClientDataAtCenterType extends AbstractType
             ->add('workersSciGrade', ChoiceType::class, array(
                 'placeholder' => 'Selecciones el grado científico',
                 'label' => 'Grado Científico',
-                'choices'  => Client::SCIENTIFIC_GRADE_CHOICE,
+                'choices'  => Client::$SCIENTIFIC_GRADE_CHOICE,
                 'attr' => array(
                     'class'=>'bs-select',
                 ),

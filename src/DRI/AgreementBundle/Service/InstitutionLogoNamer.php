@@ -10,12 +10,21 @@ namespace DRI\AgreementBundle\Service;
 
 use Vich\UploaderBundle\Naming\NamerInterface;
 use Vich\UploaderBundle\Mapping\PropertyMapping;
+
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+
 use DRI\UsefulBundle\Useful\Useful;
+use DRI\AgreementBundle\Entity\Institution;
 
 class InstitutionLogoNamer implements NamerInterface
 {
-
+    /**
+     * Creates a name for the file being uploaded.
+     *
+     * @param Institution $institution
+     * @param PropertyMapping $logo
+     * @return string
+     */
     public function name($institution, PropertyMapping $logo)
     {
         $file = $logo->getFile($institution);
@@ -32,6 +41,10 @@ class InstitutionLogoNamer implements NamerInterface
         return $name;
     }
 
+    /**
+     * @param UploadedFile $file
+     * @return mixed|string|null
+     */
     private function getExtension(UploadedFile $file)
     {
         $originalName = $file->getClientOriginalName();

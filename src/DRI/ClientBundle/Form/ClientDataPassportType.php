@@ -8,23 +8,16 @@
 
 namespace DRI\ClientBundle\Form;
 
-use DRI\ClientBundle\Entity\Client;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
-use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\LanguageType;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Doctrine\ORM\EntityRepository;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
-
-use DRI\UsefulBundle\Form\DatePickerType;
+use DRI\ClientBundle\Entity\Client;
 
 /**
  * Class ClientType
@@ -40,7 +33,9 @@ class ClientDataPassportType extends AbstractType
     {
         $builder
 
-            //Datos de pasaporte
+            /*
+             * DATOS DE PASAPORTE
+             */
             ->add('mothersName',TextType::class, [
                 'required' => false,
                 'attr' => [
@@ -56,7 +51,7 @@ class ClientDataPassportType extends AbstractType
             ->add('civilState', ChoiceType::class, array(
                 'placeholder' => 'Seleccione estado civil',
                 'label' => 'Estado civil',
-                'choices'  => Client::CIVIL_STATE_CHOICE,
+                'choices'  => Client::$CIVIL_STATE_CHOICE,
                 'attr' => array(
                     'class'=>'bs-select',
                 ),
@@ -76,7 +71,7 @@ class ClientDataPassportType extends AbstractType
             ->add('eyesColor', ChoiceType::class, array(
                 'placeholder' => 'Seleccione color de los ojos',
                 'label' => 'Color de los ojos',
-                'choices'  => Client::EYES_COLOR_CHOICE,
+                'choices'  => Client::$EYES_COLOR_CHOICE,
                 'attr' => array(
                     'class'=>'bs-select',
                 ),
@@ -85,7 +80,7 @@ class ClientDataPassportType extends AbstractType
             ->add('skinColor', ChoiceType::class, array(
                 'placeholder' => 'Seleccione color de la piel',
                 'label' => 'Color de la piel',
-                'choices'  => Client::SKIN_COLOR_CHOICE,
+                'choices'  => Client::$SKIN_COLOR_CHOICE,
                 'attr' => array(
                     'class'=>'bs-select',
                 ),
@@ -94,7 +89,7 @@ class ClientDataPassportType extends AbstractType
             ->add('hairColor', ChoiceType::class, array(
                 'placeholder' => 'Seleccione color del cabello',
                 'label' => 'Color del cabello',
-                'choices'  => Client::HAIR_COLOR_CHOICE,
+                'choices'  => Client::$HAIR_COLOR_CHOICE,
                 'attr' => array(
                     'class'=>'bs-select',
                 ),

@@ -2,29 +2,21 @@
 
 namespace DRI\ClientBundle\Controller;
 
-use DRI\ClientBundle\Datatables\ClientDatatable;
-use DRI\ClientBundle\Entity\Client;
-
-use PhpParser\Node\Scalar\String_;
-use Sg\DatatablesBundle\Datatable\DatatableInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Symfony\Component\Security\Acl\Exception\Exception;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\HttpFoundation\JsonResponse;
+
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Form\FormInterface;
 
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
-use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
-use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Exception;
 
 use DRI\UsefulBundle\Useful\Useful;
+use DRI\ClientBundle\Entity\Client;
 
 
 /**
@@ -37,40 +29,28 @@ class ClientController extends Controller
     /**
      * Estatistics for Client entities.
      *
-     * @param Request $request
-     *
      * @Route("/index", name="client_index")
-     *
      * @return Response
      */
-    public function indexAction(Request $request)
+    public function indexAction()
     {
-        return $this->render('DRIClientBundle:Client:index.html.twig', array(
-
-        ));
+        return $this->render('DRIClientBundle:Client:index.html.twig');
     }
 
     /**
      * Lists all Client entities.
      *
      * @param Request $request
-     *
-     * @Route("/list", name="client_list")
-     * @Method("GET")
-     *
+     * @Route("/list", name="client_list", methods={"GET"})
      * @return Response
+     * @throws Exception
      */
     public function listAction(Request $request)
     {
         $isAjax = $request->isXmlHttpRequest();
 
         // Get your Datatable ...
-        //$datatable = $this->get('app.datatable.client');
-        //$datatable->buildDatatable();
-
-        // or use the DatatableFactory
-        /** @var DatatableInterface $datatable */
-        $datatable = $this->get('sg_datatables.factory')->create(ClientDatatable::class);
+        $datatable = $this->get('app.datatable.client.client');
         $datatable->buildDatatable();
 
         if ($isAjax) {
@@ -90,12 +70,9 @@ class ClientController extends Controller
      * Creates a new client entity.
      *
      * @param Request $request
-     *
-     * @Route("/new", name="client_new")
-     * @Method({"GET", "POST"})
+     * @Route("/new", name="client_new", methods={"GET","POST"})
      * @Security("has_role('ROLE_REQUIRE_SPECIALIST') or has_role('ROLE_INFO_SPECIALIST')")
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return RedirectResponse|Response
      */
     public function newAction(Request $request)
     {
@@ -119,12 +96,11 @@ class ClientController extends Controller
         if ($form->isSubmitted() && $form->isValid()) {
             $em->persist($client);
 
-            $passport = $passRepo->findOneByClientCi($client->getCI());
+            $passport = $passRepo->findOneBy(['clientCi'],$client);
             if($passport){
                 $passport->setHolder($client);
                 $em->persist($passport);
             }
-
 
             $em->flush();
 
@@ -141,10 +117,7 @@ class ClientController extends Controller
      * Finds and displays a client entity.
      *
      * @param Client $client
-     *
-     * @Route("/profile/{fullNameSlug}", name="client_profile", options = {"expose" = true})
-     * @Method("GET")
-     *
+     * @Route("/profile/{fullNameSlug}", name="client_profile", options = {"expose" = true}, methods={"GET"})
      * @return Response
      */
     public function profileAction(Client $client)
@@ -162,12 +135,10 @@ class ClientController extends Controller
      *
      * @param Request $request
      * @param Client  $client
-     *
-     * @Route("/config/{fullNameSlug}", name="client_config", options = {"expose" = true})
-     * @Method({"GET", "POST"})
+     * @Route("/config/{fullNameSlug}", name="client_config", options = {"expose" = true}, methods={"GET", "POST"})
      * @Security("has_role('ROLE_REQUIRE_SPECIALIST') or has_role('ROLE_INFO_SPECIALIST')")
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return RedirectResponse|Response
      */
     public function configAction(Request $request, Client $client)
     {
@@ -219,12 +190,9 @@ class ClientController extends Controller
      *
      * @param Request $request
      * @param Client  $client
-     *
-     * @Route("/{id}", name="client_delete")
-     * @Method("DELETE")
+     * @Route("/{id}", name="client_delete", methods={"DELETE"})
      * @Security("has_role('ROLE_ADMIN')")
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @return RedirectResponse
      */
     public function deleteAction(Request $request, Client $client)
     {
@@ -244,8 +212,7 @@ class ClientController extends Controller
      * Creates a form to delete a client entity.
      *
      * @param Client $client The client entity
-     *
-     * @return \Symfony\Component\Form\Form The form
+     * @return FormInterface The form
      */
     private function createDeleteForm(Client $client)
     {
@@ -260,11 +227,8 @@ class ClientController extends Controller
      * Bulk delete action.
      *
      * @param Request $request
-     *
-     * @Route("/bulk/delete", name="client_bulk_delete")
-     * @Method({"GET", "POST"})
+     * @Route("/bulk/delete", name="client_bulk_delete", methods={"GET", "POST"})
      * @Security("has_role('ROLE_ADMIN')")
-     *
      * @return Response
      */
     public function bulkDeleteAction(Request $request)
@@ -303,9 +267,7 @@ class ClientController extends Controller
      * Get all Users from Database to show in Select2-Filter.
      *
      * @param Request $request
-     *
      * @Route("/usernames", name="select2_usernames")
-     *
      * @return JsonResponse|Response
      */
     public function select2CreatedByUsersnames(Request $request)
@@ -328,13 +290,11 @@ class ClientController extends Controller
 
     /**
      * Generate and save a PDF
-     *
+     * @param Client $client
      * @Route("/{id}/pdf", name="client_pdf")
+     * @return Response
      */
-    public function pdfAction(Client $client, Request $request) {
-        $em = $this->getDoctrine()->getManager();
-        $c = $em->getRepository('DRIClientBundle:Client')->find($client);
-
+    public function pdfAction(Client $client) {
         $html = $this->renderView('DRIClientBundle::pdf_report.html.twig', [
             'client' => $client
         ]);
@@ -368,10 +328,7 @@ class ClientController extends Controller
      * Available CI.
      *
      * @param Request $request
-     *
-     * @Route("/ci-available", name="client__ci_is_available", options={"expose"=true})
-     * @Method({"GET", "POST"})
-     *
+     * @Route("/ci-available", name="client__ci_is_available", options={"expose"=true}, methods={"GET", "POST"})
      * @return JsonResponse|Response
      */
     public function isAvailableCIAction(Request $request){
@@ -381,15 +338,14 @@ class ClientController extends Controller
             $ci = $request->request->get('ci');
 
             $em = $this->getDoctrine()->getManager();
-            $exist = $em->getRepository('DRIClientBundle:Client')->findOneByCi($ci);
+            $exist = $em->getRepository('DRIClientBundle:Client')->findOneBy(['ci'],$ci);
 
             if(!$exist){
                 return new JsonResponse(true);
             }
-            else {
-                return new JsonResponse(false);
-            }
         }
+
+        return new JsonResponse(false);
 
     }
 
@@ -397,10 +353,7 @@ class ClientController extends Controller
      * Available Email.
      *
      * @param Request $request
-     *
-     * @Route("/email-available", name="client__email_is_available", options={"expose"=true})
-     * @Method({"GET", "POST"})
-     *
+     * @Route("/email-available", name="client__email_is_available", options={"expose"=true}, methods={"GET", "POST"})
      * @return JsonResponse|Response
      */
     public function isAvailableEmailAction(Request $request){
@@ -410,15 +363,14 @@ class ClientController extends Controller
             $email = $request->request->get('email');
 
             $em = $this->getDoctrine()->getManager();
-            $exist = $em->getRepository('DRIClientBundle:Client')->findOneByEmail($email);
+            $exist = $em->getRepository('DRIClientBundle:Client')->findOneBy(['email'],$email);
 
             if(!$exist){
                 return new JsonResponse(true);
             }
-            else {
-                return new JsonResponse(false);
-            }
         }
+
+        return new JsonResponse(false);
 
     }
 

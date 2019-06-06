@@ -10,11 +10,21 @@ namespace DRI\ClientBundle\Service;
 
 use Vich\UploaderBundle\Naming\NamerInterface;
 use Vich\UploaderBundle\Mapping\PropertyMapping;
+
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+
+use DRI\ClientBundle\Entity\Client;
 
 class ClientImageNamer implements NamerInterface
 {
 
+    /**
+     * Creates a name for the file being uploaded.
+     *
+     * @param Client $client
+     * @param PropertyMapping $clientPicture
+     * @return string
+     */
     public function name($client, PropertyMapping $clientPicture)
     {
         $file = $clientPicture->getFile($client);
@@ -29,6 +39,10 @@ class ClientImageNamer implements NamerInterface
         return $name;
     }
 
+    /**
+     * @param UploadedFile $file
+     * @return mixed|string|null
+     */
     private function getExtension(UploadedFile $file)
     {
         $originalName = $file->getClientOriginalName();

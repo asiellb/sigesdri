@@ -8,28 +8,24 @@
 
 namespace DRI\ClientBundle\Form;
 
-use DRI\ClientBundle\Entity\Client;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\LanguageType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+
 use Doctrine\ORM\EntityRepository;
 
-use DRI\UsefulBundle\Form\DatePickerType;
 use Presta\ImageBundle\Form\Type\ImageType;
 
-use Vich\UploaderBundle\Form\Type\VichFileType;
-use Vich\UploaderBundle\Form\Type\VichImageType;
+use DRI\UsefulBundle\Form\DatePickerType;
 
-use DRI\UsefulBundle\Entity\Area;
+use DRI\ClientBundle\Entity\Client;
 
 /**
  * Class ClientType
@@ -44,7 +40,9 @@ class ClientType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            //Datos Generales
+            /*
+             * DATOS GENERALES
+             */
             ->add('clientPictureFile', ImageType::class, [
                 'cancel_button_class' => 'btn dark btn-outline',
                 'save_button_class' => 'btn green',
@@ -96,7 +94,7 @@ class ClientType extends AbstractType
                 'label_attr' => [
                     'class' => 'radio-inline'
                 ],
-                'choices'  => Client::GENDER_CHOICE,
+                'choices'  => Client::$GENDER_CHOICE,
                 'attr' => array(
                     'class'=>'radio-list',
                 ),
@@ -138,7 +136,7 @@ class ClientType extends AbstractType
                 'label_attr' => [
                     'class' => 'radio-inline'
                 ],
-                'choices'  => Client::CLIENT_TYPES_CHOICE,
+                'choices'  => Client::$CLIENT_TYPES_CHOICE,
                 'attr' => array(
                     'class'=>'radio-list',
                 ),
@@ -160,11 +158,13 @@ class ClientType extends AbstractType
                 'attr' => [
                     'class' => 'select2-multiple'
                 ],
-                'choices'  => Client::ORGANIZATION_CHOICE,
+                'choices'  => Client::$ORGANIZATION_CHOICE,
                 'multiple'=> true,
             ])
 
-            //Datos de pasaporte
+            /*
+             * DATOS DE PASAPORTE
+             */
             ->add('mothersName',TextType::class, [
                 'required' => false,
                 'attr' => [
@@ -180,7 +180,7 @@ class ClientType extends AbstractType
             ->add('civilState', ChoiceType::class, array(
                 'placeholder' => 'Seleccione estado civil',
                 'label' => 'Estado civil',
-                'choices'  => Client::CIVIL_STATE_CHOICE,
+                'choices'  => Client::$CIVIL_STATE_CHOICE,
                 'attr' => array(
                     'class'=>'bs-select',
                 ),
@@ -200,7 +200,7 @@ class ClientType extends AbstractType
             ->add('eyesColor', ChoiceType::class, array(
                 'placeholder' => 'Seleccione color de los ojos',
                 'label' => 'Color de los ojos',
-                'choices'  => Client::EYES_COLOR_CHOICE,
+                'choices'  => Client::$EYES_COLOR_CHOICE,
                 'attr' => array(
                     'class'=>'bs-select',
                 ),
@@ -209,7 +209,7 @@ class ClientType extends AbstractType
             ->add('skinColor', ChoiceType::class, array(
                 'placeholder' => 'Seleccione color de la piel',
                 'label' => 'Color de la piel',
-                'choices'  => Client::SKIN_COLOR_CHOICE,
+                'choices'  => Client::$SKIN_COLOR_CHOICE,
                 'attr' => array(
                     'class'=>'bs-select',
                 ),
@@ -218,7 +218,7 @@ class ClientType extends AbstractType
             ->add('hairColor', ChoiceType::class, array(
                 'placeholder' => 'Seleccione color del cabello',
                 'label' => 'Color del cabello',
-                'choices'  => Client::HAIR_COLOR_CHOICE,
+                'choices'  => Client::$HAIR_COLOR_CHOICE,
                 'attr' => array(
                     'class'=>'bs-select',
                 ),
@@ -378,9 +378,12 @@ class ClientType extends AbstractType
                 ],
             ])
 
-            //Datos en la UC
+            /*
+             * DATOS EN EL CENTRO
+             */
 
-            //Estudiantes
+            /*Estudiantes*/
+
             ->add('studentsYear', TextType::class, [
                 'required' => false,
                 'attr' => [
@@ -414,7 +417,8 @@ class ClientType extends AbstractType
                 'required' => false
             ])
 
-            //Trabajadores
+            /*Trabajadores*/
+
             ->add('workersOccupation', TextType::class, [
                 'required' => false,
                 'attr' => [
@@ -430,7 +434,7 @@ class ClientType extends AbstractType
             ->add('workersEduCategory', ChoiceType::class, array(
                 'placeholder' => 'Selecciones la categoría docente',
                 'label' => 'Categoría Docente',
-                'choices'  => Client::TEACHING_CATEGORY_CHOICE,
+                'choices'  => Client::$TEACHING_CATEGORY_CHOICE,
                 'attr' => array(
                     'class'=>'bs-select',
                 ),
@@ -438,7 +442,7 @@ class ClientType extends AbstractType
             ->add('workersSciGrade', ChoiceType::class, array(
                 'placeholder' => 'Selecciones el grado científico',
                 'label' => 'Grado Científico',
-                'choices'  => Client::SCIENTIFIC_GRADE_CHOICE,
+                'choices'  => Client::$SCIENTIFIC_GRADE_CHOICE,
                 'attr' => array(
                     'class'=>'bs-select',
                 ),
