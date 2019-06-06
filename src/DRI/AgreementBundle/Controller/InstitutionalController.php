@@ -2,49 +2,22 @@
 
 namespace DRI\AgreementBundle\Controller;
 
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
-use DRI\AgreementBundle\Datatables\InstitutionalDatatable;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-
-use DRI\PassportBundle\Entity\Application;
-use DRI\PassportBundle\Datatables\ApplicationDatatable;
-use DRI\UsefulBundle\Useful\Useful;
-
-use PhpParser\Node\Scalar\String_;
-use Sg\DatatablesBundle\Datatable\DatatableInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Symfony\Component\Security\Acl\Exception\Exception;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\JsonResponse;
-
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
-use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
-use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Pagerfanta\Pagerfanta;
-use Pagerfanta\Adapter\DoctrineORMAdapter;
-use Pagerfanta\View\TwitterBootstrap3View;
-
-// Include the BinaryFileResponse and the ResponseHeaderBag
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Acl\Exception\Exception;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Form\FormInterface;
 
-// Include the requires classes of Phpword
-use PhpOffice\PhpWord\PhpWord;
-use PhpOffice\PhpWord\IOFactory;
-use PhpOffice\PhpWord\Shared\Html;
-use PhpOffice\PhpWord\Shared\Converter;
-use PhpOffice\PhpWord\TemplateProcessor;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
 use DRI\AgreementBundle\Entity\Institutional;
-use DRI\AgreementBundle\Form\InstitutionalType;
+use DRI\AgreementBundle\Entity\Application;
 
 
 /**
@@ -57,37 +30,27 @@ class InstitutionalController extends Controller
     /**
      * Lists all Institutional entities.
      *
-     * @Route("/index", name="agreement_institutional_index")
-     * @Method("GET")
+     * @Route("/index", name="agreement_institutional_index", methods={"GET"})
+     * @return Response
      */
-    public function indexAction(Request $request)
+    public function indexAction()
     {
-        return $this->render('DRIAgreementBundle:Institutional:index.html.twig', array(
-
-        ));
+        return $this->render('DRIAgreementBundle:Institutional:index.html.twig');
     }
 
     /**
      * Lists all Institutional Agreements entities.
      *
      * @param Request $request
-     *
-     * @Route("/list", name="agreement_institutional_list")
-     * @Method("GET")
-     *
+     * @Route("/list", name="agreement_institutional_list", methods={"GET"})
      * @return Response
+     * @throws \Exception
      */
     public function listAction(Request $request)
     {
         $isAjax = $request->isXmlHttpRequest();
 
-        // Get your Datatable ...
-        //$datatable = $this->get('app.datatable.client');
-        //$datatable->buildDatatable();
-
-        // or use the DatatableFactory
-        /** @var DatatableInterface $datatable */
-        $datatable = $this->get('sg_datatables.factory')->create(InstitutionalDatatable::class);
+        $datatable = $this->get('app.datatable.agreement.institutional');
         $datatable->buildDatatable();
 
         if ($isAjax) {
@@ -106,16 +69,17 @@ class InstitutionalController extends Controller
     /**
      * Displays a form to create a new Institutional entity.
      *
-     * @Route("/new/{application}", name="agreement_institutional_new")
-     * @Method({"GET", "POST"})
+     * @param Request $request
+     * @param Application $application
+     * @Route("/new/{application}", name="agreement_institutional_new", methods={"GET", "POST"})
      * @Security("has_role('ROLE_MANAGE_SPECIALIST')")
+     * @return Response
      */
-    public function newAction(Request $request, $application = null)
+    public function newAction(Request $request, Application $application = null)
     {
         $user   = null;
         $app    = null;
         $inst   = null;
-        $lastVisited = $request->server->get('HTTP_REFERER');
 
         if($this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             $user = $this->getUser();  // get $user object
@@ -179,8 +143,9 @@ class InstitutionalController extends Controller
     /**
      * Finds and displays a Institutional entity.
      *
-     * @Route("/view/{id}", name="agreement_institutional_show", options = {"expose" = true})
-     * @Method("GET")
+     * @param Institutional $institutional
+     * @Route("/view/{id}", name="agreement_institutional_show", options = {"expose" = true}, methods={"GET"})
+     * @return Response
      */
     public function showAction(Institutional $institutional)
     {
@@ -194,9 +159,11 @@ class InstitutionalController extends Controller
     /**
      * Displays a form to edit an existing Institutional entity.
      *
-     * @Route("/edit/{id}", name="agreement_institutional_edit", options = {"expose" = true})
-     * @Method({"GET", "POST"})
+     * @param Request $request
+     * @param Institutional $institutional
+     * @Route("/edit/{id}", name="agreement_institutional_edit", options = {"expose" = true}, methods={"GET", "POST"})
      * @Security("has_role('ROLE_MANAGE_SPECIALIST')")
+     * @return Response
      */
     public function editAction(Request $request, Institutional $institutional)
     {
@@ -249,9 +216,11 @@ class InstitutionalController extends Controller
     /**
      * Deletes a Institutional entity.
      *
-     * @Route("/{id}", name="agreement_institutional_delete")
-     * @Method("DELETE")
+     * @param Request $request
+     * @param Institutional $institutional
+     * @Route("/{id}", name="agreement_institutional_delete", methods={"DELETE"})
      * @Security("has_role('ROLE_ADMIN')")
+     * @return Response
      */
     public function deleteAction(Request $request, Institutional $institutional)
     {
@@ -275,8 +244,7 @@ class InstitutionalController extends Controller
      * Creates a form to delete a Institutional entity.
      *
      * @param Institutional $institutional The Institutional entity
-     *
-     * @return \Symfony\Component\Form\Form The form
+     * @return FormInterface The form
      */
     private function createDeleteForm(Institutional $institutional)
     {
@@ -290,10 +258,10 @@ class InstitutionalController extends Controller
     /**
      * Delete Institutional by id
      *
-     * @param mixed $id The entity id
-     * @Route("/delete/{id}", name="agreement_institutional_by_id_delete")
-     * @Method("GET")
+     * @param Institutional $institutional The entity id
+     * @Route("/delete/{id}", name="agreement_institutional_by_id_delete", methods={"GET"})
      * @Security("has_role('ROLE_ADMIN')")
+     * @return Response
      */
     public function deleteByIdAction(Institutional $institutional){
         $em = $this->getDoctrine()->getManager();
@@ -309,13 +277,14 @@ class InstitutionalController extends Controller
         return $this->redirect($this->generateUrl('agreement_institutional_list'));
 
     }
-    
 
     /**
-    * Bulk Action
-    * @Route("/bulk-action/", name="agreement_institutional_bulk_delete")
-    * @Method("POST")
+     * Bulk Action
+     *
+     * @param Request $request
+     * @Route("/bulk-action/", name="agreement_institutional_bulk_delete", methods={"POST"})
      * @Security("has_role('ROLE_ADMIN')")
+     * @return Response
     */
     public function bulkAction(Request $request)
     {
@@ -349,37 +318,11 @@ class InstitutionalController extends Controller
         return new Response('Solicitud incorrecta', 400);
     }
 
-
-    /**
-     * Assign numberSlug for Application entity.
-     *
-     * @Route("/assign_institutional_number/")
-     * @Security("has_role('ROLE_ADMIN')")
-     *
-     */
-    public function assignInstitutionalNumberSlug(){
-
-        $em = $this->getDoctrine()->getManager();
-        $instRepo   = $em->getRepository('DRIAgreementBundle:Institutional');
-
-        $agreements = $instRepo->findByNumber('');
-
-        foreach ($agreements as $agreement){
-            $agreement->setNumber();
-
-            $em->persist($agreement);
-            $em->flush();
-        }
-    }
-
     /**
      * Returns a JSON string with the dependencies of the Application with the providen id.
      *
      * @param Request $request
-     *
-     * @Route("/list_agreement_application_dependencies", name="list_agreement_application_dependencies", options={"expose"=true})
-     * @Method({"POST"})
-     *
+     * @Route("/list_agreement_application_dependencies", name="list_agreement_application_dependencies", options={"expose"=true}, methods={"POST"})
      * @return JsonResponse|Response
      */
     public function listApplicationDependenciesAction(Request $request)
@@ -392,9 +335,7 @@ class InstitutionalController extends Controller
             $application = $request->request->get('application');
             $application = (int)$application;
 
-
-
-            $app = $applicationRepository->findOneById($application);
+            $app = $applicationRepository->findOneBy(['Id'],$application);
 
             if(!$app){
                 throw $this->createNotFoundException("No llego la ficha.");
@@ -413,28 +354,27 @@ class InstitutionalController extends Controller
                 "name" => $name
             ];
 
-            //throw new Exception($institutionList);
-
             // Return array with structure of the passports of the providen client id
             return new JsonResponse(
                 array(
-                    'institutions'     => $institutionList
+                    'institutions' => $institutionList
                 )
             );
         }
+
+        return new JsonResponse([
+            'success' => false,
+            'message' => 'Error a la hora de obtener las dependencias',
+        ]);
     }
 
     /**
      * Returns a JSON string with the dependencies of the Application with the providen id.
      *
-     * @param Request $request
-     *
-     * @Route("/report/annual", name="list_agreement_annual_report", options={"expose"=true})
-     * @Method({"GET", "POST"})
-     *
+     * @Route("/report/annual", name="list_agreement_annual_report", options={"expose"=true}, methods={"GET", "POST"})
      * @return Response
      */
-    public function listAnnualReportAction(Request $request)
+    public function listAnnualReportAction()
     {
         $countryArray = $this->getAnnualReport();
 
@@ -450,7 +390,7 @@ class InstitutionalController extends Controller
      *
      * @Route("/report/annual/pdf", name="list_agreement_annual_report_pdf")
      */
-    public function pdfAnnualReportAction(Request $request) {
+    public function pdfAnnualReportAction() {
         $countryArray = $this->getAnnualReport();
 
         $header = $this->renderView(':pdf:header_pdf_base.html.twig');
@@ -504,16 +444,14 @@ class InstitutionalController extends Controller
         return $response;
     }
 
-
     /**
      * Generate and save a PDF
      *
      * @Route("/report/annual/word", name="list_agreement_annual_report_word")
+     * @throws \Exception
      */
-    public function annualReportAction(Request $request)
+    public function annualReportAction()
     {
-        $em = $this->getDoctrine()->getManager();
-
         $name = 'Reporte Anual de Convenios';
         $filename = sprintf('%s - %s.docx', $name, date('Y'));
         $template = "report_templates/agreements_report_template_1.docx";
@@ -555,49 +493,43 @@ class InstitutionalController extends Controller
         return $response;
     }
 
-
+    /**
+     * @return array
+     */
     public function getAnnualReport(){
         $em = $this->getDoctrine()->getManager();
 
         $institutionalRepo  = $em->getRepository('DRIAgreementBundle:Institutional');
-        $institutionRepo    = $em->getRepository('DRIAgreementBundle:Institution');
         $countryRepo        = $em->getRepository('DRIUsefulBundle:Country');
-
-        //for agreements pages
 
         $agreementList = $institutionalRepo->findAll();
 
         $countriesList = array();
-        $finalArray = array();
-        $regionsArray = array();
 
         foreach ($agreementList as $agreement) {
-            //$regionsArray[] = $agreement->getInstitution()->getCountry()->getContinent();
             $countriesList[] = $agreement->getCountry();
         }
 
-        //$regionsArray = array_unique($regionsArray);
         $countriesList = array_unique($countriesList);
-        //asort($countriesArray);
 
         $countryArray = array();
 
         foreach ($countriesList as $country) {
-            $agreementsTotal = 0;
             $agreementsActive = 0;
             $agreementsReactived = 0;
             $agreementsSigned = 0;
 
-            $continent = $country->getContinent();
-            if($country->getSubArea() == null){
-                $area = $country->getArea();
+            $currentCountry = $countryRepo->findOneBy($country);
+            $continent = $currentCountry->getContinent();
+            if($currentCountry->getSubArea() == null){
+                $area = $currentCountry->getArea();
             }else{
-                $area = $country->getSubArea();
+                $area = $currentCountry->getSubArea();
             }
 
-            $agreementsTotal = count($institutionalRepo->findByCountry($country));
+            $agreementsTotal = count($institutionalRepo->findBy(['country'],$country));
 
-            foreach ($institutionalRepo->findByCountry($country) as $agreement){
+            foreach ($institutionalRepo->findBy(['country'],$country) as $agreement){
                 if($agreement->isActive()){
                     $agreementsActive = $agreementsActive + 1;
                 }
@@ -611,7 +543,7 @@ class InstitutionalController extends Controller
             $countryArray[] = array(
                 'cont'                  => $continent,
                 'region'                => $area,
-                'name'                  => $country->getSpName(),
+                'name'                  => $currentCountry->getSpName(),
                 'agreementsTotal'       => $agreementsTotal,
                 'agreementsActive'      => $agreementsActive,
                 'agreementsSigned'      => $agreementsSigned,
@@ -621,8 +553,8 @@ class InstitutionalController extends Controller
 
         foreach ($countryArray as $key => $row) {
             $cont[$key]   = $row['cont'];
-            $region[$key]   = $row['region'];
-            $name[$key]     = $row['name'];
+            $region[$key] = $row['region'];
+            $name[$key]   = $row['name'];
         }
 
         array_multisort($cont, SORT_ASC, $region, SORT_ASC, $name, SORT_ASC, $countryArray);

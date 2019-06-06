@@ -1,13 +1,25 @@
 services:
-#    dri_agreement.example:
-#        class: DRI\AgreementBundle\Example
-#        arguments: ["@service_id", "plain_value", %parameter%]
 
+#   TWIG EXTENSIONS
     twig.extension.agreements:
         class: DRI\AgreementBundle\Twig\Extension\DRIAgreementExtension
         tags:
             - { name: twig.extension }
 
+#   DATATABLES CLASSES
+    app.datatable.agreement.application:
+        class: DRI\AgreementBundle\Datatables\ApplicationDatatable
+        parent: sg_datatables.datatable.abstract
+
+    app.datatable.agreement.institutional:
+        class: DRI\AgreementBundle\Datatables\InstitutionalDatatable
+        parent: sg_datatables.datatable.abstract
+
+    app.datatable.agreement.institution:
+        class: DRI\AgreementBundle\Datatables\InstitutionDatatable
+        parent: sg_datatables.datatable.abstract
+
+#   NAMER CLASSES
     namer.institutions_logos:
         class: DRI\AgreementBundle\Service\InstitutionLogoNamer
         tags:

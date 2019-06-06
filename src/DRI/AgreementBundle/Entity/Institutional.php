@@ -3,19 +3,21 @@
 namespace DRI\AgreementBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\HttpFoundation\File\File;
+
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
-use DRI\ClientBundle\Entity\Language;
-use DRI\ClientBundle\Entity\Organization;
-use DRI\PassportBundle\Entity\Passport;
-use DRI\PassportBundle\Entity\Application as PassportApplication;
-use DRI\ExitBundle\Entity\Departure;
-use DRI\AgreementBundle\Entity\Application;
+use DateTime;
+use DateInterval;
+use Exception;
+
 use DRI\UsefulBundle\Entity\Country;
 use DRI\UsefulBundle\Entity\Area;
 use DRI\UserBundle\Entity\User;
@@ -46,12 +48,12 @@ class Institutional
      * ********************************************************************************
      **********************************************************************************/
 
-    const INSTITUTIONAL_ACTION_TYPE = [
+    public static $INSTITUTIONAL_ACTION_TYPE = [
         'FIR' => 'Firma',
         'OFI' => 'Reactivación',
     ];
 
-    const INSTITUTIONAL_ACTION_TYPE_CHOICE = [
+    public static $INSTITUTIONAL_ACTION_TYPE_CHOICE = [
         'Firma'         =>'FIR',
         'Reactivación'  =>'REA',
     ];
@@ -126,14 +128,14 @@ class Institutional
     private $parent;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="date", nullable=true)
      */
     private $startDate;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="date", nullable=true)
      */
@@ -166,7 +168,7 @@ class Institutional
     private $state;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime")
      *
@@ -175,7 +177,7 @@ class Institutional
     private $createdAt;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime")
      *
@@ -226,8 +228,8 @@ class Institutional
      */
     public function __construct()
     {
-        $this->createdAt = new \DateTime('now');
-        $this->updatedAt = new \DateTime('now');
+        $this->createdAt = new DateTime('now');
+        $this->updatedAt = new DateTime('now');
         $this->benefitedAreas = new ArrayCollection();
     }
 
@@ -252,7 +254,7 @@ class Institutional
     public function isActive(){
         $inDate = $this->getStartDate();
         $exDate = $this->getEndDate();
-        $now    = new \DateTime("now");
+        $now    = new DateTime("now");
 
         if (($now >= $inDate) && ($now <= $exDate))
             return true;
@@ -261,7 +263,7 @@ class Institutional
 
     public function isExpired(){
         $exDate = $this->getEndDate();
-        $now    = new \DateTime("now");
+        $now    = new DateTime("now");
 
         if($exDate != null){
             if ($now > $exDate)
@@ -272,10 +274,10 @@ class Institutional
 
     public function isForExpiring(){
         $exDate = $this->getEndDate();
-        $now    = new \DateTime("now");
+        $now    = new DateTime("now");
         if($exDate){
             $toExDate = clone $exDate;
-            $toExDate->sub(new \DateInterval('P6M'));
+            $toExDate->sub(new DateInterval('P6M'));
 
             if (($now >= $toExDate) && ($now <= $exDate))
                 return true;
@@ -400,7 +402,7 @@ class Institutional
     /**
      * Get institution
      *
-     * @return string
+     * @return Institution
      */
     public function getInstitution()
     {
@@ -458,7 +460,7 @@ class Institutional
     /**
      * Set startDate
      *
-     * @param \DateTime $startDate
+     * @param DateTime $startDate
      *
      * @return Institutional
      */
@@ -472,7 +474,7 @@ class Institutional
     /**
      * Get startDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getStartDate()
     {
@@ -482,7 +484,7 @@ class Institutional
     /**
      * Set endDate
      *
-     * @param \DateTime $endDate
+     * @param DateTime $endDate
      *
      * @return Institutional
      */
@@ -496,7 +498,7 @@ class Institutional
     /**
      * Get endDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getEndDate()
     {
@@ -552,9 +554,10 @@ class Institutional
     }
 
     /**
-     * @param File|\Symfony\Component\HttpFoundation\File\UploadedFile $digitalCopy
+     * @param File|UploadedFile $digitalCopy
      *
      * @return Institutional
+     * @throws Exception
      */
     public function setDigitalCopyFile(File $digitalCopy = null)
     {
@@ -563,7 +566,7 @@ class Institutional
         if ($digitalCopy) {
             // It is required that at least one field changes if you are using doctrine
             // otherwise the event listeners won't be called and the file is lost
-            $this->updatedAt = new \DateTime('now');
+            $this->updatedAt = new DateTime('now');
         }
 
         return $this;
@@ -607,10 +610,11 @@ class Institutional
      * @ORM\PrePersist
      *
      * @return Institutional
+     * @throws Exception
      */
     public function setCreatedAt()
     {
-        $this->createdAt = new \DateTime('now');
+        $this->createdAt = new DateTime('now');
 
         return $this;
     }
@@ -618,7 +622,7 @@ class Institutional
     /**
      * Get createdAt
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getCreatedAt()
     {
@@ -631,10 +635,11 @@ class Institutional
      * @ORM\PreUpdate
      *
      * @return Institutional
+     * @throws Exception
      */
     public function setUpdatedAt()
     {
-        $this->updatedAt = new \DateTime('now');
+        $this->updatedAt = new DateTime('now');
 
         return $this;
     }
@@ -642,7 +647,7 @@ class Institutional
     /**
      * Get updatedAt
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getUpdatedAt()
     {
@@ -726,7 +731,7 @@ class Institutional
     /**
      * Get benefitedAreas
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection
      */
     public function getBenefitedAreas()
     {
@@ -769,8 +774,10 @@ class Institutional
      **********************************************************************************/
 
 
-
-
+    /**
+     * @param $actionType
+     * @return string
+     */
     static function actionType_AcronimToName($actionType){
         switch ($actionType){
             case 'FIR': return 'Firma';break;
@@ -779,6 +786,10 @@ class Institutional
         }
     }
 
+    /**
+     * @param $actionType
+     * @return string
+     */
     static function actionType_NameToAcronim($actionType){
         switch ($actionType){
             case 'Firma': return 'COR';break;

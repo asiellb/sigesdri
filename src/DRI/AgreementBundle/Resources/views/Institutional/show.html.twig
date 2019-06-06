@@ -135,7 +135,7 @@
                                                     <div class="col-md-5 name"> Logo: </div>
                                                     <div class="col-md-7 value">
                                                         <div class="thumbnail" style="width: 120px">
-                                                            <img src="{{ asset(vich_uploader_asset(institutional, 'univLogoFile', 'DRI\\AgreementBundle\\Entity\\Institutional')) }}" style="height: 120px; width: 120px; display: block;">
+                                                            <img src="{{ asset(vich_uploader_asset(institutional, 'univLogoFile', 'DRI\\AgreementBundle\\Entity\\Institutional')) }}" alt="" style="height: 120px; width: 120px; display: block;">
                                                         </div>
                                                     </div>
                                                 </div>
@@ -148,7 +148,7 @@
                                                 <div class="row static-info">
                                                     <div class="col-md-5 name"> URL: </div>
                                                     <div class="col-md-7 value">
-                                                        <a href="{{ institutional.url }}"><i class="la la-link"></i> Visitar el sitio</a>
+                                                        <a href="{{ institutional.institution.url }}"><i class="la la-link"></i> Visitar el sitio</a>
                                                     </div>
                                                 </div>
                                             </div>

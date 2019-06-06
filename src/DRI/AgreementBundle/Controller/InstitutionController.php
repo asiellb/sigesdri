@@ -6,34 +6,14 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Acl\Exception\Exception;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
-use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
-use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Form\FormInterface;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
-use PhpParser\Node\Scalar\String_;
-use Sg\DatatablesBundle\Datatable\DatatableInterface;
-
-use Pagerfanta\Pagerfanta;
-use Pagerfanta\Adapter\DoctrineORMAdapter;
-use Pagerfanta\View\TwitterBootstrap3View;
 
 use DRI\AgreementBundle\Entity\Institution;
-use DRI\AgreementBundle\Form\InstitutionType;
-use DRI\AgreementBundle\Form\InstitutionFilterType;
-use DRI\AgreementBundle\Datatables\InstitutionDatatable;
-
-use DRI\UsefulBundle\Useful\Useful;
-
 
 /**
  * Institution controller.
@@ -43,48 +23,18 @@ use DRI\UsefulBundle\Useful\Useful;
 class InstitutionController extends Controller
 {
     /**
-     * Lists all Institution entities.
-     *
-     * @Route("/index1", name="institution_index1")
-     * @Method("GET")
-     */
-    public function indexAction(Request $request)
-    {
-        $em = $this->getDoctrine()->getManager();
-        $queryBuilder = $em->getRepository('DRIAgreementBundle:Institution')->createQueryBuilder('e');
-        list($filterForm, $queryBuilder) = $this->filter($queryBuilder, $request);
-
-        list($institutions, $pagerHtml) = $this->paginator($queryBuilder, $request);
-        
-        return $this->render('institution/index.html.twig', array(
-            'institutions' => $institutions,
-            'pagerHtml' => $pagerHtml,
-            'filterForm' => $filterForm->createView(),
-
-        ));
-    }
-
-    /**
      * Lists all Institutions entities.
      *
      * @param Request $request
-     *
-     * @Route("/index", name="institution_index")
-     * @Method("GET")
-     *
+     * @Route("/index", name="institution_index", methods={"GET"})
      * @return Response
+     * @throws \Exception
      */
     public function listAction(Request $request)
     {
         $isAjax = $request->isXmlHttpRequest();
 
-        // Get your Datatable ...
-        //$datatable = $this->get('app.datatable.client');
-        //$datatable->buildDatatable();
-
-        // or use the DatatableFactory
-        /** @var DatatableInterface $datatable */
-        $datatable = $this->get('sg_datatables.factory')->create(InstitutionDatatable::class);
+        $datatable = $this->get('app.datatable.agreement.institution');
         $datatable->buildDatatable();
 
         if ($isAjax) {
@@ -100,91 +50,13 @@ class InstitutionController extends Controller
         ));
     }
 
-    
-    /**
-    * Create filter form and process filter request.
-    *
-    */
-    protected function filter($queryBuilder, $request)
-    {
-        $session = $request->getSession();
-        $filterForm = $this->createForm('DRI\AgreementBundle\Form\InstitutionFilterType');
-
-        // Reset filter
-        if ($request->get('filter_action') == 'reset') {
-            $session->remove('InstitutionControllerFilter');
-        }
-
-        // Filter action
-        if ($request->get('filter_action') == 'filter') {
-            // Bind values from the request
-            $filterForm->submit($request->query->get($filterForm->getName()));
-
-            if ($filterForm->isValid()) {
-                // Build the query from the given form object
-                $this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($filterForm, $queryBuilder);
-                // Save filter to session
-                $filterData = $filterForm->getData();
-                $session->set('InstitutionControllerFilter', $filterData);
-            }
-        } else {
-            // Get filter from session
-            if ($session->has('InstitutionControllerFilter')) {
-                $filterData = $session->get('InstitutionControllerFilter');
-                
-                foreach ($filterData as $key => $filter) { //fix for entityFilterType that is loaded from session
-                    if (is_object($filter)) {
-                        $filterData[$key] = $queryBuilder->getEntityManager()->merge($filter);
-                    }
-                }
-                
-                $filterForm = $this->createForm('DRI\AgreementBundle\Form\InstitutionFilterType', $filterData);
-                $this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($filterForm, $queryBuilder);
-            }
-        }
-
-        return array($filterForm, $queryBuilder);
-    }
-
-    /**
-    * Get results from paginator and get paginator view.
-    *
-    */
-    protected function paginator($queryBuilder, $request)
-    {
-        // Paginator
-        $adapter = new DoctrineORMAdapter($queryBuilder);
-        $pagerfanta = new Pagerfanta($adapter);
-        $currentPage = $request->get('page', 1);
-        $pagerfanta->setCurrentPage($currentPage);
-        $entities = $pagerfanta->getCurrentPageResults();
-
-        // Paginator - route generator
-        $me = $this;
-        $routeGenerator = function($page) use ($me)
-        {
-            return $me->generateUrl('institution', array('page' => $page));
-        };
-
-        // Paginator - view
-        $view = new TwitterBootstrap3View();
-        $pagerHtml = $view->render($pagerfanta, $routeGenerator, array(
-            'proximity' => 3,
-            'prev_message' => 'previous',
-            'next_message' => 'next',
-        ));
-
-        return array($entities, $pagerHtml);
-    }
-    
-    
-
     /**
      * Displays a form to create a new Institution entity.
      *
-     * @Route("/new", name="institution_new")
-     * @Method({"GET", "POST"})
+     * @param Request $request
+     * @Route("/new", name="institution_new", methods={"GET", "POST"})
      * @Security("has_role('ROLE_REQUIRE_SPECIALIST') or has_role('ROLE_MANAGE_SPECIALIST')")
+     * @return Response
      */
     public function newAction(Request $request)
     {
@@ -223,13 +95,13 @@ class InstitutionController extends Controller
             'form'   => $form->createView(),
         ));
     }
-    
 
     /**
      * Finds and displays a Institution entity.
      *
-     * @Route("/{id}", name="institution_show", options = {"expose" = true})
-     * @Method("GET")
+     * @param Institution $institution
+     * @Route("/{id}", name="institution_show", options = {"expose" = true}, methods={"GET"})
+     * @return Response
      */
     public function showAction(Institution $institution)
     {
@@ -239,14 +111,15 @@ class InstitutionController extends Controller
             'delete_form' => $deleteForm->createView(),
         ));
     }
-    
 
     /**
      * Displays a form to edit an existing Institution entity.
      *
-     * @Route("/edit/{id}", name="institution_edit", options = {"expose" = true})
-     * @Method({"GET", "POST"})
+     * @param Request $request
+     * @param Institution $institution
+     * @Route("/edit/{id}", name="institution_edit", options = {"expose" = true}, methods={"GET", "POST"})
      * @Security("has_role('ROLE_REQUIRE_SPECIALIST') or has_role('ROLE_MANAGE_SPECIALIST')")
+     * @return Response
      */
     public function editAction(Request $request, Institution $institution)
     {
@@ -283,18 +156,18 @@ class InstitutionController extends Controller
             'delete_form' => $deleteForm->createView(),
         ));
     }
-    
 
     /**
      * Deletes a Institution entity.
      *
-     * @Route("/{id}", name="institution_delete")
-     * @Method("DELETE")
+     * @param Request $request
+     * @param Institution $institution
+     * @Route("/{id}", name="institution_delete", methods={"DELETE"})
      * @Security("has_role('ROLE_ADMIN')")
+     * @return Response
      */
     public function deleteAction(Request $request, Institution $institution)
     {
-    
         $form = $this->createDeleteForm($institution);
         $form->handleRequest($request);
 
@@ -314,8 +187,7 @@ class InstitutionController extends Controller
      * Creates a form to delete a Institution entity.
      *
      * @param Institution $institution The Institution entity
-     *
-     * @return \Symfony\Component\Form\Form The form
+     * @return FormInterface The form
      */
     private function createDeleteForm(Institution $institution)
     {
@@ -329,10 +201,10 @@ class InstitutionController extends Controller
     /**
      * Delete Institution by id
      *
-     * @param mixed $id The entity id
-     * @Route("/delete/{id}", name="institution_by_id_delete")
-     * @Method("GET")
+     * @param Institution $institution The entity id
+     * @Route("/delete/{id}", name="institution_by_id_delete", methods={"GET"})
      * @Security("has_role('ROLE_ADMIN')")
+     * @return Response
      */
     public function deleteByIdAction(Institution $institution){
         $em = $this->getDoctrine()->getManager();
@@ -348,13 +220,14 @@ class InstitutionController extends Controller
         return $this->redirect($this->generateUrl('institution_index'));
 
     }
-    
 
     /**
-    * Bulk Action
-    * @Route("/bulk-action/", name="institution_bulk_delete")
-    * @Method("POST")
+     * Bulk Action
+     *
+     * @param Request $request
+     * @Route("/bulk-action/", name="institution_bulk_delete", methods={"POST"})
      * @Security("has_role('ROLE_ADMIN')")
+     * @return Response
     */
     public function bulkAction(Request $request)
     {
@@ -387,6 +260,4 @@ class InstitutionController extends Controller
 
         return new Response('Solicitud incorrecta', 400);
     }
-    
-
 }

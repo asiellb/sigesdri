@@ -3,22 +3,15 @@
 namespace DRI\AgreementBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Collections\ArrayCollection;
+
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\HttpFoundation\File\File;
+
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
-use DRI\ClientBundle\Entity\Language;
-use DRI\ClientBundle\Entity\Organization;
-use DRI\PassportBundle\Entity\Passport;
-use DRI\PassportBundle\Entity\Application as PassportApplication;
-use DRI\ExitBundle\Entity\Departure;
-use DRI\ExitBundle\Entity\Application;
+use DateTime;
+use Exception;
+
 use DRI\UsefulBundle\Entity\Country;
-use DRI\UsefulBundle\Entity\Area;
-use DRI\UsefulBundle\Useful\Useful;
 use DRI\UserBundle\Entity\User;
 
 /**
@@ -64,7 +57,7 @@ class National
 
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime")
      *
@@ -73,7 +66,7 @@ class National
     private $createdAt;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime")
      *
@@ -104,8 +97,8 @@ class National
      */
     public function __construct()
     {
-        $this->createdAt = new \DateTime('now');
-        $this->updatedAt = new \DateTime('now');
+        $this->createdAt = new DateTime('now');
+        $this->updatedAt = new DateTime('now');
     }
 
 
@@ -199,10 +192,11 @@ class National
      * @ORM\PrePersist
      *
      * @return National
+     * @throws Exception
      */
     public function setCreatedAt()
     {
-        $this->createdAt = new \DateTime('now');
+        $this->createdAt = new DateTime('now');
 
         return $this;
     }
@@ -210,7 +204,7 @@ class National
     /**
      * Get createdAt
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getCreatedAt()
     {
@@ -223,10 +217,11 @@ class National
      * @ORM\PreUpdate
      *
      * @return National
+     * @throws Exception
      */
     public function setUpdatedAt()
     {
-        $this->updatedAt = new \DateTime('now');
+        $this->updatedAt = new DateTime('now');
 
         return $this;
     }
@@ -234,7 +229,7 @@ class National
     /**
      * Get updatedAt
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getUpdatedAt()
     {

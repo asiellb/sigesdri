@@ -3,21 +3,18 @@
 namespace DRI\AgreementBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Collections\ArrayCollection;
+
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\HttpFoundation\File\File;
+
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
-use DRI\ClientBundle\Entity\Language;
-use DRI\ClientBundle\Entity\Organization;
-use DRI\PassportBundle\Entity\Passport;
-use DRI\PassportBundle\Entity\Application as PassportApplication;
-use DRI\ExitBundle\Entity\Departure;
-use DRI\ExitBundle\Entity\Application;
+use DateTime;
+use Exception;
+
 use DRI\UsefulBundle\Entity\Country;
-use DRI\UsefulBundle\Entity\Area;
 use DRI\UserBundle\Entity\User;
 use DRI\UsefulBundle\Useful\Useful;
 
@@ -130,7 +127,7 @@ class Institution
     private $rector;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime")
      *
@@ -139,7 +136,7 @@ class Institution
     private $createdAt;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime")
      *
@@ -171,8 +168,8 @@ class Institution
      */
     public function __construct()
     {
-        $this->createdAt = new \DateTime('now');
-        $this->updatedAt = new \DateTime('now');
+        $this->createdAt = new DateTime('now');
+        $this->updatedAt = new DateTime('now');
     }
 
     public function __toString()
@@ -421,9 +418,11 @@ class Institution
     }
 
     /**
-     * @param File|\Symfony\Component\HttpFoundation\File\UploadedFile $logo
+     * Set logoFile
      *
+     * @param File|UploadedFile $logo
      * @return Institution
+     * @throws Exception
      */
     public function setLogoFile(File $logo = null)
     {
@@ -432,13 +431,15 @@ class Institution
         if ($logo) {
             // It is required that at least one field changes if you are using doctrine
             // otherwise the event listeners won't be called and the file is lost
-            $this->updatedAt = new \DateTime('now');
+            $this->updatedAt = new DateTime('now');
         }
 
         return $this;
     }
 
     /**
+     * Get logo File
+     *
      * @return File|null
      */
     public function getLogoFile()
@@ -500,10 +501,11 @@ class Institution
      * @ORM\PrePersist
      *
      * @return Institution
+     * @throws Exception
      */
     public function setCreatedAt()
     {
-        $this->createdAt = new \DateTime('now');
+        $this->createdAt = new DateTime('now');
 
         return $this;
     }
@@ -511,7 +513,7 @@ class Institution
     /**
      * Get createdAt
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getCreatedAt()
     {
@@ -524,10 +526,11 @@ class Institution
      * @ORM\PreUpdate
      *
      * @return Institution
+     * @throws Exception
      */
     public function setUpdatedAt()
     {
-        $this->updatedAt = new \DateTime('now');
+        $this->updatedAt = new DateTime('now');
 
         return $this;
     }
@@ -535,7 +538,7 @@ class Institution
     /**
      * Get updatedAt
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getUpdatedAt()
     {

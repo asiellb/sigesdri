@@ -3,25 +3,17 @@
 namespace DRI\AgreementBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Collections\ArrayCollection;
+
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\HttpFoundation\File\File;
+
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
-use DRI\ClientBundle\Entity\Language;
-use DRI\ClientBundle\Entity\Organization;
-use DRI\PassportBundle\Entity\Passport;
-use DRI\PassportBundle\Entity\Application as PassportApplication;
-use DRI\ExitBundle\Entity\Departure;
-use DRI\ExitBundle\Entity\Application as ExitApplication;
-use DRI\UsefulBundle\Entity\Country;
-use DRI\UsefulBundle\Entity\Area;
+use DateTime;
+use Exception;
+
 use DRI\UserBundle\Entity\User;
 use DRI\UsefulBundle\Useful\Useful;
-use DRI\AgreementBundle\Entity\Institutional;
-use DRI\AgreementBundle\Entity\Institution;
 
 
 /**
@@ -47,13 +39,13 @@ class Application
      * ********************************************************************************
      **********************************************************************************/
 
-    const AGREEMENT_APPLICATION_STATE = [
+    public static $AGREEMENT_APPLICATION_STATE = [
         'CON' =>'Confeccionada',
         'APR' =>'Aprobada',
         'REC' =>'Rechazada',
     ];
 
-    const AGREEMENT_APPLICATION_STATE_CHOICE = [
+    public static $AGREEMENT_APPLICATION_STATE_CHOICE = [
         'Confeccionada'  =>'CON',
         'Aprobada'       =>'APR',
         'Rechazada'      =>'REC',
@@ -176,7 +168,7 @@ class Application
     private $state;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime", nullable=true)
      *
@@ -185,7 +177,7 @@ class Application
     private $confirmDate;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime", nullable=true)
      *
@@ -215,7 +207,7 @@ class Application
     private $used;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime")
      *
@@ -224,7 +216,7 @@ class Application
     private $createdAt;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime", nullable=true)
      *
@@ -273,8 +265,8 @@ class Application
         $this->state                = 'CON';
         $this->closed               = false;
         $this->used                 = false;
-        $this->createdAt            = new \DateTime('now');
-        $this->updatedAt            = new \DateTime('now');
+        $this->createdAt            = new DateTime('now');
+        $this->updatedAt            = new DateTime('now');
     }
 
     public function __toString()
@@ -643,7 +635,7 @@ class Application
     /**
      * Set confirmDate
      *
-     * @param \DateTime $confirmDate
+     * @param DateTime $confirmDate
      *
      * @return Application
      */
@@ -657,7 +649,7 @@ class Application
     /**
      * Get confirmDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getConfirmDate()
     {
@@ -667,7 +659,7 @@ class Application
     /**
      * Set rejectDate
      *
-     * @param \DateTime $rejectDate
+     * @param DateTime $rejectDate
      *
      * @return Application
      */
@@ -681,7 +673,7 @@ class Application
     /**
      * Get rejectDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getRejectDate()
     {
@@ -718,10 +710,11 @@ class Application
      * @ORM\PrePersist
      *
      * @return Application
+     * @throws Exception
      */
     public function setCreatedAt()
     {
-        $this->createdAt = new \DateTime('now');
+        $this->createdAt = new DateTime('now');
 
         return $this;
     }
@@ -729,7 +722,7 @@ class Application
     /**
      * Get createdAt
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getCreatedAt()
     {
@@ -742,10 +735,11 @@ class Application
      * @ORM\PreUpdate
      *
      * @return Application
+     * @throws Exception
      */
     public function setUpdatedAt()
     {
-        $this->updatedAt = new \DateTime('now');
+        $this->updatedAt = new DateTime('now');
 
         return $this;
     }
@@ -753,7 +747,7 @@ class Application
     /**
      * Get updatedAt
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getUpdatedAt()
     {
@@ -825,7 +819,7 @@ class Application
     /**
      * Get institution
      *
-     * @return \DRI\AgreementBundle\Entity\Institution
+     * @return Institution
      */
     public function getInstitution()
     {
@@ -849,7 +843,7 @@ class Application
     /**
      * Get institutional
      *
-     * @return \DRI\AgreementBundle\Entity\Institutional
+     * @return Institutional
      */
     public function getInstitutional()
     {
@@ -873,7 +867,7 @@ class Application
     /**
      * Get createdBy
      *
-     * @return \DRI\UserBundle\Entity\User
+     * @return User
      */
     public function getCreatedBy()
     {
@@ -897,7 +891,7 @@ class Application
     /**
      * Get lastUpdateBy
      *
-     * @return \DRI\UserBundle\Entity\User
+     * @return User
      */
     public function getLastUpdateBy()
     {
@@ -915,9 +909,10 @@ class Application
      **********************************************************************************/
 
 
-
-
-
+    /**
+     * @param $state
+     * @return string
+     */
     static function state_AcronimToName($state){
         switch ($state){
             case 'CON': return 'Confeccionada';break;
@@ -927,6 +922,10 @@ class Application
         }
     }
 
+    /**
+     * @param $state
+     * @return string
+     */
     static function state_NameToAcronim($state){
         switch ($state){
             case 'Confeccionada': return 'CON';break;

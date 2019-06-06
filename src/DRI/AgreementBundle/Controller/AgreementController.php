@@ -3,9 +3,8 @@
 namespace DRI\AgreementBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+Use Symfony\Component\Routing\Annotation\Route;
 
-use DRI\AgreementBundle\Entity\Institutional;
 use DRI\UsefulBundle\Useful\Useful;
 
 class AgreementController extends Controller

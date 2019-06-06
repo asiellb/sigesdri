@@ -4,10 +4,7 @@ namespace DRI\AgreementBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormError;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Lexik\Bundle\FormFilterBundle\Filter\Form\Type as Filters;
 
 
@@ -58,16 +55,17 @@ class ApplicationFilterType extends AbstractType
 
     }
 
-    public function getBlockPrefix()
-    {
-        return 'dri_agreementbundle_applicationfiltertype';
-    }
-    
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function setDefaultOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
             'csrf_protection' => false,
             'validation_groups' => array('filtering') // avoid NotBlank() constraint-related message
         ));
     }
+
+    public function getBlockPrefix()
+    {
+        return 'dri_agreementbundle_applicationfiltertype';
+    }
+
 }

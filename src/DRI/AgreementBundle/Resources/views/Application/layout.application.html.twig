@@ -6,7 +6,7 @@
     {{ parent() }}
     <li>
     {% if '/agreement/application/index' in app.request.getPathInfo() %}
-        <span>Ficha de Consulta</span> </a> <i class="fa fa-circle"></i>
+        <span>Ficha de Consulta</span> <i class="fa fa-circle"></i>
     {% else %}
         <a href="{{ path('agreement_application_index') }}" ><span>Ficha de Consulta</span> </a> <i class="fa fa-circle"></i>
     {% endif %}

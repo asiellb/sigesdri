@@ -11,7 +11,6 @@ namespace DRI\AgreementBundle\Service;
 use Vich\UploaderBundle\Naming\NamerInterface;
 use Vich\UploaderBundle\Mapping\PropertyMapping;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use DRI\UsefulBundle\Useful\Useful;
 
 class AgrIntDCONamer implements NamerInterface
 {
