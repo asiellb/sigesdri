@@ -2,30 +2,21 @@
 
 namespace DRI\ExitBundle\Controller;
 
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-
-use PhpParser\Node\Scalar\String_;
-use Sg\DatatablesBundle\Datatable\DatatableInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Symfony\Component\Security\Acl\Exception\Exception;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
-use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
-use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+
+use Exception;
 
 use DRI\ExitBundle\Entity\Departure;
-use DRI\ExitBundle\Datatables\DepartureDatatable;
 use DRI\ClientBundle\Entity\Client;
 use DRI\ExitBundle\Entity\Application;
-use DRI\ExitBundle\Form\ApplicationType;
 use DRI\ExitBundle\Form\DepartureType;
 
 /**
@@ -38,13 +29,10 @@ class DepartureController extends Controller
     /**
      * Estatistics for Departure entities.
      *
-     * @param Request $request
-     *
      * @Route("/index", name="departure_index")
-     *
      * @return Response
      */
-    public function indexAction(Request $request)
+    public function indexAction()
     {
         return $this->render('@DRIExit/Departure/index.html.twig', array(
 
@@ -55,23 +43,15 @@ class DepartureController extends Controller
      * Lists all Departure entities.
      *
      * @param Request $request
-     *
-     * @Route("/list", name="departure_list")
-     * @Method("GET")
-     *
+     * @Route("/list", name="departure_list", methods={"GET"})
      * @return Response
+     * @throws Exception
      */
     public function listAction(Request $request)
     {
         $isAjax = $request->isXmlHttpRequest();
 
-        // Get your Datatable ...
-        //$datatable = $this->get('app.datatable.client');
-        //$datatable->buildDatatable();
-
-        // or use the DatatableFactory
-        /** @var DatatableInterface $datatable */
-        $datatable = $this->get('sg_datatables.factory')->create(DepartureDatatable::class);
+        $datatable = $this->get('app.datatable.exits.departure');
         $datatable->buildDatatable();
 
         if ($isAjax) {
@@ -92,14 +72,11 @@ class DepartureController extends Controller
      *
      * @param Request $request
      * @param Client $clientset
-     *
-     * @Route("/new/{clientset}", name="departure_new")
-     * @Method({"GET", "POST"})
+     * @Route("/new/{clientset}", name="departure_new", methods={"GET", "POST"})
      * @Security("has_role('ROLE_REQUIRE_SPECIALIST')")
-     *
      * @return Response
      */
-    public function newAction(Request $request, $clientset = null)
+    public function newAction(Request $request, Client $clientset = null)
     {
         $user = null;
         $client = null;
@@ -168,11 +145,8 @@ class DepartureController extends Controller
      *
      * @param Request $request
      * @param Application $application
-     *
-     * @Route("/new-from-application/{application}", name="departure_new_from_application")
-     * @Method({"GET", "POST"})
+     * @Route("/new-from-application/{application}", name="departure_new_from_application", methods={"GET", "POST"})
      * @Security("has_role('ROLE_REQUIRE_SPECIALIST')")
-     *
      * @return Response
      */
     public function newFromApplicationAction(Request $request, $application = null)
@@ -241,10 +215,7 @@ class DepartureController extends Controller
      * Finds and displays a departure entity.
      *
      * @param Departure $departure
-     *
-     * @Route("/{numberSlug}", name="departure_show")
-     * @Method("GET")
-     *
+     * @Route("/{numberSlug}", name="departure_show", methods={"GET"})
      * @return Response
      */
     public function showAction(Departure $departure)
@@ -262,11 +233,8 @@ class DepartureController extends Controller
      *
      * @param Request $request
      * @param Departure $departure
-     *
-     * @Route("/edit/{numberSlug}", name="departure_edit", options = {"expose" = true})
-     * @Method({"GET", "POST"})
+     * @Route("/edit/{numberSlug}", name="departure_edit", options = {"expose" = true}, methods={"GET", "POST"})
      * @Security("has_role('ROLE_REQUIRE_SPECIALIST')")
-     *
      * @return Response
      */
     public function editAction(Request $request, Departure $departure)
@@ -327,13 +295,14 @@ class DepartureController extends Controller
     /**
      * Deletes a Departure entity.
      *
-     * @Route("/{id}", name="departure_delete")
-     * @Method("DELETE")
+     * @param Request $request
+     * @param Departure $departure
+     * @Route("/{id}", name="departure_delete", methods={"DELETE"})
      * @Security("has_role('ROLE_ADMIN')")
+     * @return Response
      */
     public function deleteAction(Request $request, Departure $departure)
     {
-
         $form = $this->createDeleteForm($departure);
         $form->handleRequest($request);
 
@@ -353,8 +322,7 @@ class DepartureController extends Controller
      * Creates a form to delete a Departure entity.
      *
      * @param Departure $departure The Departure entity
-     *
-     * @return \Symfony\Component\Form\Form The form
+     * @return FormInterface The form
      */
     private function createDeleteForm(Departure $departure)
     {
@@ -369,11 +337,8 @@ class DepartureController extends Controller
      * Delete Departure by id
      *
      * @param Departure $departure
-     *
-     * @Route("/delete/{id}", name="departure_by_id_delete")
-     * @Method("GET")
+     * @Route("/delete/{id}", name="departure_by_id_delete", methods={"GET"})
      * @Security("has_role('ROLE_ADMIN')")
-     *
      * @return Response
      */
     public function deleteByIdAction(Departure $departure){
@@ -395,11 +360,8 @@ class DepartureController extends Controller
      * Bulk delete action.
      *
      * @param Request $request
-     *
-     * @Route("/bulk/delete", name="departure_bulk_delete")
-     * @Method({"GET", "POST"})
+     * @Route("/bulk/delete", name="departure_bulk_delete", methods={"GET", "POST"})
      * @Security("has_role('ROLE_ADMIN')")
-     *
      * @return Response
      */
     public function bulkDeleteAction(Request $request)
@@ -438,10 +400,7 @@ class DepartureController extends Controller
      * Returns a JSON string with the dependencies of the Client with the providen id.
      *
      * @param Request $request
-     *
-     * @Route("/list_client_dependencies", name="list_client_dependencies", options={"expose"=true})
-     * @Method({"POST"})
-     *
+     * @Route("/list_client_dependencies", name="list_client_dependencies", options={"expose"=true}, methods={"POST"})
      * @return JsonResponse|Response
      */
     public function listClientDependenciesAction(Request $request)
@@ -507,5 +466,7 @@ class DepartureController extends Controller
                 )
             );
         }
+
+        return new Response('Solicitud Incorrecta', Response::HTTP_BAD_REQUEST);
     }
 }

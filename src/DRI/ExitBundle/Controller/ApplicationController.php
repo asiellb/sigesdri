@@ -2,51 +2,33 @@
 
 namespace DRI\ExitBundle\Controller;
 
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
-use Elastica\Exception\NotFoundException;
 use Symfony\Component\HttpFoundation\Request,
     Symfony\Component\HttpFoundation\Response,
     Symfony\Component\HttpFoundation\JsonResponse,
     Symfony\Component\HttpFoundation\BinaryFileResponse,
     Symfony\Component\HttpFoundation\ResponseHeaderBag,
-    Symfony\Component\Security\Acl\Exception\Exception,
+    Symfony\Component\Form\FormInterface,
+    Symfony\Component\Routing\Annotation\Route,
     Symfony\Component\Security\Core\Exception\AccessDeniedException,
     Symfony\Component\Serializer\Serializer,
     Symfony\Component\Serializer\Encoder\JsonEncoder,
-    Symfony\Component\Serializer\Normalizer\ArrayDenormalizer,
-    Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer,
-    Symfony\Component\Serializer\Normalizer\ObjectNormalizer,
-    Symfony\Bundle\FrameworkBundle\Controller\Controller;
+    Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method,
-    Sensio\Bundle\FrameworkExtraBundle\Configuration\Route,
-    Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-use Sg\DatatablesBundle\Datatable\DatatableInterface;
-
-use PhpParser\Node\Scalar\String_;
-
-use PhpOffice\PhpWord\PhpWord,
-    PhpOffice\PhpWord\IOFactory,
-    PhpOffice\PhpWord\Shared\Html,
-    PhpOffice\PhpWord\Shared\Converter,
-    PhpOffice\PhpWord\TemplateProcessor,
-    PhpOffice\PhpWord\Settings as WordSettings,
-    PhpOffice\PhpWord\Writer\Word2007\Element\Container,
-    PhpOffice\Common\XMLWriter;
-
 use HTMLtoOpenXML\Parser;
 
-use DRI\ExitBundle\Entity\Application,
+use Exception;
+
+use DRI\ClientBundle\Entity\Client,
+    DRI\ExitBundle\Entity\Application,
     DRI\ExitBundle\Entity\Mission,
     DRI\ExitBundle\Form\ApplicationType,
-    DRI\ExitBundle\Datatables\ApplicationDatatable,
     DRI\UsefulBundle\Useful\Useful;
-
-use DOMDocument;
-use Vich\UploaderBundle\Exception\NoFileFoundException;
 
 /**
  * Application controller.
@@ -57,24 +39,17 @@ class ApplicationController extends Controller
 {
     /**
      * Lists all Application entities.
+     *
      * @param Request $request
-     *
-     * @Route("/index", name="exit_application_index")
-     * @Method("GET")
-     *
+     * @Route("/index", name="exit_application_index", methods={"GET"})
      * @return Response
+     * @throws Exception
      */
     public function indexAction(Request $request)
     {
         $isAjax = $request->isXmlHttpRequest();
 
-        // Get your Datatable ...
-        //$datatable = $this->get('app.datatable.client');
-        //$datatable->buildDatatable();
-
-        // or use the DatatableFactory
-        /** @var DatatableInterface $datatable */
-        $datatable = $this->get('sg_datatables.factory')->create(ApplicationDatatable::class);
+        $datatable = $this->get('app.datatable.exits.application');
         $datatable->buildDatatable();
 
         if ($isAjax) {
@@ -93,11 +68,14 @@ class ApplicationController extends Controller
     /**
      * Displays a form to create a new Application entity.
      *
-     * @Route("/new/{type}/{client}", name="exit_application_new")
-     * @Method({"GET", "POST"})
+     * @param Request $request
+     * @param string $type
+     * @param Client $client
+     * @Route("/new/{type}/{client}", name="exit_application_new", methods={"GET", "POST"})
      * @Security("has_role('ROLE_REQUIRE_SPECIALIST')")
+     * @return Response
      */
-    public function newAction(Request $request, $type, $client = null)
+    public function newAction(Request $request, $type, Client $client = null)
     {
         $user = null;
         $holder = null;
@@ -159,8 +137,9 @@ class ApplicationController extends Controller
     /**
      * Finds and displays a Application entity.
      *
-     * @Route("/view/{numberSlug}", name="exit_application_show")
-     * @Method("GET")
+     * @param Application $exitApplication
+     * @Route("/view/{numberSlug}", name="exit_application_show", methods={"GET"})
+     * @return Response
      */
     public function showAction(Application $exitApplication)
     {
@@ -198,9 +177,11 @@ class ApplicationController extends Controller
     /**
      * Displays a form to edit an existing Application entity.
      *
-     * @Route("/edit/{numberSlug}", name="exit_application_edit")
-     * @Method({"GET", "POST"})
+     * @param Request $request
+     * @param Application $exitApplication
+     * @Route("/edit/{numberSlug}", name="exit_application_edit", methods={"GET", "POST"})
      * @Security("has_role('ROLE_REQUIRE_SPECIALIST')")
+     * @return Response
      */
     public function editAction(Request $request, Application $exitApplication)
     {
@@ -285,9 +266,11 @@ class ApplicationController extends Controller
     /**
      * Deletes a Application entity.
      *
-     * @Route("/delete/{id}", name="exit_application_delete")
-     * @Method("DELETE")
+     * @param Request $request
+     * @param Application $exitApplication
+     * @Route("/delete/{id}", name="exit_application_delete", methods={"DELETE"})
      * @Security("has_role('ROLE_ADMIN')")
+     * @return Response
      */
     public function deleteAction(Request $request, Application $exitApplication)
     {
@@ -311,8 +294,7 @@ class ApplicationController extends Controller
      * Creates a form to delete a Application entity.
      *
      * @param Application $exitApplication The Application entity
-     *
-     * @return \Symfony\Component\Form\Form The form
+     * @return FormInterface The form
      */
     private function createDeleteForm(Application $exitApplication)
     {
@@ -326,11 +308,9 @@ class ApplicationController extends Controller
     /**
      * Delete Application by id
      *
-     * @param mixed $id The entity id
-     * @Route("/delete-by-id/{id}", name="exit_application_by_id_delete")
-     * @Method("GET")
+     * @param Application $exitApplication The entity id
+     * @Route("/delete-by-id/{id}", name="exit_application_by_id_delete", methods={"GET"})
      * @Security("has_role('ROLE_ADMIN')")
-     *
      * @return Response
      */
     public function deleteByIdAction(Application $exitApplication){
@@ -345,18 +325,14 @@ class ApplicationController extends Controller
         }
 
         return $this->redirect($this->generateUrl('exit_application_index'));
-
     }
 
     /**
      * Bulk delete action.
      *
      * @param Request $request
-     *
-     * @Route("/bulk/delete", name="exit_application_bulk_delete")
-     * @Method({"GET", "POST"})
+     * @Route("/bulk/delete", name="exit_application_bulk_delete", methods={"GET", "POST"})
      * @Security("has_role('ROLE_ADMIN')")
-     *
      * @return Response
      */
     public function bulkDeleteAction(Request $request)
@@ -395,10 +371,7 @@ class ApplicationController extends Controller
      * Muestra información del cliente
      *
      * @param Request $request
-     *
-     * @Route("/", name="exit_application_client_show")
-     * @Method({"GET"})
-     *
+     * @Route("/", name="exit_application_client_show", methods={"GET"})
      * @return Response
      */
     public function clientShowAction(Request $request)
@@ -414,11 +387,11 @@ class ApplicationController extends Controller
 
             $client_id = (int)$client_id;
 
-            $clientRepository = $em->getRepository('DRIClientBundle:Client')->findOneById($client_id);
+            $client = $em->getRepository('DRIClientBundle:Client')->findOneBy(['id'],$client_id);
 
             $client = [
-                'clientArea'  =>  $clientRepository->getArea()->getName(),
-                'clientPicture' =>  $clientRepository->getClientPicture(),
+                'clientArea'  =>  $client->getArea()->getName(),
+                'clientPicture' =>  $client->getClientPicture(),
             ];
             $response = new JsonResponse();
             $response->setStatusCode(200);
@@ -428,6 +401,7 @@ class ApplicationController extends Controller
             ));
             return $response;
         }
+        return new Response('Solicitud incorrecta.', 400);
     }
 
     /**
@@ -435,7 +409,7 @@ class ApplicationController extends Controller
      *
      * @Route("/assign_number_slug/dsa")
      * @Security("has_role('ROLE_ADMIN')")
-     *
+     * @return Response
      */
     public function assignNumberSlug(){
 
@@ -444,22 +418,27 @@ class ApplicationController extends Controller
 
         $eas = $eaRepo->findAll();
 
-        foreach ($eas as $ea){
-            $ea->setNumberSlug(Useful::getSlug($ea->getNumber()));
+        if ($eas){
+            foreach ($eas as $ea){
+                $ea->setNumberSlug(Useful::getSlug($ea->getNumber()));
 
-            $em->persist($ea);
-            $em->flush();
+                $em->persist($ea);
+                $em->flush();
+            }
+            return new Response('Solicitud procesada.', Response::HTTP_OK );
         }
-        $dondeEstaba = $this->getRequest()->server->get('HTTP_REFERER');
-    }
 
+        return new Response('Solicitud incorrecta.', Response::HTTP_NOT_FOUND);
+    }
 
     /**
      * Generate and save a PDF
      *
+     * @param Application $exitApplication
      * @Route("/pdf/{numberSlug}", name="client_pdf")
+     * @return Response
      */
-    public function pdfAction(Application $exitApplication, Request $request) {
+    public function pdfAction(Application $exitApplication) {
         $em = $this->getDoctrine()->getManager();
         $app = $em->getRepository('DRIExitBundle:Application')->find($exitApplication);
 
@@ -492,16 +471,16 @@ class ApplicationController extends Controller
         return $response;
     }
 
-
     /**
      * Generate and save a Comand File
      *
+     * @param Application $application
      * @Route("/command-file/{id}/word", name="exit_command_file_to_word")
+     * @return Response
+     * @throws Exception
      */
-    public function commandFileToWordAction(Application $application, Request $request)
+    public function commandFileToWordAction(Application $application)
     {
-        $em = $this->getDoctrine()->getManager();
-
         $name = 'Ficha de Mandatos';
         $client = $application->getClient()->getShortName();
         $filename = sprintf('%s - %s - %s.docx', $name, $client, date('dmY'));
@@ -551,9 +530,12 @@ class ApplicationController extends Controller
     /**
      * Generate and save a Comand File
      *
+     * @param Application $application
      * @Route("/official-file/{id}/word", name="exit_official_file_to_word")
+     * @return Response
+     * @throws Exception
      */
-    public function officialFileToWordAction(Application $application, Request $request)
+    public function officialFileToWordAction(Application $application)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -589,9 +571,6 @@ class ApplicationController extends Controller
             $at = Useful::getAge($application->getClient()->getWorkersAdmissionDate()->format('Y-m-d')) ;
         else
             $at = '';
-
-        //LAST 2 YEAR MISSIONS
-        $last2Years =  array();
 
         //CURRENT MISSION
         $missionList = array();
@@ -635,13 +614,6 @@ class ApplicationController extends Controller
         $cSustitute = $application->getDirectiveSubstitute();
         $goeSustitute = $application->getGoeSubstitute();
 
-        //ECONOMIC INFO 1
-        $monthPay = '';
-        $totalPay = '';
-
-        //ECONOMIC INFO 2
-        $economics = array();
-
         //LAST 2 YEARS DEPARTURES
         $departureList = array();
         $departures = $em->getRepository('DRIExitBundle:Application')->getDeparturesForClientInLastYears($application->getClient()->getId(),2);
@@ -651,8 +623,6 @@ class ApplicationController extends Controller
                 $l2yCountry = '';
                 $l2yInstitution = '';
                 $l2yConcept = '';
-                $l2yLapsed = '';
-                $l2yDepartureDate = '';
 
                 $count = 0;
                 foreach ($l2yMissions as $mission){
@@ -733,9 +703,12 @@ class ApplicationController extends Controller
     /**
      * Generate and save a Comand File
      *
+     * @param Application $application
      * @Route("/cc-nomenclature-file/{id}/word", name="exit_cc_nomenclature_file_to_word")
+     * @return Response
+     * @throws Exception
      */
-    public function ccNomenclatureFileToWordAction(Application $application, Request $request)
+    public function ccNomenclatureFileToWordAction(Application $application)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -986,9 +959,12 @@ class ApplicationController extends Controller
     /**
      * Generate and save a Comand File
      *
+     * @param Mission $mission
      * @Route("/consult-bol-nic-ven-file/{id}/word", name="exit_consult_bol_nic_ven_file_to_word")
+     * @return Response
+     * @throws Exception
      */
-    public function consultBolNicVenFileToWordAction(Mission $mission, Request $request)
+    public function consultBolNicVenFileToWordAction(Mission $mission)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -1064,9 +1040,12 @@ class ApplicationController extends Controller
     /**
      * Generate and save a Comand File
      *
+     * @param Mission $mission
      * @Route("/rt-nomenclature-file/{id}/word", name="exit_rt_nomenclature_file_to_word")
+     * @return Response
+     * @throws Exception
      */
-    public function rtNomenclatureFileToWordAction(Mission $mission, Request $request)
+    public function rtNomenclatureFileToWordAction(Mission $mission)
     {
         $em = $this->getDoctrine()->getManager();
         $application = $mission->getApplication();
@@ -1279,6 +1258,10 @@ class ApplicationController extends Controller
         return $response;
     }
 
+    /**
+     * @param string $type
+     * @return string
+     */
     public function formatClientType($type){
         switch ($type){
             case 'dir':

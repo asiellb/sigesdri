@@ -3,14 +3,14 @@
 namespace DRI\ExitBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
+
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\CurrencyType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Intl\Intl;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+
 use DRI\ExitBundle\Entity\Economic;
 
 class EconomicType extends AbstractType
@@ -20,7 +20,7 @@ class EconomicType extends AbstractType
         $builder
             ->add('type', ChoiceType::class, [
                 'label'     => 'Tipo',
-                'choices'   => Economic::ECONOMIC_TYPE_CHOICE,
+                'choices'   => Economic::$ECONOMIC_TYPE_CHOICE,
                 'placeholder' => 'Elije una opción',
                 'attr' => array(
                     'class'=>'bs-select',
@@ -38,7 +38,7 @@ class EconomicType extends AbstractType
             ])
             ->add('source', ChoiceType::class, [
                 'label'     => 'Financiamiento',
-                'choices'   => Economic::ECONOMIC_SOURCE_CHOICE,
+                'choices'   => Economic::$ECONOMIC_SOURCE_CHOICE,
                 'placeholder' => 'Elije una opción',
                 'attr' => array(
                     'class'=>'bs-select',

@@ -3,21 +3,20 @@
 namespace DRI\ExitBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\Validator\Constraints as Assert;
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\HttpFoundation\File\File;
+
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
+
+use DateTime;
+use Exception;
 
 use DRI\ClientBundle\Entity\Client;
 use DRI\UserBundle\Entity\User;
-use DRI\PassportBundle\Entity\Passport;
-use DRI\UsefulBundle\Entity\Country;
-use DRI\ExitBundle\Entity\Economic;
-use DRI\ExitBundle\Entity\Departure;
-use DRI\ExitBundle\Entity\ManagerTravelPlan;
-use DRI\ExitBundle\Entity\CommandFile;
 use DRI\UsefulBundle\Useful\Useful;
 
 /**
@@ -40,13 +39,13 @@ class Application
      * ********************************************************************************
      **********************************************************************************/
 
-    const EXIT_APPLICATION_STATE = [
+    public static $EXIT_APPLICATION_STATE = [
         'CON' =>'Confeccionada',
         'APR' =>'Aprobada',
         'REC' =>'Rechazada',
     ];
 
-    const EXIT_APPLICATION_STATE_CHOICE = [
+    public static $EXIT_APPLICATION_STATE_CHOICE = [
         'Confeccionada'  =>'CON',
         'Aprobada'       =>'APR',
         'Rechazada'      =>'REC',
@@ -144,7 +143,7 @@ class Application
     private $lapsed;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="date")
      *
@@ -154,7 +153,7 @@ class Application
     private $exitDate;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="date")
      *
@@ -185,7 +184,7 @@ class Application
     private $pccApproval;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="date", nullable=true)
      *
@@ -201,7 +200,7 @@ class Application
     private $vriApproval;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="date", nullable=true)
      *
@@ -217,7 +216,7 @@ class Application
     private $rsApproval;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="date", nullable=true)
      *
@@ -233,7 +232,7 @@ class Application
     private $osApproval;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="date", nullable=true)
      *
@@ -260,7 +259,7 @@ class Application
     private $agreement;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime", nullable=true)
      *
@@ -276,7 +275,7 @@ class Application
     private $approvalObservations;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime", nullable=true)
      *
@@ -321,7 +320,7 @@ class Application
     private $used;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime")
      *
@@ -330,7 +329,7 @@ class Application
     private $createdAt;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime")
      *
@@ -387,8 +386,8 @@ class Application
         $this->closed    = false;
         $this->used      = false;
         $this->inPlan    = false;
-        $this->createdAt = new \DateTime('now');
-        $this->updatedAt = new \DateTime('now');
+        $this->createdAt = new DateTime('now');
+        $this->updatedAt = new DateTime('now');
     }
 
     public function __toString()
@@ -582,7 +581,7 @@ class Application
     /**
      * Set exitDate
      *
-     * @param \DateTime $exitDate
+     * @param DateTime $exitDate
      *
      * @return Application
      */
@@ -596,7 +595,7 @@ class Application
     /**
      * Get exitDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getExitDate()
     {
@@ -606,7 +605,7 @@ class Application
     /**
      * Set arrivalDate
      *
-     * @param \DateTime $arrivalDate
+     * @param DateTime $arrivalDate
      *
      * @return Application
      */
@@ -620,7 +619,7 @@ class Application
     /**
      * Get arrivalDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getArrivalDate()
     {
@@ -702,7 +701,7 @@ class Application
     /**
      * Set pccApprovalDate
      *
-     * @param \DateTime $pccApprovalDate
+     * @param DateTime $pccApprovalDate
      *
      * @return Application
      */
@@ -716,7 +715,7 @@ class Application
     /**
      * Get pccApprovalDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getPccApprovalDate()
     {
@@ -750,7 +749,7 @@ class Application
     /**
      * Set vriApprovalDate
      *
-     * @param \DateTime $vriApprovalDate
+     * @param DateTime $vriApprovalDate
      *
      * @return Application
      */
@@ -764,7 +763,7 @@ class Application
     /**
      * Get vriApprovalDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getVriApprovalDate()
     {
@@ -798,7 +797,7 @@ class Application
     /**
      * Set rsApprovalDate
      *
-     * @param \DateTime $rsApprovalDate
+     * @param DateTime $rsApprovalDate
      *
      * @return Application
      */
@@ -812,7 +811,7 @@ class Application
     /**
      * Get rsApprovalDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getRsApprovalDate()
     {
@@ -846,7 +845,7 @@ class Application
     /**
      * Set osApprovalDate
      *
-     * @param \DateTime $osApprovalDate
+     * @param DateTime $osApprovalDate
      *
      * @return Application
      */
@@ -860,7 +859,7 @@ class Application
     /**
      * Get osApprovalDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getOsApprovalDate()
     {
@@ -871,8 +870,8 @@ class Application
      * Set state
      *
      * @param string $state
-     *
      * @return Application
+     * @throws Exception
      */
     public function setState($state)
     {
@@ -880,11 +879,11 @@ class Application
 
         switch ($state){
             case 'APR':
-                $this->approvalDate = new \DateTime('now');
+                $this->approvalDate = new DateTime('now');
                 $this->closed = true;
                 break;
             case 'REC':
-                $this->rejectDate = new \DateTime('now');
+                $this->rejectDate = new DateTime('now');
                 $this->closed = true;
                 break;
             default:
@@ -931,7 +930,7 @@ class Application
     /**
      * Set approvalDate
      *
-     * @param \DateTime $approvalDate
+     * @param DateTime $approvalDate
      *
      * @return Application
      */
@@ -945,7 +944,7 @@ class Application
     /**
      * Get approvalDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getApprovalDate()
     {
@@ -979,7 +978,7 @@ class Application
     /**
      * Set rejectDate
      *
-     * @param \DateTime $rejectDate
+     * @param DateTime $rejectDate
      *
      * @return Application
      */
@@ -993,7 +992,7 @@ class Application
     /**
      * Get rejectDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getRejectDate()
     {
@@ -1097,9 +1096,9 @@ class Application
     }
 
     /**
-     * @param File|\Symfony\Component\HttpFoundation\File\UploadedFile $digitalCopy
-     *
+     * @param File|UploadedFile $digitalCopy
      * @return Application
+     * @throws Exception
      */
     public function setDigitalCopyFile(File $digitalCopy = null)
     {
@@ -1108,7 +1107,7 @@ class Application
         if ($digitalCopy) {
             // It is required that at least one field changes if you are using doctrine
             // otherwise the event listeners won't be called and the file is lost
-            $this->updatedAt = new \DateTime('now');
+            $this->updatedAt = new DateTime('now');
         }
 
         return $this;
@@ -1128,10 +1127,11 @@ class Application
      * @ORM\PrePersist()
      *
      * @return Application
+     * @throws Exception
      */
     public function setCreatedAt()
     {
-        $this->createdAt = new \DateTime('now');
+        $this->createdAt = new DateTime('now');
 
         return $this;
     }
@@ -1139,7 +1139,7 @@ class Application
     /**
      * Get createdAt
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getCreatedAt()
     {
@@ -1152,10 +1152,11 @@ class Application
      * @ORM\PreUpdate()
      *
      * @return Application
+     * @throws Exception
      */
     public function setUpdatedAt()
     {
-        $this->updatedAt = new \DateTime('now');
+        $this->updatedAt = new DateTime('now');
 
         return $this;
     }
@@ -1163,7 +1164,7 @@ class Application
     /**
      * Get updatedAt
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getUpdatedAt()
     {
@@ -1271,11 +1272,11 @@ class Application
     /**
      * Add mission
      *
-     * @param \DRI\ExitBundle\Entity\Mission $mission
+     * @param Mission $mission
      *
      * @return Application
      */
-    public function addMission(\DRI\ExitBundle\Entity\Mission $mission)
+    public function addMission(Mission $mission)
     {
         $mission->setApplication($this);
         $this->missions[] = $mission;
@@ -1286,9 +1287,9 @@ class Application
     /**
      * Remove mission
      *
-     * @param \DRI\ExitBundle\Entity\Mission $mission
+     * @param Mission $mission
      */
-    public function removeMission(\DRI\ExitBundle\Entity\Mission $mission)
+    public function removeMission(Mission $mission)
     {
         $this->missions->removeElement($mission);
     }
@@ -1296,7 +1297,7 @@ class Application
     /**
      * Get missions
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection
      */
     public function getMissions()
     {
@@ -1306,11 +1307,11 @@ class Application
     /**
      * Set commandFile
      *
-     * @param \DRI\ExitBundle\Entity\CommandFile $commandFile
+     * @param CommandFile $commandFile
      *
      * @return Application
      */
-    public function setCommandFile(\DRI\ExitBundle\Entity\CommandFile $commandFile = null)
+    public function setCommandFile(CommandFile $commandFile = null)
     {
         $this->commandFile = $commandFile;
 
@@ -1320,7 +1321,7 @@ class Application
     /**
      * Get commandFile
      *
-     * @return \DRI\ExitBundle\Entity\CommandFile
+     * @return CommandFile
      */
     public function getCommandFile()
     {
@@ -1386,9 +1387,10 @@ class Application
      **********************************************************************************/
 
 
-
-
-
+    /**
+     * @param $state
+     * @return string
+     */
     static function state_AcronimToName($state){
         switch ($state){
             case 'CON': return 'Confeccionada';break;
@@ -1398,6 +1400,10 @@ class Application
         }
     }
 
+    /**
+     * @param $state
+     * @return string
+     */
     static function state_NameToAcronim($state){
         switch ($state){
             case 'Confeccionada': return 'CON';break;

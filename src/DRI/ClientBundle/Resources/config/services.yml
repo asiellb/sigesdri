@@ -8,7 +8,7 @@ services:
 
 
 #   DATATABLES CLASSES
-    app.datatable.client.client:
+    app.datatable.clients.client:
         class: DRI\ClientBundle\Datatables\ClientDatatable
         parent: sg_datatables.datatable.abstract
 

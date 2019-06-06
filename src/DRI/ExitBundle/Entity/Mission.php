@@ -4,20 +4,18 @@ namespace DRI\ExitBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\Validator\Constraints as Assert;
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\HttpFoundation\File\File;
+
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
-use DRI\ClientBundle\Entity\Client;
+use DateTime;
+use Exception;
+
 use DRI\UserBundle\Entity\User;
 use DRI\UsefulBundle\Entity\Country;
-use DRI\ExitBundle\Entity\Application;
-use DRI\ExitBundle\Entity\Economic;
-use DRI\ExitBundle\Entity\Departure;
-use DRI\ExitBundle\Entity\ManagerTravelPlan;
-use DRI\UsefulBundle\Useful\Useful;
 
 /**
  * Mission
@@ -39,7 +37,7 @@ class Mission
      * ********************************************************************************
      **********************************************************************************/
 
-    const MISSION_CONCEPT = [
+    public static $MISSION_CONCEPT = [
         'MOF' =>'Misión Oficial',
         'IAC' =>'Intercambio Académico',
         'IES' =>'Intercambio Estudiantil',
@@ -53,7 +51,7 @@ class Mission
         'COM' =>'Comercialización',
     ];
 
-    const MISSION_CONCEPT_CHOICE = [
+    public static $MISSION_CONCEPT_CHOICE = [
         'Misión Oficial'                =>'MOF',
         'Intercambio Académico'         =>'IAC',
         'Intercambio Estudiantil'       =>'IES',
@@ -128,7 +126,7 @@ class Mission
     private $personWhoInvitesPosition;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="date")
      *
@@ -138,7 +136,7 @@ class Mission
     private $fromDate;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="date")
      *
@@ -218,7 +216,7 @@ class Mission
     private $approved;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime")
      *
@@ -227,7 +225,7 @@ class Mission
     private $createdAt;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime")
      *
@@ -277,8 +275,8 @@ class Mission
     {
         $this->approved = true;
         $this->economics = new ArrayCollection();
-        $this->createdAt = new \DateTime('now');
-        $this->updatedAt = new \DateTime('now');
+        $this->createdAt = new DateTime('now');
+        $this->updatedAt = new DateTime('now');
     }
 
     public function isApproved(){
@@ -410,7 +408,7 @@ class Mission
     /**
      * Set fromDate
      *
-     * @param \DateTime $fromDate
+     * @param DateTime $fromDate
      *
      * @return Mission
      */
@@ -424,7 +422,7 @@ class Mission
     /**
      * Get fromDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getFromDate()
     {
@@ -434,7 +432,7 @@ class Mission
     /**
      * Set untilDate
      *
-     * @param \DateTime $untilDate
+     * @param DateTime $untilDate
      *
      * @return Mission
      */
@@ -448,7 +446,7 @@ class Mission
     /**
      * Get untilDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getUntilDate()
     {
@@ -552,9 +550,9 @@ class Mission
     }
 
     /**
-     * @param File|\Symfony\Component\HttpFoundation\File\UploadedFile $workPlanSynthesis
-     *
+     * @param File|UploadedFile $workPlanSynthesis
      * @return Mission
+     * @throws Exception
      */
     public function setWorkPlanSynthesisFile(File $workPlanSynthesis = null)
     {
@@ -563,7 +561,7 @@ class Mission
         if ($workPlanSynthesis) {
             // It is required that at least one field changes if you are using doctrine
             // otherwise the event listeners won't be called and the file is lost
-            $this->updatedAt = new \DateTime('now');
+            $this->updatedAt = new DateTime('now');
         }
 
         return $this;
@@ -715,10 +713,11 @@ class Mission
      * @ORM\PrePersist()
      *
      * @return Mission
+     * @throws Exception
      */
     public function setCreatedAt()
     {
-        $this->createdAt = new \DateTime('now');
+        $this->createdAt = new DateTime('now');
 
         return $this;
     }
@@ -726,7 +725,7 @@ class Mission
     /**
      * Get createdAt
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getCreatedAt()
     {
@@ -739,10 +738,11 @@ class Mission
      * @ORM\PreUpdate()
      *
      * @return Mission
+     * @throws Exception
      */
     public function setUpdatedAt()
     {
-        $this->updatedAt = new \DateTime('now');
+        $this->updatedAt = new DateTime('now');
 
         return $this;
     }
@@ -750,7 +750,7 @@ class Mission
     /**
      * Get updatedAt
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getUpdatedAt()
     {
@@ -841,9 +841,10 @@ class Mission
      **********************************************************************************/
 
 
-
-
-
+    /**
+     * @param $concept
+     * @return string
+     */
     static function concept_AcronimToName($concept){
         switch ($concept){
             case 'MOF': return 'Misión Oficial';break;
@@ -861,6 +862,10 @@ class Mission
         }
     }
 
+    /**
+     * @param $concept
+     * @return string
+     */
     static function concept_NameToAcronim($concept){
         switch ($concept){
             case 'Misión Oficial': return 'MOF';break;

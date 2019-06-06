@@ -9,21 +9,8 @@
 namespace DRI\ExitBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\Validator\Constraints as Assert;
 
-use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
-
-use DRI\ClientBundle\Entity\Client;
-use DRI\UserBundle\Entity\User;
-use DRI\PassportBundle\Entity\Passport;
-use DRI\UsefulBundle\Entity\Country;
-use DRI\ExitBundle\Entity\Departure;
-use DRI\UsefulBundle\Useful\Useful;
-use DRI\ExitBundle\Entity\Application;
-use DRI\ExitBundle\Entity\ManagerTravelPlan;
 
 /**
  * Economic
@@ -47,7 +34,7 @@ class Economic
 
     const INITIAL_BALANCE_OF_EVENT_ACOUNT = 4000;
 
-    const ECONOMIC_TYPE = [
+    public static $ECONOMIC_TYPE = [
         'P'  => 'Pasaje',
         'PA' => 'Pasaje Aéreo',
         'E'  => 'Estancia',
@@ -61,7 +48,7 @@ class Economic
         'O'  => 'Otros',
     ];
 
-    const ECONOMIC_TYPE_CHOICE = [
+    public static $ECONOMIC_TYPE_CHOICE = [
         'Pasaje'                => 'P',
         'Pasaje Aéreo'          => 'PA',
         'Estancia'              => 'E',
@@ -75,13 +62,13 @@ class Economic
         'Otros'                 => 'O',
     ];
 
-    const ECONOMIC_SOURCE = [
+    public static $ECONOMIC_SOURCE = [
         'PE'  => 'Parte Extranjera',
         'UC'  => 'Parte Cubana (UC)',
         'MES' => 'Parte Cubana (MES)',
     ];
 
-    const ECONOMIC_SOURCE_CHOICE = [
+    public static $ECONOMIC_SOURCE_CHOICE = [
         'Parte Extranjera'   => 'PE',
         'Parte Cubana (UC)'  => 'UC',
         'Parte Cubana (MES)' => 'MES',
@@ -168,13 +155,17 @@ class Economic
      **********************************************************************************/
 
 
-
-
+    /**
+     * @param $type
+     */
     public function setType($type)
     {
         $this->type = $type;
     }
 
+    /**
+     * @return string
+     */
     public function getType()
     {
         return $this->type;
@@ -339,9 +330,10 @@ class Economic
      **********************************************************************************/
 
 
-
-
-
+    /**
+     * @param $type
+     * @return string
+     */
     static function type_AcronimToName($type){
         switch ($type){
             case 'P': return 'Pasaje';break;
@@ -359,6 +351,10 @@ class Economic
         }
     }
 
+    /**
+     * @param $type
+     * @return string
+     */
     static function type_NameToAcronim($type){
         switch ($type){
             case 'Pasaje': return 'P';break;

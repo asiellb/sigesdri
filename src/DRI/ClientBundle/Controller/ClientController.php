@@ -5,11 +5,11 @@ namespace DRI\ClientBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Form\FormInterface;
 
@@ -50,7 +50,7 @@ class ClientController extends Controller
         $isAjax = $request->isXmlHttpRequest();
 
         // Get your Datatable ...
-        $datatable = $this->get('app.datatable.client.client');
+        $datatable = $this->get('app.datatable.clients.client');
         $datatable->buildDatatable();
 
         if ($isAjax) {
@@ -398,6 +398,7 @@ class ClientController extends Controller
      * Generate the Short Name for all Client entities
      *
      * @Route("/generate-type", name="generate-type")
+     * @throws Exception
      */
     public function generateTypeAction()
     {

@@ -9,7 +9,7 @@
 namespace DRI\ExitBundle\Twig\Extension;
 
 use Twig\Extension\AbstractExtension;
-use Twig\TwigFilter;
+use Twig\TwigFunction;
 
 use DRI\ExitBundle\Entity\Application;
 use DRI\ExitBundle\Entity\Mission;
@@ -22,11 +22,11 @@ class DRIExitExtension extends AbstractExtension
     public function getFunctions()
     {
         return array(
-            new \Twig_SimpleFunction('fn_exit_application_state', [$this, 'fnExitApplicationState']),
-            new \Twig_SimpleFunction('fn_mission_concept', [$this, 'fnMissionConcept']),
-            new \Twig_SimpleFunction('fn_economic_type', [$this, 'fnEconomicType']),
-            new \Twig_SimpleFunction('fn_economic_source', [$this, 'fnEconomicSource']),
-            new \Twig_SimpleFunction('fn_manager_travel_plan_state', [$this, 'fnManagerTravelPlanState']),
+            new TwigFunction('fn_exit_application_state', [$this, 'fnExitApplicationState']),
+            new TwigFunction('fn_mission_concept', [$this, 'fnMissionConcept']),
+            new TwigFunction('fn_economic_type', [$this, 'fnEconomicType']),
+            new TwigFunction('fn_economic_source', [$this, 'fnEconomicSource']),
+            new TwigFunction('fn_manager_travel_plan_state', [$this, 'fnManagerTravelPlanState']),
         );
     }
 

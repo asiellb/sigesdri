@@ -2,24 +2,19 @@
 
 namespace DRI\ExitBundle\Form;
 
+use Symfony\Component\Form\AbstractType;
+
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
-use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
-use Vich\UploaderBundle\Form\Type\VichFileType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
 use DRI\ExitBundle\Entity\ManagerTravelPlan;
 use DRI\ClientBundle\Entity\Client;
-use DRI\UsefulBundle\Entity\Country;
-use DRI\ExitBundle\Entity\Economic;
 use DRI\UsefulBundle\Form\DatePickerType;
 
 class ManagerTravelPlanType extends AbstractType
@@ -100,7 +95,7 @@ class ManagerTravelPlanType extends AbstractType
                 'label_attr' => [
                     'class' => 'icheck-label'
                 ],
-                'choices'  => ManagerTravelPlan::MANAGER_TRAVEL_PLAN_STATE_CHOICE,
+                'choices'  => ManagerTravelPlan::$MANAGER_TRAVEL_PLAN_STATE_CHOICE,
                 'attr' => array(
                     'class'=>'radio-list',
                 ),

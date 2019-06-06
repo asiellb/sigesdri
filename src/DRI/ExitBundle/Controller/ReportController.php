@@ -2,58 +2,21 @@
 
 namespace DRI\ExitBundle\Controller;
 
-use DRI\ExitBundle\Entity\Economic;
-use Elastica\Exception\NotFoundException;
-use function Matrix\add;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+
 use Symfony\Component\HttpFoundation\Request,
     Symfony\Component\HttpFoundation\Response,
-    Symfony\Component\HttpFoundation\JsonResponse,
     Symfony\Component\HttpFoundation\BinaryFileResponse,
     Symfony\Component\HttpFoundation\ResponseHeaderBag,
-    Symfony\Component\Security\Acl\Exception\Exception,
-    Symfony\Component\Security\Core\Exception\AccessDeniedException,
-    Symfony\Component\Serializer\Serializer,
-    Symfony\Component\Serializer\Encoder\JsonEncoder,
-    Symfony\Component\Serializer\Normalizer\ArrayDenormalizer,
-    Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer,
-    Symfony\Component\Serializer\Normalizer\ObjectNormalizer,
-    Symfony\Bundle\FrameworkBundle\Controller\Controller;
+    Symfony\Component\Routing\Annotation\Route,
+    Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method,
-    Sensio\Bundle\FrameworkExtraBundle\Configuration\Route,
-    Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-
-use Doctrine\Common\Collections\ArrayCollection;
-
-use Sg\DatatablesBundle\Datatable\DatatableInterface;
-
-use PhpParser\Node\Scalar\String_;
-
-use PhpOffice\PhpWord\PhpWord,
-    PhpOffice\PhpWord\IOFactory,
-    PhpOffice\PhpWord\Shared\Html,
-    PhpOffice\PhpWord\Shared\Converter,
-    PhpOffice\PhpWord\TemplateProcessor,
-    PhpOffice\PhpWord\Settings as WordSettings,
-    PhpOffice\PhpWord\Writer\Word2007\Element\Container,
-    PhpOffice\Common\XMLWriter
-    ;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\IOFactory as SpreadsheetIOF;
-use PhpOffice\PhpSpreadsheet\Style;
-use PhpOffice\PhpSpreadsheet\Writer;
-use PhpOffice\PhpSpreadsheet\Reader;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 
-use HTMLtoOpenXML\Parser;
+use Exception;
 
-use DRI\ExitBundle\Entity\Application,
-    DRI\ExitBundle\Form\ApplicationType,
-    DRI\ExitBundle\Datatables\ApplicationDatatable,
+use DRI\ExitBundle\Entity\Economic,
     DRI\UsefulBundle\Useful\Useful;
-
-use DOMDocument;
 
 /**
  * Exit Report controller.
@@ -68,10 +31,7 @@ class ReportController extends Controller
      *
      * @param Request $request
      * @param integer $year
-     *
-     * @Route("/event-acount/{year}", name="exit_report_event_acount")
-     * @Method({"GET", "POST"})
-     *
+     * @Route("/event-acount/{year}", name="exit_report_event_acount", methods={"GET", "POST"})
      * @return Response
      */
     public function reportEventAcount(Request $request, $year = null){
@@ -133,15 +93,12 @@ class ReportController extends Controller
      * Generate and save a Event Acount Report to Word
      *
      * @param integer $year
-     *
      * @Route("/event-acount-word/{year}", name="exit_report_event_acount_to_word")
-     *
      * @return BinaryFileResponse
+     * @throws Exception
      */
     public function reportEventAcountToWord($year = null)
     {
-        $em = $this->getDoctrine()->getManager();
-
         $currentDate = sprintf('%s', date('d/m/Y'));
         $name = 'Reporte de Cuenta Eventualidades';
         $template = "report_templates/event_acount_template.docx";
@@ -189,6 +146,12 @@ class ReportController extends Controller
         return $response;
     }
 
+    /**
+     * Get the Apps for Year with EvenAcountList
+     *
+     * @param integer $year
+     * @return array
+     */
     public function getAppsForYearWithEvenAcountList($year){
         $em = $this->getDoctrine()->getManager();
         $appRepo = $em->getRepository('DRIExitBundle:Application');
@@ -202,6 +165,7 @@ class ReportController extends Controller
             $client     = $entry->getClient()->getFullName();
             $ci         = $entry->getClient()->getCi();
             $area       = $entry->getClient()->getFaculty() != null ? $entry->getClient()->getFaculty()->getName() : $entry->getClient()->getWorkersWorkPlace();
+            $category   = '';
             switch ($entry->getClient()->getClientType()){
                 case 'dir':$category   = 'Directivo';break;
                 case 'doc':$category   = 'Docente';break;
@@ -329,17 +293,13 @@ class ReportController extends Controller
         $writerXlsx->save($fileName);
     }
 
-
     /**
      * Generate Event Acount Report
      *
      * @param Request $request
      * @param integer $year
      * @param integer $month
-     *
-     * @Route("/dcc2/{year}/{month}", name="exit_report_dcc2")
-     * @Method({"GET", "POST"})
-     *
+     * @Route("/dcc2/{year}/{month}", name="exit_report_dcc2", methods={"GET", "POST"})
      * @return Response
      */
     public function reportDCC2(Request $request, $year = null, $month = null){
@@ -425,10 +385,9 @@ class ReportController extends Controller
      *
      * @param integer $year
      * @param integer $month
-     *
      * @Route("/dcc2-excel/{year}/{month}", name="exit_report_dcc2_to_excel")
-     *
      * @return BinaryFileResponse
+     * @throws Exception
      */
     public function reportDCC2ToWord($year = null, $month = null)
     {
@@ -493,6 +452,13 @@ class ReportController extends Controller
         return $response;*/
     }
 
+    /**
+     * Get Dependencies for Month
+     *
+     * @param $year
+     * @param $month
+     * @return array
+     */
     public function getDepsForMonth($year, $month){
         $em = $this->getDoctrine()->getManager();
         $depRepo = $em->getRepository('DRIExitBundle:Departure');

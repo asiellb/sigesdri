@@ -2,46 +2,27 @@
 
 namespace DRI\ExitBundle\Controller;
 
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
-use PhpParser\Node\Scalar\String_;
-use Sg\DatatablesBundle\Datatable\DatatableInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Symfony\Component\Security\Acl\Exception\Exception;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\HttpFoundation\JsonResponse;
-
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
-use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
-use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
-// Include the BinaryFileResponse and the ResponseHeaderBag
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-
-// Include the requires classes of Phpword
-use PhpOffice\PhpWord\PhpWord;
-use PhpOffice\PhpWord\IOFactory;
-use PhpOffice\PhpWord\Shared\Html;
-use PhpOffice\PhpWord\Shared\Converter;
-use PhpOffice\PhpWord\TemplateProcessor;
-
-use DRI\ExitBundle\Entity\ManagerTravelPlan;
-use DRI\ExitBundle\Form\ManagerTravelPlanType;
-use DRI\UsefulBundle\Useful\Useful;
 
 use Pagerfanta\Pagerfanta;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Pagerfanta\View\TwitterBootstrap3View;
+
+use Exception;
+
+use DRI\ExitBundle\Entity\ManagerTravelPlan;
+
 
 
 /**
@@ -54,8 +35,9 @@ class ManagerTravelPlanController extends Controller
     /**
      * Lists all ManagerTravelPlan entities.
      *
-     * @Route("/index", name="exit_managertravelplan_index")
-     * @Method("GET")
+     * @param Request $request
+     * @Route("/index", name="exit_managertravelplan_index", methods={"GET"})
+     * @return Response
      */
     public function indexAction(Request $request)
     {
@@ -76,17 +58,15 @@ class ManagerTravelPlanController extends Controller
     /**
      * Show the Manager Travel Plan for the next year.
      *
-     * @Route("/current-plan", name="exit_managertravelplan_current_plan")
-     * @Method("GET")
+     * @Route("/current-plan", name="exit_managertravelplan_current_plan", methods={"GET"})
+     * @return Response
      */
-    public function currentPlanAction(Request $request)
+    public function currentPlanAction()
     {
         $em = $this->getDoctrine()->getManager();
         $entries = $em->getRepository('DRIExitBundle:ManagerTravelPlan')->getCurrentPlan();
 
-
         $year = date_format(date_create(), 'Y');
-
 
         return $this->render('DRIExitBundle:ManagerTravelPlan:current-plan.html.twig', array(
             'year' => $year,
@@ -97,8 +77,10 @@ class ManagerTravelPlanController extends Controller
     /**
      * Show the Manager Travel Plan for pass year.
      *
-     * @Route("/old-plan/{year}", name="exit_managertravelplan_old_plan")
-     * @Method({"GET", "POST"})
+     * @param Request $request
+     * @param string $year
+     * @Route("/old-plan/{year}", name="exit_managertravelplan_old_plan", methods={"GET", "POST"})
+     * @return Response
      */
     public function oldPlanAction(Request $request, $year = null)
     {
@@ -128,20 +110,13 @@ class ManagerTravelPlanController extends Controller
 
         $year_form->handleRequest($request);
 
-
         if ($year_form->isSubmitted() && $year_form->isValid()) {
-            // data is an array with "name", "email", and "message" keys
             $data = $year_form->getData();
             $year = $data['year'];
             $entries = $em->getRepository('DRIExitBundle:ManagerTravelPlan')->getOldPlan($year);
-            //var_dump($entries);
         }else{
-            //$year = $year-1;
             $entries = $em->getRepository('DRIExitBundle:ManagerTravelPlan')->getOldPlan($year);
         }
-
-        //$em = $this->getDoctrine()->getManager();
-        //$entries = $em->getRepository('DRIExitBundle:ManagerTravelPlan')->getCurrentPlan();
 
         return $this->render('DRIExitBundle:ManagerTravelPlan:old-plan.html.twig', array(
             'year' => $year,
@@ -151,9 +126,12 @@ class ManagerTravelPlanController extends Controller
     }
 
     /**
-    * Get results from paginator and get paginator view.
-    *
-    */
+     * Get results from paginator and get paginator view.
+     *
+     * @param $queryBuilder
+     * @param Request $request
+     * @return array
+     */
     protected function paginator($queryBuilder, Request $request)
     {
         //sorting
@@ -191,9 +169,13 @@ class ManagerTravelPlanController extends Controller
 
         return array($entities, $pagerHtml);
     }
-    
-    /*
+
+    /**
      * Calculates the total of records string
+     *
+     * @param $queryBuilder
+     * @param $request
+     * @return string
      */
     protected function getTotalOfRecordsString($queryBuilder, $request) {
         $totalOfRecords = $queryBuilder->select('COUNT(e.id)')->getQuery()->getSingleScalarResult();
@@ -212,9 +194,10 @@ class ManagerTravelPlanController extends Controller
     /**
      * Displays a form to create a new ManagerTravelPlan entity.
      *
-     * @Route("/new", name="exit_managertravelplan_new")
-     * @Method({"GET", "POST"})
+     * @param Request $request
+     * @Route("/new", name="exit_managertravelplan_new", methods={"GET", "POST"})
      * @Security("has_role('ROLE_METH_ADVISORY')")
+     * @return Response
      */
     public function newAction(Request $request)
     {
@@ -225,7 +208,6 @@ class ManagerTravelPlanController extends Controller
         }
 
         $em = $this->getDoctrine()->getManager();
-        $clientRepo = $em->getRepository('DRIClientBundle:Client');
 
         $managerTravelPlan = new ManagerTravelPlan();
 
@@ -257,13 +239,13 @@ class ManagerTravelPlanController extends Controller
             'form'   => $form->createView(),
         ));
     }
-    
 
     /**
      * Finds and displays a ManagerTravelPlan entity.
      *
-     * @Route("/view/{numberSlug}", name="exit_managertravelplan_show")
-     * @Method("GET")
+     * @param ManagerTravelPlan $managerTravelPlan
+     * @Route("/view/{numberSlug}", name="exit_managertravelplan_show", methods={"GET"})
+     * @return Response
      */
     public function showAction(ManagerTravelPlan $managerTravelPlan)
     {
@@ -273,15 +255,15 @@ class ManagerTravelPlanController extends Controller
             'delete_form' => $deleteForm->createView(),
         ));
     }
-    
-    
 
     /**
      * Displays a form to edit an existing ManagerTravelPlan entity.
      *
-     * @Route("/edit/{numberSlug}", name="exit_managertravelplan_edit")
-     * @Method({"GET", "POST"})
+     * @param Request $request
+     * @param ManagerTravelPlan $managerTravelPlan
+     * @Route("/edit/{numberSlug}", name="exit_managertravelplan_edit", methods={"GET", "POST"})
      * @Security("has_role('ROLE_METH_ADVISORY')")
+     * @return Response
      */
     public function editAction(Request $request, ManagerTravelPlan $managerTravelPlan)
     {
@@ -345,15 +327,14 @@ class ManagerTravelPlanController extends Controller
             return $this->redirectToRoute('exit_managertravelplan_current_plan');
         }
     }
-    
-    
 
     /**
      * Cancel a ManagerTravelPlan entity.
      *
-     * @Route("/cancel/{id}", name="exit_managertravelplan_cancel")
-     * @Method("GET")
+     * @param ManagerTravelPlan $managerTravelPlan
+     * @Route("/cancel/{id}", name="exit_managertravelplan_cancel", methods={"GET"})
      * @Security("has_role('ROLE_METH_ADVISORY')")
+     * @return Response
      */
     public function candelAction(ManagerTravelPlan $managerTravelPlan)
     {
@@ -387,13 +368,14 @@ class ManagerTravelPlanController extends Controller
     /**
      * Deletes a ManagerTravelPlan entity.
      *
-     * @Route("/delete/{id}", name="exit_managertravelplan_delete")
-     * @Method("DELETE")
+     * @param Request $request
+     * @param ManagerTravelPlan $managerTravelPlan
+     * @Route("/delete/{id}", name="exit_managertravelplan_delete", methods={"DELETE"})
      * @Security("has_role('ROLE_ADMIN')")
+     * @return Response
      */
     public function deleteAction(Request $request, ManagerTravelPlan $managerTravelPlan)
     {
-
         $form = $this->createDeleteForm($managerTravelPlan);
         $form->handleRequest($request);
 
@@ -413,8 +395,7 @@ class ManagerTravelPlanController extends Controller
      * Creates a form to delete a ManagerTravelPlan entity.
      *
      * @param ManagerTravelPlan $managerTravelPlan The ManagerTravelPlan entity
-     *
-     * @return \Symfony\Component\Form\Form The form
+     * @return FormInterface The form
      */
     private function createDeleteForm(ManagerTravelPlan $managerTravelPlan)
     {
@@ -428,9 +409,10 @@ class ManagerTravelPlanController extends Controller
     /**
      * Delete ManagerTravelPlan by id
      *
-     * @Route("/delete-by-id/{id}", name="exit_managertravelplan_by_id_delete")
-     * @Method("GET")
+     * @param ManagerTravelPlan $managerTravelPlan
+     * @Route("/delete-by-id/{id}", name="exit_managertravelplan_by_id_delete", methods={"GET"})
      * @Security("has_role('ROLE_ADMIN')")
+     * @return Response
      */
     public function deleteByIdAction(ManagerTravelPlan $managerTravelPlan){
         $em = $this->getDoctrine()->getManager();
@@ -444,15 +426,15 @@ class ManagerTravelPlanController extends Controller
         }
 
         return $this->redirect($this->generateUrl('exit_managertravelplan_index'));
-
     }
-    
 
     /**
      * Bulk Action
-     * @Route("/bulk/delete", name="exit_managertravelplan_bulk_action")
-     * @Method({"GET", "POST"})
+     *
+     * @param Request $request
+     * @Route("/bulk/delete", name="exit_managertravelplan_bulk_action", methods={"GET", "POST"})
      * @Security("has_role('ROLE_ADMIN')")
+     * @return Response
     */
     public function bulkAction(Request $request)
     {
@@ -483,27 +465,38 @@ class ManagerTravelPlanController extends Controller
     /**
      * Generate and save a ManagerTravelPlan to Word
      *
+     * @param string $year
      * @Route("/plan-to/word/{year}", name="exit_managertravelplan_to_word")
+     * @return BinaryFileResponse
+     * @throws Exception
      */
     public function planToWordAction($year = null)
     {
         $em = $this->getDoctrine()->getManager();
+        $mtpRepo = $em->getRepository('DRIExitBundle:ManagerTravelPlan');
         $currentDate = sprintf('%s', date('d/m/Y'));
         $entriesArray = array();
         $name = 'Plan de Salidas al Exterior ';
         $template = "report_templates/manager_travel_plan_template.docx";
 
+        $filename = sprintf('%s - %s.docx', $name, date('Y')+1);
+        $entries = $mtpRepo->getCurrentPlan();
+
         if ($year){
             $filename = sprintf('%s - %s.docx', $name, $year);
-            $entries = $em->getRepository('DRIExitBundle:ManagerTravelPlan')->getOldPlan($year);
-        }else{
-            $filename = sprintf('%s - %s.docx', $name, date('Y')+1);
-            $entries = $em->getRepository('DRIExitBundle:ManagerTravelPlan')->getCurrentPlan();
+            $entries = $mtpRepo->getOldPlan($year);
         }
 
+        /*
+         * todo
+         * Remodelar el repositorio
+         */
+
         foreach ($entries as $entry) {
-            $fullName = $entry->getClient()->getFullName();
-            $position = $entry->getClient()->getWorkersPosition();
+            $client = $entry->getClient();
+
+            $fullName = $client->getFullName();
+            $position = $client->getWorkersPosition();
             $countries = '';
             foreach ($entry->getCountries() as $country){
                 $countries .= $country->getSpName().'</w:t><w:br/><w:t>';

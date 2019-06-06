@@ -2,23 +2,20 @@
 
 namespace DRI\ExitBundle\Form;
 
-use DRI\ExitBundle\Entity\Mission;
 use Symfony\Component\Form\AbstractType;
+
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
-use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+
 use Vich\UploaderBundle\Form\Type\VichFileType;
 
-use DRI\ExitBundle\Entity\Economic;
-use DRI\ExitBundle\Entity\Application;
+use DRI\ExitBundle\Entity\Mission;
 use DRI\UsefulBundle\Form\DatePickerType;
 
 class MissionType extends AbstractType
@@ -77,7 +74,7 @@ class MissionType extends AbstractType
                 ]
             ))
             ->add('concept', ChoiceType::class, [
-                'choices'   => Mission::MISSION_CONCEPT_CHOICE,
+                'choices'   => Mission::$MISSION_CONCEPT_CHOICE,
                 'placeholder' => 'Seleccione el Concepto de Salida',
                 'attr' => [
                     'class' => 'select2',

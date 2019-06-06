@@ -8,11 +8,9 @@
 
 namespace DRI\ExitBundle\Service;
 
-use Cocur\Slugify\Slugify;
 use Vich\UploaderBundle\Naming\NamerInterface;
 use Vich\UploaderBundle\Mapping\PropertyMapping;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use DRI\UsefulBundle\Useful\Useful;
 
 class ExtMisWPSNamer implements NamerInterface
 {

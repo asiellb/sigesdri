@@ -34,7 +34,7 @@ class InstitutionController extends Controller
     {
         $isAjax = $request->isXmlHttpRequest();
 
-        $datatable = $this->get('app.datatable.agreement.institution');
+        $datatable = $this->get('app.datatable.agreements.institution');
         $datatable->buildDatatable();
 
         if ($isAjax) {

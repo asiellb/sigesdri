@@ -3,20 +3,19 @@
 namespace DRI\ExitBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\Validator\Constraints as Assert;
 
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Validator\Constraints as Assert;
+
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
+
+use DateTime;
+use Exception;
 
 use DRI\ClientBundle\Entity\Client;
 use DRI\UserBundle\Entity\User;
 use DRI\PassportBundle\Entity\Passport;
-use DRI\UsefulBundle\Entity\Country;
-use DRI\ExitBundle\Entity\Economic;
-use DRI\ExitBundle\Entity\ManagerTravelPlan;
-use DRI\ExitBundle\Entity\Application;
 use DRI\UsefulBundle\Useful\Useful;
 
 /**
@@ -77,7 +76,7 @@ class Departure
     private $passport;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="date", nullable=true)
      *
@@ -86,7 +85,7 @@ class Departure
     private $passportDelivery;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="date", nullable=true)
      *
@@ -95,7 +94,7 @@ class Departure
     private $departureDate;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="date", nullable=true)
      *
@@ -104,7 +103,7 @@ class Departure
     private $returnDate;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="date", nullable=true)
      *
@@ -141,7 +140,7 @@ class Departure
     private $closed;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime")
      *
@@ -150,7 +149,7 @@ class Departure
     private $createdAt;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime")
      *
@@ -182,8 +181,8 @@ class Departure
      */
     public function __construct()
     {
-        $this->createdAt = new \DateTime('now');
-        $this->updatedAt = new \DateTime('now');
+        $this->createdAt = new DateTime('now');
+        $this->updatedAt = new DateTime('now');
         $this->closed    = false;
     }
 
@@ -236,7 +235,7 @@ class Departure
 
     public function isInProgress(){
         $inDate = $this->getDepartureDate();
-        $now    = new \DateTime("now");
+        $now    = new DateTime("now");
 
         if (($now >= $inDate))
             return true;
@@ -245,7 +244,7 @@ class Departure
 
     public function isOnHold(){
         $inDate = $this->getDepartureDate();
-        $now    = new \DateTime("now");
+        $now    = new DateTime("now");
 
         if (($now < $inDate))
             return true;
@@ -254,7 +253,7 @@ class Departure
 
     public function isCompleted(){
         $inDate = $this->getReturnDate();
-        $now    = new \DateTime("now");
+        $now    = new DateTime("now");
 
         if (($now > $inDate))
             return true;
@@ -401,7 +400,7 @@ class Departure
     /**
      * Set passportDelivery
      *
-     * @param \DateTime $passportDelivery
+     * @param DateTime $passportDelivery
      *
      * @return Departure
      */
@@ -415,7 +414,7 @@ class Departure
     /**
      * Get passportDelivery
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getPassportDelivery()
     {
@@ -425,7 +424,7 @@ class Departure
     /**
      * Set departureDate
      *
-     * @param \DateTime $departureDate
+     * @param DateTime $departureDate
      *
      * @return Departure
      */
@@ -439,7 +438,7 @@ class Departure
     /**
      * Get departureDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getDepartureDate()
     {
@@ -449,7 +448,7 @@ class Departure
     /**
      * Set returnDate
      *
-     * @param \DateTime $returnDate
+     * @param DateTime $returnDate
      *
      * @return Departure
      */
@@ -463,7 +462,7 @@ class Departure
     /**
      * Get returnDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getReturnDate()
     {
@@ -473,7 +472,7 @@ class Departure
     /**
      * Set passportCollection
      *
-     * @param \DateTime $passportCollection
+     * @param DateTime $passportCollection
      *
      * @return Departure
      */
@@ -487,7 +486,7 @@ class Departure
     /**
      * Get passportCollection
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getPassportCollection()
     {
@@ -544,9 +543,9 @@ class Departure
 
 
     /**
-     * @param File|\Symfony\Component\HttpFoundation\File\UploadedFile $results
-     *
+     * @param File|UploadedFile $results
      * @return Departure
+     * @throws Exception
      */
     public function setResultsFile(File $results = null)
     {
@@ -555,7 +554,7 @@ class Departure
         if ($results) {
             // It is required that at least one field changes if you are using doctrine
             // otherwise the event listeners won't be called and the file is lost
-            $this->updatedAt = new \DateTime('now');
+            $this->updatedAt = new DateTime('now');
         }
 
         return $this;
@@ -599,10 +598,11 @@ class Departure
      * @ORM\PrePersist()
      *
      * @return Departure
+     * @throws Exception
      */
     public function setCreatedAt()
     {
-        $this->createdAt = new \DateTime('now');
+        $this->createdAt = new DateTime('now');
 
         return $this;
     }
@@ -610,7 +610,7 @@ class Departure
     /**
      * Get createdAt
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getCreatedAt()
     {
@@ -623,10 +623,11 @@ class Departure
      * @ORM\PreUpdate()
      *
      * @return Departure
+     * @throws Exception
      */
     public function setUpdatedAt()
     {
-        $this->updatedAt = new \DateTime('now');
+        $this->updatedAt = new DateTime('now');
 
         return $this;
     }
@@ -634,7 +635,7 @@ class Departure
     /**
      * Get updatedAt
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getUpdatedAt()
     {

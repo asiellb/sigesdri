@@ -1,13 +1,22 @@
 services:
-#    dri_exit.example:
-#        class: DRI\ExitBundle\Example
-#        arguments: ["@service_id", "plain_value", %parameter%]
 
+#   TWIG EXTENSIONS
     twig.extension.exits:
         class: DRI\ExitBundle\Twig\Extension\DRIExitExtension
         tags:
             - { name: twig.extension }
 
+#   DATATABLES CLASSES
+    app.datatable.exits.application:
+        class: DRI\ExitBundle\Datatables\ApplicationDatatable
+        parent: sg_datatables.datatable.abstract
+
+    app.datatable.exits.departure:
+        class: DRI\ExitBundle\Datatables\DepartureDatatable
+        parent: sg_datatables.datatable.abstract
+
+
+#   NAMER CLASSES
     namer.ext_app_dco_files:
         class: DRI\ExitBundle\Service\ExtAppDCONamer
         tags:
@@ -23,6 +32,7 @@ services:
         tags:
             - { name: namer }
 
+#   FORMTYPE CLASES
     DRI\ExitBundle\Form\DepartureType:
         arguments: ['@doctrine.orm.entity_manager']
         tags: [form.type]

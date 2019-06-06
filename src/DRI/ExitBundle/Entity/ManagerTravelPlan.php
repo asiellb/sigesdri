@@ -2,21 +2,19 @@
 
 namespace DRI\ExitBundle\Entity;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
 use Symfony\Component\Validator\Constraints as Assert;
 
-use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
+
+use DateTime;
 
 use DRI\ClientBundle\Entity\Client;
 use DRI\UserBundle\Entity\User;
-use DRI\PassportBundle\Entity\Passport;
 use DRI\UsefulBundle\Entity\Country;
-use DRI\ExitBundle\Entity\Economic;
-use DRI\ExitBundle\Entity\Departure;
-use DRI\ExitBundle\Entity\Application;
 use DRI\UsefulBundle\Useful\Useful;
 
 /**
@@ -39,13 +37,13 @@ class ManagerTravelPlan
      * ********************************************************************************
      **********************************************************************************/
 
-    const MANAGER_TRAVEL_PLAN_STATE = [
+    public static $MANAGER_TRAVEL_PLAN_STATE = [
         'CON' =>'Confeccionada',
         'APR' =>'Aprobada',
         'REC' =>'Rechazada',
     ];
 
-    const MANAGER_TRAVEL_PLAN_STATE_CHOICE = [
+    public static $MANAGER_TRAVEL_PLAN_STATE_CHOICE = [
         'Confeccionada'  =>'CON',
         'Aprobada'       =>'APR',
         'Rechazada'      =>'REC',
@@ -111,7 +109,7 @@ class ManagerTravelPlan
     private $objetives;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="date")
      */
@@ -149,7 +147,7 @@ class ManagerTravelPlan
     private $approval;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime", nullable=true)
      *
@@ -172,7 +170,7 @@ class ManagerTravelPlan
     private $reject;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime", nullable=true)
      *
@@ -209,7 +207,7 @@ class ManagerTravelPlan
     private $canceled;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime")
      *
@@ -218,7 +216,7 @@ class ManagerTravelPlan
     private $createdAt;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime")
      *
@@ -266,8 +264,9 @@ class ManagerTravelPlan
     {
         $this->state     = 'CON';
         $this->financing = new ArrayCollection();
-        $this->createdAt = new \DateTime('now');
-        $this->updatedAt = new \DateTime('now');
+        $this->countries = new ArrayCollection();
+        $this->createdAt = new DateTime('now');
+        $this->updatedAt = new DateTime('now');
         $this->closed    = false;
         $this->used      = false;
         $this->canceled  = false;
@@ -423,7 +422,7 @@ class ManagerTravelPlan
     /**
      * Set departureDate
      *
-     * @param \DateTime $departureDate
+     * @param DateTime $departureDate
      *
      * @return ManagerTravelPlan
      */
@@ -437,7 +436,7 @@ class ManagerTravelPlan
     /**
      * Get departureDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getDepartureDate()
     {
@@ -519,7 +518,7 @@ class ManagerTravelPlan
     /**
      * Set approvalDate
      *
-     * @param \DateTime $approvalDate
+     * @param DateTime $approvalDate
      *
      * @return ManagerTravelPlan
      */
@@ -533,7 +532,7 @@ class ManagerTravelPlan
     /**
      * Get approvalDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getApprovalDate()
     {
@@ -592,7 +591,7 @@ class ManagerTravelPlan
     /**
      * Set rejectDate
      *
-     * @param \DateTime $rejectDate
+     * @param DateTime $rejectDate
      *
      * @return ManagerTravelPlan
      */
@@ -606,7 +605,7 @@ class ManagerTravelPlan
     /**
      * Get rejectDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getRejectDate()
     {
@@ -712,7 +711,7 @@ class ManagerTravelPlan
     /**
      * Set createdAt
      *
-     * @param \DateTime $createdAt
+     * @param DateTime $createdAt
      *
      * @return ManagerTravelPlan
      */
@@ -726,7 +725,7 @@ class ManagerTravelPlan
     /**
      * Get createdAt
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getCreatedAt()
     {
@@ -736,7 +735,7 @@ class ManagerTravelPlan
     /**
      * Set updatedAt
      *
-     * @param \DateTime $updatedAt
+     * @param DateTime $updatedAt
      *
      * @return ManagerTravelPlan
      */
@@ -750,7 +749,7 @@ class ManagerTravelPlan
     /**
      * Get updatedAt
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getUpdatedAt()
     {
@@ -774,7 +773,7 @@ class ManagerTravelPlan
     /**
      * Get client
      *
-     * @return \DRI\ClientBundle\Entity\Client
+     * @return Client
      */
     public function getClient()
     {
@@ -790,9 +789,10 @@ class ManagerTravelPlan
      */
     public function addCountry(Country $country)
     {
-        $this->countries[] = $country;
-
-        return $this;
+        if ($this->countries->contains($country)) {
+            return $this;
+        }
+        $this->countries->add($country);
     }
 
     /**
@@ -802,13 +802,17 @@ class ManagerTravelPlan
      */
     public function removeCountry(Country $country)
     {
+        if (!$this->countries->contains($country)) {
+            return;
+        }
+
         $this->countries->removeElement($country);
     }
 
     /**
      * Get countries
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection
      */
     public function getCountries()
     {
@@ -931,9 +935,10 @@ class ManagerTravelPlan
      **********************************************************************************/
 
 
-
-
-
+    /**
+     * @param $state
+     * @return string
+     */
     static function state_AcronimToName($state){
         switch ($state){
             case 'CON': return 'Confeccionada';break;
@@ -943,6 +948,10 @@ class ManagerTravelPlan
         }
     }
 
+    /**
+     * @param $state
+     * @return string
+     */
     static function state_NameToAcronim($state){
         switch ($state){
             case 'Confeccionada': return 'CON';break;

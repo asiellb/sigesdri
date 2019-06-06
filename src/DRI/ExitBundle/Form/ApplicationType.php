@@ -2,30 +2,22 @@
 
 namespace DRI\ExitBundle\Form;
 
-use function PHPSTORM_META\type;
+use Symfony\Component\Form\AbstractType;
+
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
-use Symfony\Component\Form\Extension\Core\Type\FormType;
-use Symfony\Component\Form\Extension\Core\Type\NumberType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+
 use Doctrine\ORM\EntityRepository;
+
 use Vich\UploaderBundle\Form\Type\VichFileType;
 
 use DRI\ClientBundle\Entity\Client;
-use DRI\ClientBundle\Repository\ClientRepository;
 use DRI\ExitBundle\Entity\Application;
-use DRI\ExitBundle\Entity\Economic;
-use DRI\ExitBundle\Entity\Mission;
-use DRI\ExitBundle\Entity\CommandFile;
-use DRI\ExitBundle\Form\MissionType;
-use DRI\ExitBundle\Form\CommandFileType;
 use DRI\UsefulBundle\Form\DatePickerType;
 
 class ApplicationType extends AbstractType
@@ -183,7 +175,7 @@ class ApplicationType extends AbstractType
                 'label_attr' => [
                     'class' => 'icheck-label'
                 ],
-                'choices'  => Application::EXIT_APPLICATION_STATE_CHOICE,
+                'choices'  => Application::$EXIT_APPLICATION_STATE_CHOICE,
                 'attr' => array(
                     'class'=>'radio-list',
                 ),

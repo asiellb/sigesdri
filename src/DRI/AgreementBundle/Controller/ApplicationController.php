@@ -37,7 +37,7 @@ class ApplicationController extends Controller
     {
         $isAjax = $request->isXmlHttpRequest();
 
-        $datatable = $this->get('app.datatable.agreement.application');
+        $datatable = $this->get('app.datatable.agreements.application');
         $datatable->buildDatatable();
 
         if ($isAjax) {
