@@ -2,14 +2,13 @@
 
 namespace DRI\PassportBundle\Entity;
 
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
-use DRI\ExitBundle\Entity\Departure;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
@@ -18,6 +17,7 @@ use DateTime;
 use DateInterval;
 use Exception;
 
+use DRI\ExitBundle\Entity\Departure;
 use DRI\ClientBundle\Entity\Client;
 use DRI\UserBundle\Entity\User;
 use DRI\UsefulBundle\Useful\Useful;
