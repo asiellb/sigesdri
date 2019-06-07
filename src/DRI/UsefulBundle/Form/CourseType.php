@@ -2,12 +2,13 @@
 
 namespace DRI\UsefulBundle\Form;
 
-use DRI\UsefulBundle\Entity\Course;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+
+use DRI\UsefulBundle\Entity\Course;
 
 class CourseType extends AbstractType
 {

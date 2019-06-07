@@ -6,7 +6,6 @@ use DRI\UsefulBundle\Entity\Area;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AreaType extends AbstractType
@@ -21,7 +20,7 @@ class AreaType extends AbstractType
             ->add('type', ChoiceType::class, array(
                 'placeholder' => 'Seleccione el Tipo',
                 'label' => 'Tipo',
-                'choices'  => Area::AREA_TYPE_CHOICE,
+                'choices'  => Area::$AREA_TYPE_CHOICE,
                 'attr' => array(
                     'class'=>'bs-select',
                 ),
