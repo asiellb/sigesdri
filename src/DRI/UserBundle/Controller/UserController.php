@@ -2,25 +2,29 @@
 
 namespace DRI\UserBundle\Controller;
 
-use Symfony\Component\HttpFoundation\Request;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Routing\Annotation\Route;
 use DRI\UserBundle\Entity\User;
-use DRI\UserBundle\Form\UserType;
 
 /**
  * User controller.
  *
  * @Route("/user")
+ * @Security("has_role('ROLE_SUPER_ADMIN')")
  */
 class UserController extends Controller
 {
     /**
      * Lists all User entities.
      *
-     * @Route("/", name="user_index")
-     * @Method("GET")
+     * @Route("/", name="user_index", methods={"GET"})
+     * @return Response
      */
     public function indexAction()
     {
@@ -36,8 +40,9 @@ class UserController extends Controller
     /**
      * Creates a new User entity.
      *
-     * @Route("/new", name="user_new")
-     * @Method({"GET", "POST"})
+     * @param Request $request
+     * @Route("/new", name="user_new", methods={"GET", "POST"})
+     * @return RedirectResponse|Response
      */
     public function newAction(Request $request)
     {
@@ -62,8 +67,9 @@ class UserController extends Controller
     /**
      * Finds and displays a User entity.
      *
-     * @Route("/{id}", name="user_show")
-     * @Method("GET")
+     * @param User $user
+     * @Route("/{id}", name="user_show", methods={"GET"})
+     * @return Response
      */
     public function showAction(User $user)
     {
@@ -78,8 +84,10 @@ class UserController extends Controller
     /**
      * Displays a form to edit an existing User entity.
      *
-     * @Route("/{id}/edit", name="user_edit")
-     * @Method({"GET", "POST"})
+     * @param Request $request
+     * @param User $user
+     * @Route("/{id}/edit", name="user_edit", methods={"GET", "POST"})
+     * @return RedirectResponse|Response
      */
     public function editAction(Request $request, User $user)
     {
@@ -105,8 +113,10 @@ class UserController extends Controller
     /**
      * Deletes a User entity.
      *
-     * @Route("/{id}", name="user_delete")
-     * @Method("DELETE")
+     * @param Request $request
+     * @param User $user
+     * @Route("/{id}", name="user_delete", methods={"DELETE"})
+     * @return RedirectResponse
      */
     public function deleteAction(Request $request, User $user)
     {
@@ -126,8 +136,7 @@ class UserController extends Controller
      * Creates a form to delete a User entity.
      *
      * @param User $user The User entity
-     *
-     * @return \Symfony\Component\Form\Form The form
+     * @return FormInterface The form
      */
     private function createDeleteForm(User $user)
     {
