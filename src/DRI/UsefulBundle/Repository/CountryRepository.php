@@ -2,9 +2,8 @@
 
 namespace DRI\UsefulBundle\Repository;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
-use DRI\UsefulBundle\Entity\Country;
+
 /**
  * CountriesRepository
  *
