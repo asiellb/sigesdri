@@ -8,22 +8,33 @@
 
 namespace DRI\UsefulBundle\Twig\Extension;
 
-use DRI\UsefulBundle\Entity\Course;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
+use Twig\TwigFunction;
 
+use DateTime;
+use DateInterval;
+use Exception;
+
+use DRI\UsefulBundle\Entity\Course;
 
 class DRIUsefulExtension extends AbstractExtension
 {
+    /**
+     * @return array|TwigFunction[]
+     */
     public function getFunctions()
     {
         return array(
-            new \Twig_SimpleFunction('dias_faltantes', [$this, 'diasFaltantes']),
-            new \Twig_SimpleFunction('month_name', [$this, 'monthName']),
-            new \Twig_SimpleFunction('fn_course_type', [$this, 'fnCourseType']),
+            new TwigFunction('dias_faltantes', [$this, 'diasFaltantes']),
+            new TwigFunction('month_name', [$this, 'monthName']),
+            new TwigFunction('fn_course_type', [$this, 'fnCourseType']),
         );
     }
 
+    /**
+     * @return array|TwigFilter[]
+     */
     public function getFilters()
     {
         return [
@@ -32,25 +43,37 @@ class DRIUsefulExtension extends AbstractExtension
             new TwigFilter('cuenta_anos', [$this, 'cuentaAnos']),
         ];
     }
+
+    /**
+     * @param $fecha
+     * @return DateInterval|false
+     * @throws Exception
+     */
     public function diasFaltantes($fecha){
-        $ahora = new \DateTime('now');
+        $ahora = new DateTime('now');
 
         $faltan = date_diff($fecha, $ahora);
         
         return $faltan;
     }
 
-    public function cuentaAtras($fecha, $id)
+    /**
+     * @param DateTime $pfecha
+     * @param $id
+     * @return string
+     */
+    public function cuentaAtras(DateTime $pfecha, $id)
     {
-        $fecha = $fecha->format('Y,').($fecha->format('m')-1).$fecha->format(',d,H,i,s');
+        $fecha = $pfecha->format('Y,').($pfecha->format('m')-1).$pfecha->format(',d,H,i,s');
 
         $html = <<<EOJ
             <script type="text/javascript">                
                 function muestraCuentaAtras(){
-                    var dias, horas, minutos, segundos;
+                    var anos, dias, horas, minutos, segundos;
                     var ahora = new Date();
-                    var fechaExpiracion = new Date($fecha);
+                    var fechaExpiracion = new Date($fecha;)
                     var falta = Math.floor( (ahora.getTime() - fechaExpiracion.getTime()) / 1000 );
+                    var cuentaAtras, diasFaltantes;
                     
                     if (falta < 0) {
                         cuentaAtras = '-';
@@ -79,18 +102,25 @@ EOJ;
         return $html;
     }
 
-    public function cuentaAnos($fecha, $id)
+    /**
+     * @param DateTime $pfecha
+     * @param $id
+     * @return string
+     */
+    public function cuentaAnos(DateTime $pfecha, $id)
     {
-        $fecha = $fecha->format('Y,').($fecha->format('m')-1).$fecha->format(',d,H,i,s');
+
+        $fecha = $pfecha->format('Y,').($pfecha->format('m')-1).$pfecha->format(',d,H,i,s');
 
         $html = <<<EOJ
             <script type="text/javascript">
                 function muestraCuentaAnos(){
                     var anos;
                     var fechaActual = new Date();
-                    var fechaInicio = new Date($fecha);
+                    var fechaInicio = new Date($fecha;)
                     var transcurrido = Math.floor( (fechaActual.getTime() - fechaInicio.getTime()) / 1000 );
-
+                    var cantAnos;
+                    
                     if (transcurrido < 0) {
                         cantAnos = '<strong class="font-red"><i class="fa fa-warning"></i> Error en la fecha de alta!!!</strong>';
                     }
@@ -111,6 +141,10 @@ EOJ;
         return $html;
     }
 
+    /**
+     * @param $month
+     * @return string
+     */
     public function monthName($month){
         $monthView = '';
         switch ($month){
