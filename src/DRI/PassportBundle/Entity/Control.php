@@ -2,20 +2,18 @@
 
 namespace DRI\PassportBundle\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
-use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
-use DRI\ClientBundle\Entity\Client;
-use DRI\UserBundle\Entity\User;
-use DRI\PassportBundle\Entity\Application;
-use DRI\UsefulBundle\Useful\Useful;
+use DateTime;
+use Exception;
 
-use DRI\PassportBundle\Entity\Passport;
+use DRI\UserBundle\Entity\User;
+use DRI\UsefulBundle\Useful\Useful;
 
 /**
  * Control
@@ -65,7 +63,7 @@ class Control
     private $passport;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="date")
      *
@@ -83,7 +81,7 @@ class Control
     private $receivesSpecialist;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="date", nullable=true)
      */
@@ -105,7 +103,7 @@ class Control
     private $closed;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime", nullable=true)
      *
@@ -114,7 +112,7 @@ class Control
     private $createdAt;
 
     /**
-     * @var \Datetime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime", nullable=true)
      *
@@ -146,8 +144,8 @@ class Control
     public function __construct()
     {
         $this->closed    = false;
-        $this->createdAt = new \DateTime('now');
-        $this->updatedAt = new \DateTime('now');
+        $this->createdAt = new DateTime('now');
+        $this->updatedAt = new DateTime('now');
     }
 
     public function __toString()
@@ -260,7 +258,7 @@ class Control
     /**
      * Set deliveryDate
      *
-     * @param \DateTime $deliveryDate
+     * @param DateTime $deliveryDate
      *
      * @return Control
      */
@@ -274,7 +272,7 @@ class Control
     /**
      * Get deliveryDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getDeliveryDate()
     {
@@ -298,7 +296,7 @@ class Control
     /**
      * Get receivesSpecialist
      *
-     * @return \DRI\UserBundle\Entity\User
+     * @return User
      */
     public function getReceivesSpecialist()
     {
@@ -308,7 +306,7 @@ class Control
     /**
      * Set pickUpDate
      *
-     * @param \DateTime $pickUpDate
+     * @param DateTime $pickUpDate
      *
      * @return Control
      */
@@ -328,7 +326,7 @@ class Control
     /**
      * Get pickUpDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getPickUpDate()
     {
@@ -352,7 +350,7 @@ class Control
     /**
      * Get deliversSpecialist
      *
-     * @return \DRI\UserBundle\Entity\User
+     * @return User
      */
     public function getDeliversSpecialist()
     {
@@ -389,10 +387,11 @@ class Control
      * @ORM\PrePersist
      *
      * @return Control
+     * @throws Exception
      */
     public function setCreatedAt()
     {
-        $this->createdAt = new \DateTime('now');;
+        $this->createdAt = new DateTime('now');;
 
         return $this;
     }
@@ -400,7 +399,7 @@ class Control
     /**
      * Get createdAt
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getCreatedAt()
     {
@@ -413,10 +412,11 @@ class Control
      * @ORM\PreUpdate
      *
      * @return Control
+     * @throws Exception
      */
     public function setUpdatedAt()
     {
-        $this->updatedAt = new \DateTime('now');
+        $this->updatedAt = new DateTime('now');
 
         return $this;
     }
@@ -424,7 +424,7 @@ class Control
     /**
      * Get updatedAt
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getUpdatedAt()
     {
@@ -449,7 +449,7 @@ class Control
     /**
      * Get createdBy
      *
-     * @return \DRI\UserBundle\Entity\User
+     * @return User
      */
     public function getCreatedBy()
     {

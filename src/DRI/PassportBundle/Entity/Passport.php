@@ -2,17 +2,24 @@
 
 namespace DRI\PassportBundle\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\ArrayCollection;
 
+use DRI\ExitBundle\Entity\Departure;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
+
+use DateTime;
+use DateInterval;
+use Exception;
 
 use DRI\ClientBundle\Entity\Client;
 use DRI\UserBundle\Entity\User;
-use DRI\PassportBundle\Entity\Application;
 use DRI\UsefulBundle\Useful\Useful;
 
 /**
@@ -36,7 +43,7 @@ class Passport
      * ********************************************************************************
      **********************************************************************************/
 
-    const PASSPORT_TYPE = [
+    public static $PASSPORT_TYPE = [
         'COR' => 'Corriente',
         //'DIP' => 'Diplomático',
         'OFI' => 'Oficial',
@@ -44,7 +51,7 @@ class Passport
         //'MAR' => 'Marino',
     ];
 
-    const PASSPORT_TYPE_CHOICE = [
+    public static $PASSPORT_TYPE_CHOICE = [
         'Corriente'   =>'COR',
         //'Diplomático' =>'DIP',
         'Oficial'     =>'OFI',
@@ -52,7 +59,7 @@ class Passport
         //'Marino'      =>'MAR',
     ];
 
-    const PASSPORT_STATE = [
+    public static $PASSPORT_STATE = [
         'ACT'  => 'Activo',
         'PPRO' => 'Por Prorrogar',
         'RPRO' => 'Requiere Prorrogar',
@@ -61,7 +68,7 @@ class Passport
         'BAJ'  => 'Baja',
     ];
 
-    const PASSPORT_STATE_CHOICE = [
+    public static $PASSPORT_STATE_CHOICE = [
         'Activo'             =>'ACT',
         'Por Prorrogar'      =>'PPRO',
         'Requiere Prorrogar' =>'RPRO',
@@ -121,7 +128,7 @@ class Passport
     private $holder;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="date")
      *
@@ -131,7 +138,7 @@ class Passport
     private $issueDate;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="date")
      *
@@ -174,7 +181,7 @@ class Passport
     private $firstExtension;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="date", nullable=true)
      *
@@ -191,7 +198,7 @@ class Passport
     private $secondExtension;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="date", nullable=true)
      *
@@ -208,7 +215,7 @@ class Passport
     private $drop;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="date", nullable=true)
      *
@@ -245,7 +252,7 @@ class Passport
     private $inStore;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime", nullable=true)
      *
@@ -254,7 +261,7 @@ class Passport
     private $createdAt;
 
     /**
-     * @var \Datetime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime", nullable=true)
      *
@@ -305,18 +312,21 @@ class Passport
 
     /**
      * Passport constructor.
-     *
+     * @throws Exception
      */
     public function __construct()
     {
         $this->controls     = new ArrayCollection();
         $this->firstPage    = '';
         $this->dropDate     = null;
-        $this->createdAt    = new \DateTime('now');
-        $this->updatedAt    = new \DateTime('now');
+        $this->createdAt    = new DateTime('now');
+        $this->updatedAt    = new DateTime('now');
         $this->inStore      = true;
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         return $this->getNumber();
@@ -333,8 +343,9 @@ class Passport
      **********************************************************************************/
 
 
-
-
+    /**
+     * @return bool|null
+     */
     public function hasHolder(){
         if(is_null($this->holder)){
             return null;
@@ -342,6 +353,9 @@ class Passport
         return true;
     }
 
+    /**
+     * @return bool|null
+     */
     public function hasApplication(){
         if(is_null($this->application) || $this->application == false){
             return null;
@@ -349,6 +363,9 @@ class Passport
         return true;
     }
 
+    /**
+     * @return bool
+     */
     public function isClosed(){
         if($this->closed){
             return true;
@@ -356,6 +373,9 @@ class Passport
         return false;
     }
 
+    /**
+     * @return bool
+     */
     public function isInStore(){
         if($this->inStore){
             return true;
@@ -363,43 +383,55 @@ class Passport
         return false;
     }
 
+    /**
+     * @return bool
+     * @throws Exception
+     */
     public function isActive(){
         $inDate = $this->getIssueDate();
         $exDate = $this->getExpiryDate();
-        $now    = new \DateTime("now");
+        $now    = new DateTime("now");
 
         if (($now >= $inDate) && ($now <= $exDate))
             return true;
         return false;
     }
 
+    /**
+     * @return bool
+     * @throws Exception
+     */
     public function isExpired(){
         $exDate = $this->getExpiryDate();
-        $now    = new \DateTime("now");
+        $now    = new DateTime("now");
 
         if ($now > $exDate)
             return true;
         return false;
     }
 
+    /**
+     * @return bool
+     * @throws Exception
+     */
     public function isForExtend(){
         if($this->getType() == 'COR'){
             $issueDate      = $this->getIssueDate();
             $firstLimitExt  = clone $issueDate;
-            $firstLimitExt->add(new \DateInterval('P2Y'));
+            $firstLimitExt->add(new DateInterval('P2Y'));
             $secondLimitExt = clone $issueDate;
-            $secondLimitExt->add(new \DateInterval('P4Y'));
-            $now            = new \DateTime("now");
+            $secondLimitExt->add(new DateInterval('P4Y'));
+            $now            = new DateTime("now");
 
             if(!$this->getFirstExtension()){
                 $firstAdvise = clone $firstLimitExt;
-                $firstAdvise->sub(new \DateInterval('P3M'));
+                $firstAdvise->sub(new DateInterval('P3M'));
 
                 if ($now >= $firstAdvise)
                     return true;
             }elseif (!$this->getSecondExtension()){
                 $secondAdvise = clone $secondLimitExt;
-                $secondAdvise->sub(new \DateInterval('P3M'));
+                $secondAdvise->sub(new DateInterval('P3M'));
 
                 if ($now >= $secondAdvise)
                     return true;
@@ -408,14 +440,18 @@ class Passport
         return false;
     }
 
+    /**
+     * @return bool
+     * @throws Exception
+     */
     public function isRequireExtend(){
         if($this->getType() == 'COR'){
             $issueDate      = $this->getIssueDate();
             $firstLimitExt  = clone $issueDate;
-            $firstLimitExt->add(new \DateInterval('P2Y'));
+            $firstLimitExt->add(new DateInterval('P2Y'));
             $secondLimitExt = clone $issueDate;
-            $secondLimitExt->add(new \DateInterval('P4Y'));
-            $now            = new \DateTime("now");
+            $secondLimitExt->add(new DateInterval('P4Y'));
+            $now            = new DateTime("now");
 
             if(!$this->getFirstExtension()){
                 if ($now >= $firstLimitExt)
@@ -428,33 +464,42 @@ class Passport
         return false;
     }
 
+    /**
+     * @return bool
+     * @throws Exception
+     */
     public function isForExpiring(){
         $exDate = $this->getExpiryDate();
         $toExDate = clone $exDate;
-        $toExDate->sub(new \DateInterval('P6M'));
-        $now    = new \DateTime("now");
+        $toExDate->sub(new DateInterval('P6M'));
+        $now    = new DateTime("now");
 
         if (($now >= $toExDate) && ($now <= $exDate))
             return true;
         return false;
     }
 
+    /**
+     * @return string
+     * @throws Exception
+     */
     public function getState(){
+        $state = '';
         if($this->isExpired()){
-            $this->state = 'VEN';
+            $state = 'VEN';
         }elseif ($this->isForExpiring()){
-            $this->state = 'PVEN';
+            $state = 'PVEN';
         }elseif ($this->getDrop() == true){
-            $this->state = 'BAJ';
+            $state = 'BAJ';
         }elseif ($this->isRequireExtend()){
-            $this->state = 'RPRO';
+            $state = 'RPRO';
         }elseif ($this->isForExtend()){
-            $this->state = 'PPRO';
+            $state = 'PPRO';
         }elseif ($this->isActive()){
-            $this->state = 'ACT';
+            $state = 'ACT';
         }
 
-        return $this->state;
+        return $state;
     }
 
 
@@ -506,9 +551,10 @@ class Passport
 
 
     /**
-     * @param File|\Symfony\Component\HttpFoundation\File\UploadedFile $firstPage
+     * @param File|UploadedFile $firstPage
      *
      * @return Passport
+     * @throws Exception
      */
     public function setFirstPageFile(File $firstPage = null)
     {
@@ -517,7 +563,7 @@ class Passport
         if ($firstPage) {
             // It is required that at least one field changes if you are using doctrine
             // otherwise the event listeners won't be called and the file is lost
-            $this->updatedAt = new \DateTime('now');
+            $this->updatedAt = new DateTime('now');
         }
 
         return $this;
@@ -583,7 +629,7 @@ class Passport
     /**
      * Set issueDate
      *
-     * @param \DateTime $issueDate
+     * @param DateTime $issueDate
      *
      * @return Passport
      */
@@ -597,7 +643,7 @@ class Passport
     /**
      * Get issueDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getIssueDate()
     {
@@ -607,7 +653,7 @@ class Passport
     /**
      * Set expiryDate
      *
-     * @param \DateTime $expiryDate
+     * @param DateTime $expiryDate
      *
      * @return Passport
      */
@@ -621,7 +667,7 @@ class Passport
     /**
      * Get expiryDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getExpiryDate()
     {
@@ -658,13 +704,14 @@ class Passport
      * @param boolean $drop
      *
      * @return Passport
+     * @throws Exception
      */
     public function setDrop($drop)
     {
         $this->drop = $drop;
 
         if ($drop){
-            $this->dropDate = new \DateTime('now');
+            $this->dropDate = new DateTime('now');
             $this->closed = true;
             $this->inStore = false;
         }
@@ -709,35 +756,11 @@ class Passport
     /**
      * Get dropDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getDropDate()
     {
         return $this->dropDate;
-    }
-
-    /**
-     * Set exits
-     *
-     * @param array $exits
-     *
-     * @return Passport
-     */
-    public function setExits($exits)
-    {
-        $this->exits = $exits;
-
-        return $this;
-    }
-
-    /**
-     * Get exits
-     *
-     * @return array
-     */
-    public function getExits()
-    {
-        return $this->exits;
     }
 
     /**
@@ -746,10 +769,11 @@ class Passport
      * @ORM\PrePersist
      *
      * @return Passport
+     * @throws Exception
      */
     public function setCreatedAt()
     {
-        $this->createdAt = new \DateTime('now');;
+        $this->createdAt = new DateTime('now');;
 
         return $this;
     }
@@ -757,7 +781,7 @@ class Passport
     /**
      * Get createdAt
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getCreatedAt()
     {
@@ -770,10 +794,11 @@ class Passport
      * @ORM\PreUpdate
      *
      * @return Passport
+     * @throws Exception
      */
     public function setUpdatedAt()
     {
-        $this->updatedAt = new \DateTime('now');
+        $this->updatedAt = new DateTime('now');
 
         return $this;
     }
@@ -781,7 +806,7 @@ class Passport
     /**
      * Get updatedAt
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getUpdatedAt()
     {
@@ -805,7 +830,7 @@ class Passport
     /**
      * Get holder
      *
-     * @return \DRI\ClientBundle\Entity\Client
+     * @return Client
      */
     public function getHolder()
     {
@@ -829,7 +854,7 @@ class Passport
     /**
      * Get createdBy
      *
-     * @return \DRI\UserBundle\Entity\User
+     * @return User
      */
     public function getCreatedBy()
     {
@@ -839,7 +864,7 @@ class Passport
     /**
      * Set dropDate
      *
-     * @param \DateTime $dropDate
+     * @param DateTime $dropDate
      *
      * @return Passport
      */
@@ -928,11 +953,11 @@ class Passport
     /**
      * Add departure
      *
-     * @param \DRI\ExitBundle\Entity\Departure $departure
+     * @param Departure $departure
      *
      * @return Passport
      */
-    public function addDeparture(\DRI\ExitBundle\Entity\Departure $departure)
+    public function addDeparture(Departure $departure)
     {
         $this->departures[] = $departure;
 
@@ -942,9 +967,9 @@ class Passport
     /**
      * Remove departure
      *
-     * @param \DRI\ExitBundle\Entity\Departure $departure
+     * @param Departure $departure
      */
-    public function removeDeparture(\DRI\ExitBundle\Entity\Departure $departure)
+    public function removeDeparture(Departure $departure)
     {
         $this->departures->removeElement($departure);
     }
@@ -952,7 +977,7 @@ class Passport
     /**
      * Get departures
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection
      */
     public function getDepartures()
     {
@@ -1035,7 +1060,7 @@ class Passport
     /**
      * Get controls
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection
      */
     public function getControls()
     {
@@ -1070,7 +1095,7 @@ class Passport
     /**
      * Set firstExtensionDate
      *
-     * @param \DateTime $firstExtensionDate
+     * @param DateTime $firstExtensionDate
      *
      * @return Passport
      */
@@ -1084,7 +1109,7 @@ class Passport
     /**
      * Get firstExtensionDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getFirstExtensionDate()
     {
@@ -1118,7 +1143,7 @@ class Passport
     /**
      * Set secondExtensionDate
      *
-     * @param \DateTime $secondExtensionDate
+     * @param DateTime $secondExtensionDate
      *
      * @return Passport
      */
@@ -1132,7 +1157,7 @@ class Passport
     /**
      * Get secondExtensionDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getSecondExtensionDate()
     {
@@ -1150,8 +1175,10 @@ class Passport
      **********************************************************************************/
 
 
-
-
+    /**
+     * @param $type
+     * @return string
+     */
     static function type_AcronimToName($type){
         switch ($type){
             case 'COR': return 'Corriente';break;
@@ -1163,6 +1190,10 @@ class Passport
         }
     }
 
+    /**
+     * @param $type
+     * @return string
+     */
     static function type_NameToAcronim($type){
         switch ($type){
             case 'Corriente': return 'COR';break;
@@ -1174,6 +1205,10 @@ class Passport
         }
     }
 
+    /**
+     * @param $state
+     * @return string
+     */
     static function state_AcronimToName($state){
         switch ($state){
             case 'ACT': return 'Activo';break;
@@ -1186,6 +1221,10 @@ class Passport
         }
     }
 
+    /**
+     * @param $state
+     * @return string
+     */
     static function state_NameToAcronim($state){
         switch ($state){
             case 'Activo': return 'ACT';break;

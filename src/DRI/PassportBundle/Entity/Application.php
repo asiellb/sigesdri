@@ -37,34 +37,34 @@ class Application
      * ********************************************************************************
      **********************************************************************************/
 
-    const PASSPORT_APPLICATION_REASON = [
+    public static $PASSPORT_APPLICATION_REASON = [
         "CON" => "Confección",
         "PRO" => "Prórroga",
     ];
 
-    const PASSPORT_APPLICATION_REASON_CHOICE = [
+    public static $PASSPORT_APPLICATION_REASON_CHOICE = [
         'Confección' =>'CON',
         'Prórroga'   =>'PRO'
     ];
 
-    const PASSPORT_APPLICATION_TYPE = [
+    public static $PASSPORT_APPLICATION_TYPE = [
         'REG' => 'Regular',
         'INM' => 'Inmediato',
     ];
 
-    const PASSPORT_APPLICATION_TYPE_CHOICE = [
+    public static $PASSPORT_APPLICATION_TYPE_CHOICE = [
         'Regular'   =>'REG',
         'Inmediato' =>'INM'
     ];
 
-    const PASSPORT_APPLICATION_STATE = [
+    public static $PASSPORT_APPLICATION_STATE = [
         'CON' => 'Confeccionada',
         'ENV' => 'Enviada',
         'CNF' => 'Confirmada',
         'REC' => 'Rechazada',
     ];
 
-    const PASSPORT_APPLICATION_STATE_CHOICE = [
+    public static $PASSPORT_APPLICATION_STATE_CHOICE = [
         'Confeccionada' => 'CON',
         'Enviada'       => 'ENV',
         'Confirmada'    => 'CNF',
