@@ -1,17 +1,29 @@
 services:
-#    dri_passport.example:
-#        class: DRI\PassportBundle\Example
-#        arguments: ["@service_id", "plain_value", %parameter%]
 
+#   TWIG EXTENSIONS
     twig.extension.passports:
         class: DRI\PassportBundle\Twig\Extension\DRIPassportExtension
         tags:
             - { name: twig.extension }
 
-    app.datatable.control:
+#   DATATABLES CLASSES
+    app.datatable.passports.passport:
+        class: DRI\PassportBundle\Datatables\PassportDatatable
+        parent: sg_datatables.datatable.abstract
+
+    app.datatable.passports.application:
+        class: DRI\PassportBundle\Datatables\ApplicationDatatable
+        parent: sg_datatables.datatable.abstract
+
+    app.datatable.passports.actives.application:
+        class: DRI\PassportBundle\Datatables\ActivesApplicationDatatable
+        parent: sg_datatables.datatable.abstract
+
+    app.datatable.passports.control:
         class: DRI\PassportBundle\Datatables\ControlDatatable
         parent: sg_datatables.datatable.abstract
 
+#   NAMER CLASSES
     namer.passports_images:
         class: DRI\PassportBundle\Service\PassportNamer
         tags:

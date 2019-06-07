@@ -66,7 +66,7 @@
                         <button class="btn btn-success btn-circle" type="submit">
                             <i class="fa fa-check"></i> Guardar
                         </button>
-                        <a class="btn btn-circle btn-icon-only btn-default fullscreen" href="javascript:;"> </a>
+                        <a class="btn btn-circle btn-icon-only btn-default fullscreen" href="javascript:"> </a>
                     </div>
                 </div>
                 <div class="portlet-body form">
@@ -77,7 +77,7 @@
                                 {% if holder is null %}
                                     {{ form_widget(form.holder) }}
                                     <span class="help-block"> Si no se ha agregado el Cliente utilice el campo
-                                        <a id="show-client-ci" href="javascript:;" class="text-info"> CI del Cliente</a>.
+                                        <a id="show-client-ci" href="javascript:" class="text-info"> CI del Cliente</a>.
                                     </span>
                                 {% else %}
                                     <select id="passport-holder-selected" class="select2" disabled="disabled">
@@ -94,7 +94,7 @@
                                 {% if holder is null %}
                                     {{ form_widget(form.clientCi) }}
                                     <span class="help-block"> Si ya se agregó el Cliente utilice el campo
-                                    <a id="show-holder" href="javascript:;" class="text-info"> Titular</a>.</span>
+                                    <a id="show-holder" href="javascript:" class="text-info"> Titular</a>.</span>
                                 {% else %}
                                     <input type="text" class="form-control" value="{{ holder.ci }}" disabled>
                                 {% endif %}

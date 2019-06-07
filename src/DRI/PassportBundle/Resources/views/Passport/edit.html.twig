@@ -74,7 +74,7 @@
                         <button class="btn btn-success btn-circle" type="submit">
                             <i class="fa fa-check"></i> Guardar
                         </button>
-                        <a class="btn btn-circle btn-icon-only btn-default fullscreen" href="javascript:;"> </a>
+                        <a class="btn btn-circle btn-icon-only btn-default fullscreen" href="javascript:"> </a>
                     </div>
                 </div>
                 <div class="portlet-body form">
@@ -86,7 +86,7 @@
                                 <div class="col-md-10">
                                     {{ form_widget(edit_form.holder) }}
                                     <span class="help-block"> Si no se ha agregado el Cliente utilice el campo
-                                        <a id="show-client-ci" href="javascript:;" class="text-info"> CI del Cliente</a>.
+                                        <a id="show-client-ci" href="javascript:" class="text-info"> CI del Cliente</a>.
                                     </span>
                                 </div>
                                 <div id="form_holder_error"> </div>
@@ -96,7 +96,7 @@
                                 <div class="col-md-10">
                                     {{ form_widget(edit_form.clientCi) }}
                                     <span class="help-block"> Si ya se agregó el Cliente utilice el campo
-                                    <a id="show-holder" href="javascript:;" class="text-info"> Titular</a>.</span>
+                                    <a id="show-holder" href="javascript:" class="text-info"> Titular</a>.</span>
                                 </div>
                             </div>
                         {% else %}
