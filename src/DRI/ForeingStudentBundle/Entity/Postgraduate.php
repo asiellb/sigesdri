@@ -2,21 +2,22 @@
 
 namespace DRI\ForeingStudentBundle\Entity;
 
-
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Collections\ArrayCollection;
+
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\HttpFoundation\File\File;
+
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
+use DateTime;
+use Exception;
+
 use DRI\UsefulBundle\Entity\Country;
-use DRI\UsefulBundle\Entity\Area;
 use DRI\UsefulBundle\Entity\Course;
 use DRI\UsefulBundle\Useful\Useful;
 use DRI\UserBundle\Entity\User;
-
 
 /**
  * Postgraduate
@@ -80,7 +81,7 @@ class Postgraduate
     private $fullNameSlug;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="date")
      *
@@ -170,14 +171,14 @@ class Postgraduate
     private $shortCourse;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="date")
      */
     private $entryDate;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="date")
      */
@@ -205,7 +206,7 @@ class Postgraduate
     private $pictureFile;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime")
      *
@@ -214,7 +215,7 @@ class Postgraduate
     private $createdAt;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime")
      *
@@ -245,8 +246,8 @@ class Postgraduate
      */
     public function __construct()
     {
-        $this->createdAt = new \DateTime('now');
-        $this->updatedAt = new \DateTime('now');
+        $this->createdAt = new DateTime('now');
+        $this->updatedAt = new DateTime('now');
     }
 
     public function __toString()
@@ -391,7 +392,7 @@ class Postgraduate
     /**
      * Set birthday
      *
-     * @param \DateTime $birthday
+     * @param DateTime $birthday
      *
      * @return Postgraduate
      */
@@ -405,7 +406,7 @@ class Postgraduate
     /**
      * Get birthday
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getBirthday()
     {
@@ -559,7 +560,7 @@ class Postgraduate
     /**
      * Set entryDate
      *
-     * @param \DateTime $entryDate
+     * @param DateTime $entryDate
      *
      * @return Postgraduate
      */
@@ -573,7 +574,7 @@ class Postgraduate
     /**
      * Get entryDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getEntryDate()
     {
@@ -583,7 +584,7 @@ class Postgraduate
     /**
      * Set expiryDate
      *
-     * @param \DateTime $expiryDate
+     * @param DateTime $expiryDate
      *
      * @return Postgraduate
      */
@@ -597,7 +598,7 @@ class Postgraduate
     /**
      * Get expiryDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getExpiryDate()
     {
@@ -653,9 +654,9 @@ class Postgraduate
     }
 
     /**
-     * @param File|\Symfony\Component\HttpFoundation\File\UploadedFile $picture
-     *
+     * @param File|UploadedFile $picture
      * @return Postgraduate
+     * @throws Exception
      */
     public function setPictureFile(File $picture = null)
     {
@@ -664,7 +665,7 @@ class Postgraduate
         if ($picture) {
             // It is required that at least one field changes if you are using doctrine
             // otherwise the event listeners won't be called and the file is lost
-            $this->updatedAt = new \DateTime('now');
+            $this->updatedAt = new DateTime('now');
         }
 
         return $this;
@@ -684,10 +685,11 @@ class Postgraduate
      * @ORM\PrePersist
      *
      * @return Postgraduate
+     * @throws Exception
      */
     public function setCreatedAt()
     {
-        $this->createdAt = new \DateTime('now');
+        $this->createdAt = new DateTime('now');
 
         return $this;
     }
@@ -695,7 +697,7 @@ class Postgraduate
     /**
      * Get createdAt
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getCreatedAt()
     {
@@ -708,10 +710,11 @@ class Postgraduate
      * @ORM\PreUpdate
      *
      * @return Postgraduate
+     * @throws Exception
      */
     public function setUpdatedAt()
     {
-        $this->updatedAt = new \DateTime('now');
+        $this->updatedAt = new DateTime('now');
 
         return $this;
     }
@@ -719,7 +722,7 @@ class Postgraduate
     /**
      * Get updatedAt
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getUpdatedAt()
     {
@@ -743,7 +746,7 @@ class Postgraduate
     /**
      * Get country
      *
-     * @return \DRI\UsefulBundle\Entity\Country
+     * @return Country
      */
     public function getCountry()
     {
@@ -815,7 +818,7 @@ class Postgraduate
     /**
      * Get createdBy
      *
-     * @return \DRI\UserBundle\Entity\User
+     * @return User
      */
     public function getCreatedBy()
     {
@@ -839,7 +842,7 @@ class Postgraduate
     /**
      * Get lastUpdateBy
      *
-     * @return \DRI\UserBundle\Entity\User
+     * @return User
      */
     public function getLastUpdateBy()
     {

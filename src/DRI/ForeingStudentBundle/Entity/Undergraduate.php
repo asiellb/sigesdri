@@ -2,21 +2,21 @@
 
 namespace DRI\ForeingStudentBundle\Entity;
 
-
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Collections\ArrayCollection;
+
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
+use DateTime;
+use Exception;
+
 use DRI\UsefulBundle\Entity\Country;
-use DRI\UsefulBundle\Entity\Area;
 use DRI\UsefulBundle\Entity\Career;
 use DRI\UsefulBundle\Useful\Useful;
 use DRI\UserBundle\Entity\User;
-
 
 /**
  * Undergraduate
@@ -44,19 +44,19 @@ class Undergraduate
      * ********************************************************************************
      **********************************************************************************/
 
-    const UNDERGRADUATE_TYPE = [
+    public static $UNDERGRADUATE_TYPE = [
         'BEC' => 'Becario',
         'AUT' => 'Autofinanciado',
         'FCO' => 'Financiado por Convenio',
     ];
 
-    const UNDERGRADUATE_TYPE_CHOICE = [
+    public static $UNDERGRADUATE_TYPE_CHOICE = [
         'Becario'                  =>'BEC',
         'Autofinanciado'            =>'AUT',
         'Financiado por Convenio' =>'FCO',
     ];
 
-    const UNDERGRADUATE_YEAR = [
+    public static $UNDERGRADUATE_YEAR = [
         'PRE' => 'Preparatoria',
         '1RO' => '1RO',
         '2DO' => '2DO',
@@ -65,7 +65,7 @@ class Undergraduate
         '5TO' => '5TO',
     ];
 
-    const UNDERGRADUATE_YEAR_CHOICE = [
+    public static $UNDERGRADUATE_YEAR_CHOICE = [
         'Preparatoria' => 'PRE',
         '1RO' => '1RO',
         '2DO' => '2DO',
@@ -129,7 +129,7 @@ class Undergraduate
     private $fullNameSlug;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="date")
      *
@@ -212,14 +212,14 @@ class Undergraduate
     private $career;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="date")
      */
     private $entryDate;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="date")
      */
@@ -247,7 +247,7 @@ class Undergraduate
     private $pictureFile;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime")
      *
@@ -256,7 +256,7 @@ class Undergraduate
     private $createdAt;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime")
      *
@@ -297,8 +297,8 @@ class Undergraduate
      */
     public function __construct()
     {
-        $this->createdAt = new \DateTime('now');
-        $this->updatedAt = new \DateTime('now');
+        $this->createdAt = new DateTime('now');
+        $this->updatedAt = new DateTime('now');
     }
 
     public function __toString()
@@ -454,7 +454,7 @@ class Undergraduate
     /**
      * Set birthday
      *
-     * @param \DateTime $birthday
+     * @param DateTime $birthday
      *
      * @return Undergraduate
      */
@@ -468,7 +468,7 @@ class Undergraduate
     /**
      * Get birthday
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getBirthday()
     {
@@ -622,7 +622,7 @@ class Undergraduate
     /**
      * Set entryDate
      *
-     * @param \DateTime $entryDate
+     * @param DateTime $entryDate
      *
      * @return Undergraduate
      */
@@ -636,7 +636,7 @@ class Undergraduate
     /**
      * Get entryDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getEntryDate()
     {
@@ -646,7 +646,7 @@ class Undergraduate
     /**
      * Set expiryDate
      *
-     * @param \DateTime $expiryDate
+     * @param DateTime $expiryDate
      *
      * @return Undergraduate
      */
@@ -660,7 +660,7 @@ class Undergraduate
     /**
      * Get expiryDate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getExpiryDate()
     {
@@ -716,9 +716,10 @@ class Undergraduate
     }
 
     /**
-     * @param File|\Symfony\Component\HttpFoundation\File\UploadedFile $picture
+     * @param File|UploadedFile $picture
      *
      * @return Undergraduate
+     * @throws Exception
      */
     public function setPictureFile(File $picture = null)
     {
@@ -727,7 +728,7 @@ class Undergraduate
         if ($picture) {
             // It is required that at least one field changes if you are using doctrine
             // otherwise the event listeners won't be called and the file is lost
-            $this->updatedAt = new \DateTime('now');
+            $this->updatedAt = new DateTime('now');
         }
 
         return $this;
@@ -747,10 +748,11 @@ class Undergraduate
      * @ORM\PrePersist
      *
      * @return Undergraduate
+     * @throws Exception
      */
     public function setCreatedAt()
     {
-        $this->createdAt = new \DateTime('now');
+        $this->createdAt = new DateTime('now');
 
         return $this;
     }
@@ -758,7 +760,7 @@ class Undergraduate
     /**
      * Get createdAt
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getCreatedAt()
     {
@@ -771,10 +773,11 @@ class Undergraduate
      * @ORM\PreUpdate
      *
      * @return Undergraduate
+     * @throws Exception
      */
     public function setUpdatedAt()
     {
-        $this->updatedAt = new \DateTime('now');
+        $this->updatedAt = new DateTime('now');
 
         return $this;
     }
@@ -782,7 +785,7 @@ class Undergraduate
     /**
      * Get updatedAt
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getUpdatedAt()
     {
@@ -792,11 +795,11 @@ class Undergraduate
     /**
      * Set country
      *
-     * @param \DRI\UsefulBundle\Entity\Country $country
+     * @param Country $country
      *
      * @return Undergraduate
      */
-    public function setCountry(\DRI\UsefulBundle\Entity\Country $country = null)
+    public function setCountry(Country $country = null)
     {
         $this->country = $country;
 
@@ -806,7 +809,7 @@ class Undergraduate
     /**
      * Get country
      *
-     * @return \DRI\UsefulBundle\Entity\Country
+     * @return Country
      */
     public function getCountry()
     {
@@ -816,11 +819,11 @@ class Undergraduate
     /**
      * Set career
      *
-     * @param \DRI\UsefulBundle\Entity\Career $career
+     * @param Career $career
      *
      * @return Undergraduate
      */
-    public function setCareer(\DRI\UsefulBundle\Entity\Career $career = null)
+    public function setCareer(Career $career = null)
     {
         $this->career = $career;
 
@@ -830,7 +833,7 @@ class Undergraduate
     /**
      * Get career
      *
-     * @return \DRI\UsefulBundle\Entity\Career
+     * @return Career
      */
     public function getCareer()
     {
@@ -840,11 +843,11 @@ class Undergraduate
     /**
      * Set createdBy
      *
-     * @param \DRI\UserBundle\Entity\User $createdBy
+     * @param User $createdBy
      *
      * @return Undergraduate
      */
-    public function setCreatedBy(\DRI\UserBundle\Entity\User $createdBy = null)
+    public function setCreatedBy(User $createdBy = null)
     {
         $this->createdBy = $createdBy;
 
@@ -854,7 +857,7 @@ class Undergraduate
     /**
      * Get createdBy
      *
-     * @return \DRI\UserBundle\Entity\User
+     * @return User
      */
     public function getCreatedBy()
     {
@@ -864,11 +867,11 @@ class Undergraduate
     /**
      * Set lastUpdateBy
      *
-     * @param \DRI\UserBundle\Entity\User $lastUpdateBy
+     * @param User $lastUpdateBy
      *
      * @return Undergraduate
      */
-    public function setLastUpdateBy(\DRI\UserBundle\Entity\User $lastUpdateBy = null)
+    public function setLastUpdateBy(User $lastUpdateBy = null)
     {
         $this->lastUpdateBy = $lastUpdateBy;
 
@@ -878,7 +881,7 @@ class Undergraduate
     /**
      * Get lastUpdateBy
      *
-     * @return \DRI\UserBundle\Entity\User
+     * @return User
      */
     public function getLastUpdateBy()
     {
@@ -896,8 +899,10 @@ class Undergraduate
      **********************************************************************************/
 
 
-
-
+    /**
+     * @param $type
+     * @return string
+     */
     static function type_AcronimToName($type){
         switch ($type){
             case 'BEC': return 'Becario';break;
@@ -907,6 +912,10 @@ class Undergraduate
         }
     }
 
+    /**
+     * @param $type
+     * @return string
+     */
     static function type_NameToAcronim($type){
         switch ($type){
             case 'Becario': return 'BEC';break;
@@ -916,6 +925,10 @@ class Undergraduate
         }
     }
 
+    /**
+     * @param $year
+     * @return string
+     */
     static function year_AcronimToName($year){
         switch ($year){
             case 'PRE': return 'Preparatoria';break;
@@ -928,6 +941,10 @@ class Undergraduate
         }
     }
 
+    /**
+     * @param $year
+     * @return string
+     */
     static function year_NameToAcronim($year){
         switch ($year){
             case 'Preparatoria': return 'PRE';break;
