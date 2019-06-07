@@ -8,13 +8,20 @@
 
 namespace DRI\PassportBundle\Service;
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+
 use Vich\UploaderBundle\Naming\NamerInterface;
 use Vich\UploaderBundle\Mapping\PropertyMapping;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+
+use DRI\PassportBundle\Entity\Passport;
 
 class PassportNamer implements NamerInterface
 {
-
+    /**
+     * @param Passport $passport
+     * @param PropertyMapping $firstPage
+     * @return string
+     */
     public function name($passport, PropertyMapping $firstPage)
     {
         $file = $firstPage->getFile($passport);
@@ -28,6 +35,10 @@ class PassportNamer implements NamerInterface
         return $name;
     }
 
+    /**
+     * @param UploadedFile $file
+     * @return mixed|string|null
+     */
     private function getExtension(UploadedFile $file)
     {
         $originalName = $file->getClientOriginalName();
