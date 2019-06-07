@@ -5,20 +5,11 @@ namespace DRI\ExitBundle\Datatables;
 use Sg\DatatablesBundle\Datatable\AbstractDatatable;
 use Sg\DatatablesBundle\Datatable\Style;
 use Sg\DatatablesBundle\Datatable\Column\Column;
-use Sg\DatatablesBundle\Datatable\Column\BooleanColumn;
 use Sg\DatatablesBundle\Datatable\Column\ActionColumn;
 use Sg\DatatablesBundle\Datatable\Column\MultiselectColumn;
-use Sg\DatatablesBundle\Datatable\Column\VirtualColumn;
 use Sg\DatatablesBundle\Datatable\Column\DateTimeColumn;
-use Sg\DatatablesBundle\Datatable\Column\ImageColumn;
-use Sg\DatatablesBundle\Datatable\Filter\TextFilter;
-use Sg\DatatablesBundle\Datatable\Filter\NumberFilter;
 use Sg\DatatablesBundle\Datatable\Filter\SelectFilter;
 use Sg\DatatablesBundle\Datatable\Filter\DateRangeFilter;
-use Sg\DatatablesBundle\Datatable\Editable\CombodateEditable;
-use Sg\DatatablesBundle\Datatable\Editable\SelectEditable;
-use Sg\DatatablesBundle\Datatable\Editable\TextareaEditable;
-use Sg\DatatablesBundle\Datatable\Editable\TextEditable;
 use Sg\DatatablesBundle\Datatable\Filter\Select2Filter;
 
 /**
@@ -49,6 +40,7 @@ class ApplicationDatatable extends AbstractDatatable
 
     /**
      * {@inheritdoc}
+     * @throws \Exception
      */
     public function buildDatatable(array $options = array())
     {
@@ -153,7 +145,6 @@ class ApplicationDatatable extends AbstractDatatable
         $applications = $this->em->getRepository('DRIExitBundle:Application')->findAll();
         $countries = $this->em->getRepository('DRIUsefulBundle:Country')->findAll();
         $clients = $this->em->getRepository('DRIClientBundle:Client')->findAll();
-        $users = $this->em->getRepository('DRIUserBundle:User')->findAll();
 
         $this->columnBuilder
             ->add(null,MultiselectColumn::class, array(
@@ -332,7 +323,6 @@ class ApplicationDatatable extends AbstractDatatable
      * @return string
      */
     private function formatState($state){
-        $type = '';
         switch ($state){
             case 'CON':
                 $type = '<div class="alert alert-info sbold"> Confeccionada </div>'; break;
@@ -340,40 +330,6 @@ class ApplicationDatatable extends AbstractDatatable
                 $type = '<div class="alert alert-success sbold"> Aprobada </div>'; break;
             case 'REC':
                 $type = '<div class="alert alert-danger sbold"> Rechazada </div>'; break;
-            default:
-                $type = '-'; break;
-        }
-        return $type;
-    }
-
-    /**
-     * Determinate concept
-     *
-     * @param string $concept
-     *
-     * @return string
-     */
-    private function formatConcept($concept){
-        $type = '';
-        switch ($concept){
-            case 'ATE':
-                $type = 'Asistencia Técnica Exportada'; break;
-            case 'PPO':
-                $type = 'Paquete de Postgrado'; break;
-            case 'ASE':
-                $type = 'Asesoría'; break;
-            case 'IAC':
-                $type = 'Intercambio Académico'; break;
-            case 'EVE':
-                $type = 'Evento'; break;
-            case 'MOF':
-                $type = 'Misión Oficial'; break;
-            case 'BPR':
-                $type = 'Beca Predoctoral'; break;
-            case 'BPO':
-                $type = 'Beca Postdoctoral'; break;
-            case 'PIN':
-                $type = 'Proyecto Internacional'; break;
             default:
                 $type = '-'; break;
         }
