@@ -10,11 +10,18 @@ namespace DRI\UserBundle\Service;
 
 use Vich\UploaderBundle\Naming\NamerInterface;
 use Vich\UploaderBundle\Mapping\PropertyMapping;
+
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+
+use DRI\UserBundle\Entity\User;
 
 class UserNamer implements NamerInterface
 {
-
+    /**
+     * @param User $user
+     * @param PropertyMapping $userImage
+     * @return string
+     */
     public function name($user, PropertyMapping $userImage)
     {
         $file = $userImage->getFile($user);
@@ -29,6 +36,10 @@ class UserNamer implements NamerInterface
         return $name;
     }
 
+    /**
+     * @param UploadedFile $file
+     * @return mixed|string|null
+     */
     private function getExtension(UploadedFile $file)
     {
         $originalName = $file->getClientOriginalName();
