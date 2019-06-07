@@ -10,12 +10,13 @@ namespace DRI\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\User as BaseUser;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\Validator\Constraints as Assert;
-use DRI\UserBundle\Entity\WorkFunction;
+
+use DateTime;
+use Exception;
 
 /**
  * @ORM\Entity
@@ -164,7 +165,7 @@ class User extends BaseUser
     private $userImageFile;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime")
      */
@@ -193,7 +194,7 @@ class User extends BaseUser
     {
         parent::__construct();
 
-        $this->lastUpdateImage = new \DateTime('now');
+        $this->lastUpdateImage = new DateTime('now');
         $this->firstName = '';
         $this->lastName = '';
         $this->userImage = '';
@@ -304,9 +305,10 @@ class User extends BaseUser
     }
 
     /**
-     * @param File|\Symfony\Component\HttpFoundation\File\UploadedFile $userImage
+     * @param File|UploadedFile $userImage
      *
      * @return User
+     * @throws Exception
      */
     public function setUserImageFile(File $userImage = null)
     {
@@ -315,7 +317,7 @@ class User extends BaseUser
         if ($userImage) {
             // It is required that at least one field changes if you are using doctrine
             // otherwise the event listeners won't be called and the file is lost
-            $this->lastUpdateImage = new \DateTime('now');
+            $this->lastUpdateImage = new DateTime('now');
         }
 
         return $this;
@@ -332,7 +334,7 @@ class User extends BaseUser
     /**
      * Set lastUpdateImage
      *
-     * @param \DateTime $lastUpdateImage
+     * @param DateTime $lastUpdateImage
      *
      * @return User
      */
@@ -346,7 +348,7 @@ class User extends BaseUser
     /**
      * Get lastUpdateImage
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getLastUpdateImage()
     {
