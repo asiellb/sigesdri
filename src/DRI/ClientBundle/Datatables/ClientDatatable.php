@@ -5,20 +5,13 @@ namespace DRI\ClientBundle\Datatables;
 use Sg\DatatablesBundle\Datatable\AbstractDatatable;
 use Sg\DatatablesBundle\Datatable\Style;
 use Sg\DatatablesBundle\Datatable\Column\Column;
-use Sg\DatatablesBundle\Datatable\Column\BooleanColumn;
 use Sg\DatatablesBundle\Datatable\Column\ActionColumn;
 use Sg\DatatablesBundle\Datatable\Column\MultiselectColumn;
-use Sg\DatatablesBundle\Datatable\Column\VirtualColumn;
 use Sg\DatatablesBundle\Datatable\Column\DateTimeColumn;
 use Sg\DatatablesBundle\Datatable\Column\ImageColumn;
 use Sg\DatatablesBundle\Datatable\Filter\TextFilter;
-use Sg\DatatablesBundle\Datatable\Filter\NumberFilter;
 use Sg\DatatablesBundle\Datatable\Filter\SelectFilter;
 use Sg\DatatablesBundle\Datatable\Filter\DateRangeFilter;
-use Sg\DatatablesBundle\Datatable\Editable\CombodateEditable;
-use Sg\DatatablesBundle\Datatable\Editable\SelectEditable;
-use Sg\DatatablesBundle\Datatable\Editable\TextareaEditable;
-use Sg\DatatablesBundle\Datatable\Editable\TextEditable;
 use Sg\DatatablesBundle\Datatable\Filter\Select2Filter;
 
 use DRI\ClientBundle\Entity\Client;
@@ -56,6 +49,7 @@ class ClientDatatable extends AbstractDatatable
 
     /**
      * {@inheritdoc}
+     * @throws \Exception
      */
     public function buildDatatable(array $options = array())
     {
@@ -251,7 +245,7 @@ class ClientDatatable extends AbstractDatatable
                         'search_type' => 'eq',
                         'cancel_button' => true,
                         'multiple' => false,
-                        'select_options' => [''    => 'Todos'] + Client::CLIENT_TYPES,
+                        'select_options' => [''    => 'Todos'] + Client::$CLIENT_TYPES,
                         'classes' => 'form-control input-xs input-sm input-inline form-filter bs-select',
                     ),
                 ),
@@ -368,14 +362,15 @@ class ClientDatatable extends AbstractDatatable
                 return 'profile-female.png';
             elseif ($gender == 'M')
                 return 'profile-male.png';
-        }else{
-            return $clientPicture;
         }
+
+        return $clientPicture;
     }
 
     /**
      * Format clientPicture
      *
+     * @param string $facultyName
      * @return string
      */
     private function formatFacultyName($facultyName){
