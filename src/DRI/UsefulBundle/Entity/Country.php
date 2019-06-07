@@ -3,12 +3,20 @@
 namespace DRI\UsefulBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
 use Symfony\Component\HttpFoundation\File\File;
-use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use DRI\UsefulBundle\Useful\Useful;
 
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
+
+use DateTime;
+use Exception;
+
+use DRI\AgreementBundle\Entity\Institutional;
 
 /**
  * Country
@@ -131,7 +139,7 @@ class Country
     private $flagFile;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(type="datetime", nullable=true)
      * @Assert\DateTime()
@@ -381,9 +389,9 @@ class Country
     /**
      * Set flagFile
      *
-     * @param File|\Symfony\Component\HttpFoundation\File\UploadedFile $flagImage
-     *
+     * @param File|UploadedFile $flagImage
      * @return Country
+     * @throws Exception
      */
     public function setFlagFile(File $flagImage = null)
     {
@@ -392,7 +400,7 @@ class Country
         if ($flagImage) {
             // It is required that at least one field changes if you are using doctrine
             // otherwise the event listeners won't be called and the file is lost
-            $this->lastFileUpdate = new \DateTime('now');
+            $this->lastFileUpdate = new DateTime('now');
         }
 
         return $this;
@@ -411,7 +419,7 @@ class Country
     /**
      * Set lastFileUpdate
      *
-     * @param \DateTime $lastFileUpdate
+     * @param DateTime $lastFileUpdate
      *
      * @return Country
      */
@@ -425,7 +433,7 @@ class Country
     /**
      * Get lastFileUpdate
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getLastFileUpdate()
     {
@@ -436,17 +444,17 @@ class Country
      */
     public function __construct()
     {
-        $this->institutionals = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->institutionals = new ArrayCollection();
     }
 
     /**
      * Add institutional
      *
-     * @param \DRI\AgreementBundle\Entity\Institutional $institutional
+     * @param Institutional $institutional
      *
      * @return Country
      */
-    public function addInstitutional(\DRI\AgreementBundle\Entity\Institutional $institutional)
+    public function addInstitutional(Institutional $institutional)
     {
         $this->institutionals[] = $institutional;
 
@@ -456,9 +464,9 @@ class Country
     /**
      * Remove institutional
      *
-     * @param \DRI\AgreementBundle\Entity\Institutional $institutional
+     * @param Institutional $institutional
      */
-    public function removeInstitutional(\DRI\AgreementBundle\Entity\Institutional $institutional)
+    public function removeInstitutional(Institutional $institutional)
     {
         $this->institutionals->removeElement($institutional);
     }
@@ -466,7 +474,7 @@ class Country
     /**
      * Get institutionals
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection
      */
     public function getInstitutionals()
     {

@@ -3,12 +3,6 @@
 namespace DRI\UsefulBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\HttpFoundation\File\File;
-use Vich\UploaderBundle\Mapping\Annotation as Vich;
-use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use DRI\UsefulBundle\Useful\Useful;
 
 /**
  * Course
@@ -27,14 +21,14 @@ class Course
      * ********************************************************************************
      **********************************************************************************/
 
-    const COURSE_TYPE = [
+    public static $COURSE_TYPE = [
         'DOC' => 'Doctorado',
         'MAE' => 'Maestría',
         'ESP' => 'Especialidad',
         'CCO' => 'Curso Corto',
     ];
 
-    const COURSE_TYPE_CHOICE = [
+    public static $COURSE_TYPE_CHOICE = [
         'Doctorado'    =>'DOC',
         'Maestría'     =>'MAE',
         'Especialidad' =>'ESP',
@@ -189,11 +183,11 @@ class Course
     /**
      * Set area
      *
-     * @param \DRI\UsefulBundle\Entity\Area $area
+     * @param Area $area
      *
      * @return Course
      */
-    public function setArea(\DRI\UsefulBundle\Entity\Area $area = null)
+    public function setArea(Area $area = null)
     {
         $this->area = $area;
 
@@ -203,7 +197,7 @@ class Course
     /**
      * Get area
      *
-     * @return \DRI\UsefulBundle\Entity\Area
+     * @return Area
      */
     public function getArea()
     {
@@ -245,8 +239,10 @@ class Course
      **********************************************************************************/
 
 
-
-
+    /**
+     * @param $type
+     * @return string
+     */
     static function type_AcronimToName($type){
         switch ($type){
             case 'DOC': return 'Doctorado';break;
@@ -257,6 +253,10 @@ class Course
         }
     }
 
+    /**
+     * @param $type
+     * @return string
+     */
     static function type_NameToAcronim($type){
         switch ($type){
             case 'Doctorado': return 'DOC';break;

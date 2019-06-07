@@ -2,14 +2,9 @@
 
 namespace DRI\UsefulBundle\Entity;
 
-
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\HttpFoundation\File\File;
-use Vich\UploaderBundle\Mapping\Annotation as Vich;
-use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use DRI\UsefulBundle\Useful\Useful;
 
 use DRI\ClientBundle\Entity\Client;
 
@@ -136,11 +131,11 @@ class Career
     /**
      * Set area
      *
-     * @param \DRI\UsefulBundle\Entity\Area $area
+     * @param Area $area
      *
      * @return Career
      */
-    public function setArea(\DRI\UsefulBundle\Entity\Area $area = null)
+    public function setArea(Area $area = null)
     {
         $this->area = $area;
 
@@ -150,7 +145,7 @@ class Career
     /**
      * Get area
      *
-     * @return \DRI\UsefulBundle\Entity\Area
+     * @return Area
      */
     public function getArea()
     {
@@ -184,7 +179,7 @@ class Career
     /**
      * Get students
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection
      */
     public function getStudents()
     {

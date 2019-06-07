@@ -4,15 +4,13 @@ namespace DRI\UsefulBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\HttpFoundation\File\File;
+
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use DRI\UsefulBundle\Useful\Useful;
 
 use DRI\ClientBundle\Entity\Client;
-use DRI\AgreementBundle\Entity\Institutional;
-use DRI\UsefulBundle\Entity\Career;
 
 /**
  * Facultad
@@ -24,7 +22,7 @@ use DRI\UsefulBundle\Entity\Career;
  */
 class Area
 {
-    const AREA_TYPE = [
+    public static $AREA_TYPE = [
         'Rectoría' => 'REC',
         'Vicerectoría' => 'VRE',
         'Dirección' => 'DIR',
@@ -32,7 +30,7 @@ class Area
         'Departamento' => 'DEP',
     ];
 
-    const AREA_TYPE_CHOICE = [
+    public static $AREA_TYPE_CHOICE = [
         'REC' => 'Rectoría',
         'VRE' => 'Vicerectoría',
         'DIR' => 'Dirección',
@@ -236,7 +234,7 @@ class Area
      */
     public function removeProfesor(Client $profesor)
     {
-        $this->profesor->removeElement($profesor);
+        $this->profesors->removeElement($profesor);
     }
 
     /**
