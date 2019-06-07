@@ -31,7 +31,7 @@ class AreaController extends Controller
      * Lists all Area entities.
      *
      * @param Request $request
-     * @Route("/", name="area", methods={"GET"})
+     * @Route("/index", name="area", methods={"GET"})
      * @return Response
      */
     public function indexAction(Request $request)
