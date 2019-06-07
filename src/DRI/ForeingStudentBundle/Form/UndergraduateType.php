@@ -3,25 +3,17 @@
 namespace DRI\ForeingStudentBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
-use DRI\UsefulBundle\Form\DatePickerType;
-use Vich\UploaderBundle\Form\Type\VichFileType;
-use Vich\UploaderBundle\Form\Type\VichImageType;
 use Presta\ImageBundle\Form\Type\ImageType;
 
-use DRI\UsefulBundle\Entity\Career;
-use DRI\UsefulBundle\Entity\Country;
 use DRI\ForeingStudentBundle\Entity\Undergraduate;
+use DRI\UsefulBundle\Form\DatePickerType;
 
 class UndergraduateType extends AbstractType
 {
@@ -42,7 +34,7 @@ class UndergraduateType extends AbstractType
                 'label_attr' => [
                     'class' => 'radio-inline'
                 ],
-                'choices'  => Undergraduate::UNDERGRADUATE_TYPE_CHOICE,
+                'choices'  => Undergraduate::$UNDERGRADUATE_TYPE_CHOICE,
                 'attr' => array(
                     'class'=>'radio-list',
                 ),
@@ -183,7 +175,7 @@ class UndergraduateType extends AbstractType
                 'label_attr' => [
                     'class' => 'radio-inline'
                 ],
-                'choices'  => Undergraduate::UNDERGRADUATE_YEAR_CHOICE,
+                'choices'  => Undergraduate::$UNDERGRADUATE_YEAR_CHOICE,
                 'attr' => array(
                     'class'=>'radio-list',
                 ),
