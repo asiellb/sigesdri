@@ -2,14 +2,14 @@
 
 namespace DRI\PassportBundle\Controller;
 
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+
 use Symfony\Component\HttpFoundation\Request,
     Symfony\Component\HttpFoundation\Response,
     Symfony\Component\Routing\Annotation\Route,
     Symfony\Component\Form\FormInterface,
     Symfony\Component\Security\Acl\Exception\Exception,
     Symfony\Component\Security\Core\Exception\AccessDeniedException;
-
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
@@ -28,11 +28,8 @@ class ControlController extends Controller
      * Lists all Application entities.
      *
      * @param Request $request
-     *
      * @Route("/index", name="passport_control_index", methods={"GET"})
-     *
      * @return Response
-     *
      * @throws \Exception
      */
     public function indexAction(Request $request)

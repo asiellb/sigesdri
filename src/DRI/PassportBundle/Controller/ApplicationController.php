@@ -2,40 +2,22 @@
 
 namespace DRI\PassportBundle\Controller;
 
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-
-use PhpParser\Node\Scalar\String_;
-use Sg\DatatablesBundle\Datatable\DatatableInterface;
-use Sg\DatatablesBundle\Response\DatatableQueryBuilder;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Symfony\Component\Security\Acl\Exception\Exception;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\HttpFoundation\JsonResponse;
-
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
-use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
-use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-
-// Include the BinaryFileResponse and the ResponseHeaderBag
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-// Include the requires classes of Phpword
-use PhpOffice\PhpWord\PhpWord;
-use PhpOffice\PhpWord\IOFactory;
-use PhpOffice\PhpWord\Shared\Html;
-use PhpOffice\PhpWord\Shared\Converter;
-use PhpOffice\PhpWord\TemplateProcessor;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
-use DRI\PassportBundle\Datatables\ActivesApplicationDatatable;
+use Exception;
+
 use DRI\PassportBundle\Entity\Application;
-use DRI\PassportBundle\Datatables\ApplicationDatatable;
 use DRI\UsefulBundle\Useful\Useful;
 
 /**
@@ -48,23 +30,15 @@ class ApplicationController extends Controller
     /**
      * Lists all Application entities.
      * @param Request $request
-     *
-     * @Route("/index", name="passport_application_index")
-     * @Method("GET")
-     *
+     * @Route("/index", name="passport_application_index", methods={"GET"})
      * @return Response
+     * @throws Exception
      */
     public function indexAction(Request $request)
     {
         $isAjax = $request->isXmlHttpRequest();
 
-        // Get your Datatable ...
-        //$datatable = $this->get('app.datatable.client');
-        //$datatable->buildDatatable();
-
-        // or use the DatatableFactory
-        /** @var DatatableInterface $datatable */
-        $datatable = $this->get('sg_datatables.factory')->create(ApplicationDatatable::class);
+        $datatable = $this->get('app.datatable.passports.application');
         $datatable->buildDatatable();
 
         if ($isAjax) {
@@ -81,35 +55,28 @@ class ApplicationController extends Controller
     }
 
     /**
-     * Lists all Application entities.
+     * Lists all Actives Application entities.
+     *
      * @param Request $request
-     *
-     * @Route("/actives", name="passport_application_actives")
-     * @Method("GET")
-     *
+     * @Route("/actives", name="passport_application_actives", methods={"GET"})
      * @return Response
+     * @throws Exception
      */
     public function activesAction(Request $request)
     {
         $isAjax = $request->isXmlHttpRequest();
 
-        // Get your Datatable ...
-        //$datatable = $this->get('app.datatable.client');
-        //$datatable->buildDatatable();
-
-        // or use the DatatableFactory
-        /** @var DatatableInterface $datatable */
-        $datatable = $this->get('sg_datatables.datatable')->getDatatable('DRIPassportBundle:Application');
+        $datatable = $this->get('app.datatable.passports.actives.application');
         $datatable->buildDatatable();
 
         if ($isAjax) {
             $responseService = $this->get('sg_datatables.response');
             $responseService->setDatatable($datatable);
 
-            $datatableQueryBuilder = $responseService->getDatatableQueryBuilder();
+            $datatableQB = $responseService->getDatatableQueryBuilder();
 
-            /** @var QueryBuilder $qb */
-            $qb = $datatableQueryBuilder->getQb();
+
+            $qb = $datatableQB->getQb();
             $qb->andWhere('number = :state1');
             //$qb->andWhere('state = :state2');
 
@@ -127,9 +94,12 @@ class ApplicationController extends Controller
     /**
      * Displays a form to create a new Application entity.
      *
-     * @Route("/new/{client}", name="passport_application_new")
-     * @Method({"GET", "POST"})
+     *
+     * @param Request $request
+     * @param null $client
+     * @Route("/new/{client}", name="passport_application_new", methods={"GET", "POST"})
      * @Security("has_role('ROLE_REQUIRE_SPECIALIST')")
+     * @return RedirectResponse|Response
      */
     public function newAction(Request $request, $client = null)
     {
@@ -188,8 +158,9 @@ class ApplicationController extends Controller
     /**
      * Finds and displays a Application entity.
      *
-     * @Route("/view/{numberSlug}", name="passport_application_show")
-     * @Method("GET")
+     * @param Application $application
+     * @Route("/view/{numberSlug}", name="passport_application_show", methods={"GET"})
+     * @return Response
      */
     public function showAction(Application $application)
     {
@@ -203,9 +174,11 @@ class ApplicationController extends Controller
     /**
      * Displays a form to edit an existing application entity.
      *
-     * @Route("/edit/{numberSlug}", name="passport_application_edit")
-     * @Method({"GET", "POST"})
+     * @param Request $request
+     * @param Application $application
+     * @Route("/edit/{numberSlug}", name="passport_application_edit", methods={"GET", "POST"})
      * @Security("has_role('ROLE_REQUIRE_SPECIALIST')")
+     * @return RedirectResponse|Response
      */
     public function editAction(Request $request, Application $application)
     {
@@ -256,9 +229,11 @@ class ApplicationController extends Controller
     /**
      * Deletes a Application entity.
      *
-     * @Route("/{id}", name="passport_application_delete")
-     * @Method("DELETE")
+     * @param Request $request
+     * @param Application $application
+     * @Route("/{id}", name="passport_application_delete", methods={"DELETE"})
      * @Security("has_role('ROLE_ADMIN')")
+     * @return RedirectResponse
      */
     public function deleteAction(Request $request, Application $application)
     {
@@ -277,13 +252,12 @@ class ApplicationController extends Controller
         
         return $this->redirectToRoute('passport_application_index');
     }
-    
+
     /**
      * Creates a form to delete a Application entity.
      *
      * @param Application $application The Application entity
-     *
-     * @return \Symfony\Component\Form\Form The form
+     * @return FormInterface The form
      */
     private function createDeleteForm(Application $application)
     {
@@ -297,12 +271,9 @@ class ApplicationController extends Controller
     /**
      * Delete Application by id
      *
-     * @param mixed $id The entity id
-     *
-     * @Route("/delete/{id}", name="passport_application_by_id_delete")
-     * @Method("GET")
+     * @param Application $application The entity id
+     * @Route("/delete/{id}", name="passport_application_by_id_delete", methods={"GET"})
      * @Security("has_role('ROLE_ADMIN')")
-     *
      * @return Response
      */
     public function deleteByIdAction(Application $application){
@@ -324,11 +295,8 @@ class ApplicationController extends Controller
      * Bulk delete action.
      *
      * @param Request $request
-     *
-     * @Route("/bulk/delete", name="passport_application_bulk_delete")
-     * @Method({"GET", "POST"})
+     * @Route("/bulk/delete", name="passport_application_bulk_delete", methods={"GET", "POST"})
      * @Security("has_role('ROLE_ADMIN')")
-     *
      * @return Response
      */
     public function bulkDeleteAction(Request $request)
@@ -368,14 +336,14 @@ class ApplicationController extends Controller
      *
      * @Route("/assign_application_number/")
      * @Security("has_role('ROLE_ADMIN')")
-     *
+     * @return Response
      */
     public function assignApplicationNumberSlug(){
 
         $em = $this->getDoctrine()->getManager();
         $passAppRepo   = $em->getRepository('DRIPassportBundle:Application');
 
-        $applications = $passAppRepo->findByApplicationNumberSlug('');
+        $applications = $passAppRepo->findBy(['numberSlug'],['']);
 
         foreach ($applications as $application){
             $application->setApplicationNumberSlug(Useful::getSlug($application->getNumber()));
@@ -383,18 +351,20 @@ class ApplicationController extends Controller
             $em->persist($application);
             $em->flush();
         }
-    }
 
+        return new Response('Asignando NumberSlug a las Solicitudes');
+    }
 
     /**
      * Generate and save a ManagerTravelPlan to Word
      *
+     * @param Application $application
      * @Route("/to/word/{numberSlug}", name="passport_application_to_word")
+     * @return BinaryFileResponse
+     * @throws \PhpOffice\PhpWord\Exception\Exception
      */
     public function applicationToWordAction(Application $application)
     {
-        $em = $this->getDoctrine()->getManager();
-        $currentDate = sprintf('%s', date('d/m/Y'));
         $name = 'Solicitud de Pasaporte ';
         $filename = sprintf('%s - %s.docx', $name, $application->getNumber());
         $template = "report_templates/passport_application_template.docx";
@@ -430,14 +400,14 @@ class ApplicationController extends Controller
             case 'OFI': $passportTypeOFI = 'X'; break;
             case 'SER': $passportTypeSER = 'X'; break;
             case 'MAR': $passportTypeMAR = 'X'; break;
-            default: '-';break;
+            default: ;break;
         }
 
         $appTypeREG = ''; $appTypeINM = '';
         switch ($application->getApplicationType()){
             case 'REG': $appTypeREG = 'X'; break;
             case 'INM': $appTypeINM = 'X'; break;
-            default: '-';break;
+            default: ;break;
         }
 
         $organ = $application->getOrgan();
@@ -455,7 +425,7 @@ class ApplicationController extends Controller
             case 'Claros': $eyesColorC = 'X'; break;
             case 'Negros': $eyesColorN = 'X'; break;
             case 'Pardos': $eyesColorP = 'X'; break;
-            default: '-';break;
+            default: ;break;
         }
 
         $skinColorB = '';$skinColorN = '';$skinColorAm = '';$skinColorM = '';$skinColorAl = '';
@@ -465,7 +435,7 @@ class ApplicationController extends Controller
             case 'Amarilla' : $skinColorAm  = 'X'; break;
             case 'Mulata'   : $skinColorM   = 'X'; break;
             case 'Albina'   : $skinColorAl  = 'X'; break;
-            default: '-';break;
+            default: ;break;
         }
 
         $hairColorCn = '';$hairColorCs = '';$hairColorN = '';$hairColorRo = '';$hairColorRu = '';$hairColorO = '';
@@ -476,7 +446,7 @@ class ApplicationController extends Controller
             case 'Rojo'     : $hairColorRo  = 'X'; break;
             case 'Rubio'    : $hairColorRu  = 'X'; break;
             case 'Otros'    : $hairColorO   = 'X'; break;
-            default: '-';break;
+            default: ;break;
         }
 
         $countryBirth = $application->getClient()->getCountryBirth();
