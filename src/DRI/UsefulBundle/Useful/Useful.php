@@ -8,9 +8,13 @@
 
 namespace DRI\UsefulBundle\Useful;
 
-
 class Useful
 {
+    /**
+     * @param $preSlug
+     * @param string $separator
+     * @return false|string|string[]|null
+     */
     static function getSlug($preSlug, $separator = '-'){
         // Código copiado de http://cubiq.org/the-perfect-php-clean-url-generator
         $slug = iconv('UTF-8', 'ASCII//TRANSLIT', $preSlug);
@@ -20,6 +24,12 @@ class Useful
         return $slug;
     }
 
+    /**
+     * @param $date_start
+     * @param $date_end
+     * @param $date_now
+     * @return bool
+     */
     static function checkInRange($date_start, $date_end, $date_now) {
         $date_start = strtotime($date_start);
         $date_end = strtotime($date_end);
@@ -29,13 +39,14 @@ class Useful
         return false;
     }
 
+    /**
+     * @return string
+     */
     static function getCurrentPeriod() {
         $currentMonth = date('m');
         $currentYear = date('Y');
         $nextYear = date('Y')+1;
         $prevYear = date('Y')-1;
-
-        $currentPeriod = '';
 
         if ($currentMonth < 8){
             $currentPeriod = sprintf('%s - %s', $prevYear, $currentYear);
@@ -46,6 +57,10 @@ class Useful
         return $currentPeriod;
     }
 
+    /**
+     * @param $birthday
+     * @return false|int|string
+     */
     static function getAge($birthday) {
         list($Y,$m,$d) = explode("-",$birthday);
         $age = ( date("md") < $m.$d ? date("Y")-$Y-1 : date("Y")-$Y );
@@ -53,6 +68,10 @@ class Useful
         return $age;
     }
 
+    /**
+     * @param $month
+     * @return string
+     */
     static function convertMonthNumberToName($month){
         $monthView = '';
         switch ($month){
@@ -73,6 +92,10 @@ class Useful
         return $monthView;
     }
 
+    /**
+     * @param $concept
+     * @return string
+     */
     static function getExitConceptName($concept){
         switch ($concept){
             case 'MOF': return 'Misión Oficial';break;
