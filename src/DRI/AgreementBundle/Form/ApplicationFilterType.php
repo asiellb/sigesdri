@@ -10,6 +10,10 @@ use Lexik\Bundle\FormFilterBundle\Filter\Form\Type as Filters;
 
 class ApplicationFilterType extends AbstractType
 {
+    /**
+     * @param FormBuilderInterface $builder
+     * @param array $options
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -55,6 +59,9 @@ class ApplicationFilterType extends AbstractType
 
     }
 
+    /**
+     * @param OptionsResolver $resolver
+     */
     public function setDefaultOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
@@ -63,6 +70,9 @@ class ApplicationFilterType extends AbstractType
         ));
     }
 
+    /**
+     * @return string
+     */
     public function getBlockPrefix()
     {
         return 'dri_agreementbundle_applicationfiltertype';
