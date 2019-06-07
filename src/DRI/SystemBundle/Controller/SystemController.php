@@ -3,16 +3,20 @@
 namespace DRI\SystemBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+
+use PHPExcel_Exception;
 
 
 class SystemController extends Controller
 {
     /**
      * @Route("/dashboard", name="dashboard")
+     * @return Response
      */
     public function indexAction()
     {
@@ -31,6 +35,7 @@ class SystemController extends Controller
 
     /**
      * @Route("/about", name="about")
+     * @return Response
      */
     public function aboutAction()
     {
@@ -39,6 +44,8 @@ class SystemController extends Controller
 
     /**
      * @Route("/excel", name="excel")
+     * @return StreamedResponse
+     * @throws PHPExcel_Exception
      */
     public function excelAction()
     {
