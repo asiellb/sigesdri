@@ -15,10 +15,10 @@
         </thead>
         <tbody>
         {% set count = 0 %}
-        {% for i in pregrado %}
+        {% for i in undergraduates %}
             <tr>
 
-                <td>{{ i.country.spName }}</td>
+                <td>{{ i.country }}</td>
                 <td class="aling-center">{{ i.fullName }}</td>
             </tr>
         {% endfor %}

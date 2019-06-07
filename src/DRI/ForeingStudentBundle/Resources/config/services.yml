@@ -1,8 +1,18 @@
 services:
-#    dri_foreing_student.example:
-#        class: DRI\ForeingStudentBundle\Example
-#        arguments: ["@service_id", "plain_value", "%parameter%"]
 
+#   TWIG EXTENSIONS
+
+#   DATATABLES CLASSES
+    app.datatable.foreingstudents.posgraduate:
+        class: DRI\ForeingStudentBundle\Datatables\PostgraduateDatatable
+        parent: sg_datatables.datatable.abstract
+
+    app.datatable.foreingstudents.undergraduate:
+        class: DRI\ForeingStudentBundle\Datatables\UndergraduateDatatable
+        parent: sg_datatables.datatable.abstract
+
+
+#   NAMER CLASSES
     namer.undergraduates_pictures:
         class: DRI\ForeingStudentBundle\Service\UndergraduatePictureNamer
         tags:
