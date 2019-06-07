@@ -2,14 +2,16 @@
 
 namespace DRI\UsefulBundle\Controller;
 
-use DRI\UsefulBundle\Datatables\CountryDatatable;
-
-use Sg\DatatablesBundle\Datatable\DatatableInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Routing\Annotation\Route;
+
+use Exception;
+
+use DRI\UsefulBundle\Entity\Country;
 
 class CountryController extends Controller
 {
@@ -17,23 +19,15 @@ class CountryController extends Controller
      * Lists all Country entities.
      *
      * @param Request $request
-     *
-     * @Route("/paises", name="paises_index")
-     * @Method("GET")
-     *
-     * @return Response
+     * @Route("/paises", name="paises_index", methods={"GET"})
+     * @return JsonResponse|Response
+     * @throws Exception
      */
     public function indexAction(Request $request)
     {
         $isAjax = $request->isXmlHttpRequest();
 
-        // Get your Datatable ...
-        //$datatable = $this->get('app.datatable.post');
-        //$datatable->buildDatatable();
-
-        // or use the DatatableFactory
-        /** @var DatatableInterface $datatable */
-        $datatable = $this->get('sg_datatables.factory')->create(CountryDatatable::class);
+        $datatable = $this->get('app.datatable.useful.country');
         $datatable->buildDatatable();
 
         if ($isAjax) {
@@ -52,13 +46,10 @@ class CountryController extends Controller
     /**
      * Lists all Country entities.
      *
-     * @param Request $request
-     *
      * @Route("/countries/list", name="countries_list")
-     *
      * @return Response
      */
-    public function listAction(Request $request)
+    public function listAction()
     {
         $em = $this->getDoctrine()->getManager();
         $countries = $em->getRepository('DRIUsefulBundle:Country')->findAll();
@@ -72,15 +63,12 @@ class CountryController extends Controller
      * Finds and displays a Country entity.
      *
      * @param Country $country
-     *
-     * @Route("/paises/{id}", name = "country_show")
-     * @Method("GET")
-     *
+     * @Route("/paises/{id}", name = "country_show", methods={"GET"})
      * @return Response
      */
     public function showAction(Country $country)
     {
-        return $this->render('country/show.html.twig', array(
+        return $this->render('DRIUsefulBundle:country:show.html.twig', array(
             'country' => $country
         ));
     }
@@ -89,15 +77,12 @@ class CountryController extends Controller
      * Finds and displays a Country entity.
      *
      * @param Country $country
-     *
-     * @Route("/paises/{id}", name = "country_edit")
-     * @Method("GET")
-     *
+     * @Route("/paises/{id}", name = "country_edit", methods={"GET"})
      * @return Response
      */
     public function editAction(Country $country)
     {
-        return $this->render('country/show.html.twig', array(
+        return $this->render('DRIUsefulBundle:country:show.html.twig', array(
             'country' => $country
         ));
     }

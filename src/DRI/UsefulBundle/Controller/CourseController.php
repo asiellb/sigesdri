@@ -2,13 +2,21 @@
 
 namespace DRI\UsefulBundle\Controller;
 
-use Symfony\Component\HttpFoundation\Request;
+use Doctrine\ORM\QueryBuilder;
+use Pagerfanta\Exception\OutOfRangeCurrentPageException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+
 use Pagerfanta\Pagerfanta;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Pagerfanta\View\TwitterBootstrap3View;
+
+use Exception;
 
 use DRI\UsefulBundle\Entity\Course;
 
@@ -22,8 +30,10 @@ class CourseController extends Controller
     /**
      * Lists all Course entities.
      *
-     * @Route("/", name="course")
-     * @Method("GET")
+     * @param Request $request
+     * @Route("/", name="course", methods={"GET"})
+     * @return Response
+     * @throws Exception
      */
     public function indexAction(Request $request)
     {
@@ -45,9 +55,12 @@ class CourseController extends Controller
     }
 
     /**
-    * Create filter form and process filter request.
-    *
-    */
+     * Create filter form and process filter request.
+     *
+     * @param QueryBuilder $queryBuilder
+     * @param Request $request
+     * @return array
+     */
     protected function filter($queryBuilder, Request $request)
     {
         $session = $request->getSession();
@@ -89,11 +102,13 @@ class CourseController extends Controller
         return array($filterForm, $queryBuilder);
     }
 
-
     /**
-    * Get results from paginator and get paginator view.
-    *
-    */
+     * Get results from paginator and get paginator view.
+     *
+     * @param QueryBuilder $queryBuilder
+     * @param Request $request
+     * @return array
+     */
     protected function paginator($queryBuilder, Request $request)
     {
         //sorting
@@ -106,7 +121,7 @@ class CourseController extends Controller
 
         try {
             $pagerfanta->setCurrentPage($request->get('pcg_page', 1));
-        } catch (\Pagerfanta\Exception\OutOfRangeCurrentPageException $ex) {
+        } catch (OutOfRangeCurrentPageException $ex) {
             $pagerfanta->setCurrentPage(1);
         }
         
@@ -131,11 +146,14 @@ class CourseController extends Controller
 
         return array($entities, $pagerHtml);
     }
-    
-    
-    
-    /*
+
+    /**
      * Calculates the total of records string
+     *
+     * @param QueryBuilder $queryBuilder
+     * @param Request $request
+     * @return string
+     * @throws Exception
      */
     protected function getTotalOfRecordsString($queryBuilder, $request) {
         $totalOfRecords = $queryBuilder->select('COUNT(e.id)')->getQuery()->getSingleScalarResult();
@@ -150,18 +168,16 @@ class CourseController extends Controller
         }
         return "Showing $startRecord - $endRecord of $totalOfRecords Records.";
     }
-    
-    
 
     /**
      * Displays a form to create a new Course entity.
      *
-     * @Route("/new", name="course_new")
-     * @Method({"GET", "POST"})
+     * @param Request $request
+     * @Route("/new", name="course_new", methods={"GET", "POST"})
+     * @return RedirectResponse|Response
      */
     public function newAction(Request $request)
     {
-    
         $course = new Course();
         $form   = $this->createForm('DRI\UsefulBundle\Form\CourseType', $course);
         $form->handleRequest($request);
@@ -182,13 +198,13 @@ class CourseController extends Controller
             'form'   => $form->createView(),
         ));
     }
-    
 
     /**
      * Finds and displays a Course entity.
      *
-     * @Route("/{id}", name="course_show")
-     * @Method("GET")
+     * @param Course $course
+     * @Route("/{id}", name="course_show", methods={"GET"})
+     * @return Response
      */
     public function showAction(Course $course)
     {
@@ -198,14 +214,14 @@ class CourseController extends Controller
             'delete_form' => $deleteForm->createView(),
         ));
     }
-    
-    
 
     /**
      * Displays a form to edit an existing Course entity.
      *
-     * @Route("/{id}/edit", name="course_edit")
-     * @Method({"GET", "POST"})
+     * @param Request $request
+     * @param Course $course
+     * @Route("/{id}/edit", name="course_edit", methods={"GET", "POST"})
+     * @return RedirectResponse|Response
      */
     public function editAction(Request $request, Course $course)
     {
@@ -227,18 +243,17 @@ class CourseController extends Controller
             'delete_form' => $deleteForm->createView(),
         ));
     }
-    
-    
 
     /**
      * Deletes a Course entity.
      *
-     * @Route("/{id}", name="course_delete")
-     * @Method("DELETE")
+     * @param Request $request
+     * @param Course $course
+     * @Route("/{id}", name="course_delete", methods={"DELETE"})
+     * @return RedirectResponse
      */
     public function deleteAction(Request $request, Course $course)
     {
-    
         $form = $this->createDeleteForm($course);
         $form->handleRequest($request);
 
@@ -258,8 +273,7 @@ class CourseController extends Controller
      * Creates a form to delete a Course entity.
      *
      * @param Course $course The Course entity
-     *
-     * @return \Symfony\Component\Form\Form The form
+     * @return FormInterface The form
      */
     private function createDeleteForm(Course $course)
     {
@@ -269,12 +283,13 @@ class CourseController extends Controller
             ->getForm()
         ;
     }
-    
+
     /**
      * Delete Course by id
      *
-     * @Route("/delete/{id}", name="course_by_id_delete")
-     * @Method("GET")
+     * @param Course $course
+     * @Route("/delete/{id}", name="course_by_id_delete", methods={"GET"})
+     * @return RedirectResponse
      */
     public function deleteByIdAction(Course $course){
         $em = $this->getDoctrine()->getManager();
@@ -290,13 +305,14 @@ class CourseController extends Controller
         return $this->redirect($this->generateUrl('course'));
 
     }
-    
 
     /**
-    * Bulk Action
-    * @Route("/bulk-action/", name="course_bulk_action")
-    * @Method("POST")
-    */
+     * Bulk Action
+     *
+     * @param Request $request
+     * @Route("/bulk-action/", name="course_bulk_action", methods={"POST"})
+     * @return RedirectResponse
+     */
     public function bulkAction(Request $request)
     {
         $ids = $request->get("ids", array());
@@ -322,6 +338,4 @@ class CourseController extends Controller
 
         return $this->redirect($this->generateUrl('course'));
     }
-    
-
 }

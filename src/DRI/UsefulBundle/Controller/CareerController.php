@@ -2,13 +2,22 @@
 
 namespace DRI\UsefulBundle\Controller;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+
+use Doctrine\ORM\QueryBuilder;
+
 use Pagerfanta\Pagerfanta;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Pagerfanta\View\TwitterBootstrap3View;
+use Pagerfanta\Exception\OutOfRangeCurrentPageException;
+
+use Exception;
 
 use DRI\UsefulBundle\Entity\Career;
 
@@ -22,8 +31,10 @@ class CareerController extends Controller
     /**
      * Lists all Career entities.
      *
-     * @Route("/", name="career")
-     * @Method("GET")
+     * @param Request $request
+     * @Route("/", name="career", methods={"GET"})
+     * @return Response
+     * @throws Exception
      */
     public function indexAction(Request $request)
     {
@@ -44,11 +55,13 @@ class CareerController extends Controller
         ));
     }
 
-
     /**
-    * Create filter form and process filter request.
-    *
-    */
+     * Create filter form and process filter request.
+     *
+     * @param QueryBuilder $queryBuilder
+     * @param Request $request
+     * @return array
+     */
     protected function filter($queryBuilder, $request)
     {
         $filterForm = $this->createForm('DRI\UsefulBundle\Form\CareerFilterType');
@@ -65,9 +78,12 @@ class CareerController extends Controller
     }
 
     /**
-    * Get results from paginator and get paginator view.
-    *
-    */
+     * Get results from paginator and get paginator view.
+     *
+     * @param QueryBuilder $queryBuilder
+     * @param Request $request
+     * @return array
+     */
     protected function paginator($queryBuilder, Request $request)
     {
         //sorting
@@ -80,7 +96,7 @@ class CareerController extends Controller
 
         try {
             $pagerfanta->setCurrentPage($request->get('pcg_page', 1));
-        } catch (\Pagerfanta\Exception\OutOfRangeCurrentPageException $ex) {
+        } catch (OutOfRangeCurrentPageException $ex) {
             $pagerfanta->setCurrentPage(1);
         }
         
@@ -105,11 +121,14 @@ class CareerController extends Controller
 
         return array($entities, $pagerHtml);
     }
-    
-    
-    
-    /*
+
+    /**
      * Calculates the total of records string
+     *
+     * @param QueryBuilder $queryBuilder
+     * @param Request $request
+     * @return string
+     * @throws Exception
      */
     protected function getTotalOfRecordsString($queryBuilder, $request) {
         $totalOfRecords = $queryBuilder->select('COUNT(e.id)')->getQuery()->getSingleScalarResult();
@@ -124,18 +143,16 @@ class CareerController extends Controller
         }
         return "Showing $startRecord - $endRecord of $totalOfRecords Records.";
     }
-    
-    
 
     /**
      * Displays a form to create a new Career entity.
      *
-     * @Route("/new", name="career_new")
-     * @Method({"GET", "POST"})
+     * @param Request $request
+     * @Route("/new", name="career_new", methods={"GET", "POST"})
+     * @return RedirectResponse|Response
      */
     public function newAction(Request $request)
     {
-    
         $career = new Career();
         $form   = $this->createForm('DRI\UsefulBundle\Form\CareerType', $career);
         $form->handleRequest($request);
@@ -156,13 +173,13 @@ class CareerController extends Controller
             'form'   => $form->createView(),
         ));
     }
-    
 
     /**
      * Finds and displays a Career entity.
      *
-     * @Route("/{id}", name="career_show")
-     * @Method("GET")
+     * @param Career $career
+     * @Route("/{id}", name="career_show", methods={"GET"})
+     * @return Response
      */
     public function showAction(Career $career)
     {
@@ -172,14 +189,14 @@ class CareerController extends Controller
             'delete_form' => $deleteForm->createView(),
         ));
     }
-    
-    
 
     /**
      * Displays a form to edit an existing Career entity.
      *
-     * @Route("/{id}/edit", name="career_edit")
-     * @Method({"GET", "POST"})
+     * @param Request $request
+     * @param Career $career
+     * @Route("/{id}/edit", name="career_edit", methods={"GET", "POST"})
+     * @return RedirectResponse|Response
      */
     public function editAction(Request $request, Career $career)
     {
@@ -201,14 +218,14 @@ class CareerController extends Controller
             'delete_form' => $deleteForm->createView(),
         ));
     }
-    
-    
 
     /**
      * Deletes a Career entity.
      *
-     * @Route("/{id}", name="career_delete")
-     * @Method("DELETE")
+     * @param Request $request
+     * @param Career $career
+     * @Route("/{id}", name="career_delete", methods={"DELETE"})
+     * @return RedirectResponse
      */
     public function deleteAction(Request $request, Career $career)
     {
@@ -232,8 +249,7 @@ class CareerController extends Controller
      * Creates a form to delete a Career entity.
      *
      * @param Career $career The Career entity
-     *
-     * @return \Symfony\Component\Form\Form The form
+     * @return FormInterface The form
      */
     private function createDeleteForm(Career $career)
     {
@@ -243,12 +259,13 @@ class CareerController extends Controller
             ->getForm()
         ;
     }
-    
+
     /**
      * Delete Career by id
      *
-     * @Route("/delete/{id}", name="career_by_id_delete")
-     * @Method("GET")
+     * @param Career $career
+     * @Route("/delete/{id}", name="career_by_id_delete", methods={"GET"})
+     * @return RedirectResponse
      */
     public function deleteByIdAction(Career $career){
         $em = $this->getDoctrine()->getManager();
@@ -264,13 +281,14 @@ class CareerController extends Controller
         return $this->redirect($this->generateUrl('career'));
 
     }
-    
 
     /**
-    * Bulk Action
-    * @Route("/bulk-action/", name="career_bulk_action")
-    * @Method("POST")
-    */
+     * Bulk Action
+     *
+     * @param Request $request
+     * @Route("/bulk-action/", name="career_bulk_action", methods={"POST"})
+     * @return RedirectResponse
+     */
     public function bulkAction(Request $request)
     {
         $ids = $request->get("ids", array());
@@ -296,6 +314,4 @@ class CareerController extends Controller
 
         return $this->redirect($this->generateUrl('career'));
     }
-    
-
 }

@@ -2,21 +2,23 @@
 
 namespace DRI\UsefulBundle\Controller;
 
+use Doctrine\ORM\QueryBuilder;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Routing\Annotation\Route;
+
 use Pagerfanta\Pagerfanta;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Pagerfanta\View\TwitterBootstrap3View;
 
-use DRI\UsefulBundle\Entity\Area;
+use Exception;
 
-use DRI\UsefulBundle\Form\AreaType;
-use DRI\UsefulBundle\Form\AreaFilterType;
+use DRI\UsefulBundle\Entity\Area;
 
 /**
  * Area controller.
@@ -28,8 +30,9 @@ class AreaController extends Controller
     /**
      * Lists all Area entities.
      *
-     * @Route("/", name="area")
-     * @Method("GET")
+     * @param Request $request
+     * @Route("/", name="area", methods={"GET"})
+     * @return Response
      */
     public function indexAction(Request $request)
     {
@@ -47,11 +50,13 @@ class AreaController extends Controller
         ));
     }
 
-    
     /**
-    * Create filter form and process filter request.
-    *
-    */
+     * Create filter form and process filter request.
+     *
+     * @param QueryBuilder $queryBuilder
+     * @param Request $request
+     * @return array
+     */
     protected function filter($queryBuilder, $request)
     {
         $session = $request->getSession();
@@ -94,9 +99,12 @@ class AreaController extends Controller
     }
 
     /**
-    * Get results from paginator and get paginator view.
-    *
-    */
+     * Get results from paginator and get paginator view.
+     *
+     * @param QueryBuilder $queryBuilder
+     * @param Request $request
+     * @return array
+     */
     protected function paginator($queryBuilder, $request)
     {
         // Paginator
@@ -123,18 +131,16 @@ class AreaController extends Controller
 
         return array($entities, $pagerHtml);
     }
-    
-    
 
     /**
      * Displays a form to create a new Area entity.
      *
-     * @Route("/new", name="area_new")
-     * @Method({"GET", "POST"})
+     * @param Request $request
+     * @Route("/new", name="area_new", methods={"GET", "POST"})
+     * @return RedirectResponse|Response
      */
     public function newAction(Request $request)
     {
-    
         $area = new Area();
         $form   = $this->createForm('DRI\UsefulBundle\Form\AreaType', $area);
         $form->handleRequest($request);
@@ -154,13 +160,13 @@ class AreaController extends Controller
             'form'   => $form->createView(),
         ));
     }
-    
 
     /**
      * Finds and displays a Area entity.
      *
-     * @Route("/{id}", name="area_show")
-     * @Method("GET")
+     * @param Area $area
+     * @Route("/{id}", name="area_show", methods={"GET"})
+     * @return Response
      */
     public function showAction(Area $area)
     {
@@ -170,14 +176,14 @@ class AreaController extends Controller
             'delete_form' => $deleteForm->createView(),
         ));
     }
-    
-    
 
     /**
      * Displays a form to edit an existing Area entity.
      *
-     * @Route("/{id}/edit", name="area_edit")
-     * @Method({"GET", "POST"})
+     * @param Request $request
+     * @param Area $area
+     * @Route("/{id}/edit", name="area_edit", methods={"GET", "POST"})
+     * @return RedirectResponse|Response
      */
     public function editAction(Request $request, Area $area)
     {
@@ -199,14 +205,14 @@ class AreaController extends Controller
             'delete_form' => $deleteForm->createView(),
         ));
     }
-    
-    
 
     /**
      * Deletes a Area entity.
      *
-     * @Route("/{id}", name="area_delete")
-     * @Method("DELETE")
+     * @param Request $request
+     * @param Area $area
+     * @Route("/{id}", name="area_delete", methods={"DELETE"})
+     * @return RedirectResponse
      */
     public function deleteAction(Request $request, Area $area)
     {
@@ -230,8 +236,7 @@ class AreaController extends Controller
      * Creates a form to delete a Area entity.
      *
      * @param Area $area The Area entity
-     *
-     * @return \Symfony\Component\Form\Form The form
+     * @return FormInterface The form
      */
     private function createDeleteForm(Area $area)
     {
@@ -241,13 +246,13 @@ class AreaController extends Controller
             ->getForm()
         ;
     }
-    
+
     /**
      * Delete Area by id
      *
-     * @param mixed $id The entity id
-     * @Route("/delete/{id}", name="area_by_id_delete")
-     * @Method("GET")
+     * @param Area $area
+     * @Route("/delete/{id}", name="area_by_id_delete", methods={"GET"})
+     * @return RedirectResponse
      */
     public function deleteByIdAction(Area $area){
         $em = $this->getDoctrine()->getManager();
@@ -263,13 +268,13 @@ class AreaController extends Controller
         return $this->redirect($this->generateUrl('area'));
 
     }
-    
 
     /**
-    * Bulk Action
-    * @Route("/bulk-action/", name="area_bulk_action")
-    * @Method("POST")
-    */
+     * Bulk Action
+     * @param Request $request
+     * @Route("/bulk-action/", name="area_bulk_action", methods={"POST"})
+     * @return RedirectResponse
+     */
     public function bulkAction(Request $request)
     {
         $ids = $request->get("ids", array());
@@ -296,15 +301,11 @@ class AreaController extends Controller
         return $this->redirect($this->generateUrl('area'));
     }
 
-
     /**
      * Returns a JSON string with the dependencies of the Area with the providen id.
      *
      * @param Request $request
-     *
-     * @Route("/list-area-career-dependencies", name="list_area_career_dependencies", options={"expose"=true})
-     * @Method({"POST"})
-     *
+     * @Route("/list-area-career-dependencies", name="list_area_career_dependencies", options={"expose"=true}, methods={"POST"})
      * @return JsonResponse|Response
      */
     public function listAreaDependenciesAction(Request $request)
@@ -317,16 +318,14 @@ class AreaController extends Controller
             $areaParam = $request->request->get('area');
             $areaParam = (int)$areaParam;
 
-            //var_dump($areaParam);
-
-            $area = $areaRepo->findOneById($areaParam);
+            $area = $areaRepo->findOneBy(['id'],$areaParam);
 
             if(!$area){
                 throw $this->createNotFoundException("No existe el Área.");
             }
 
             // Search the Careers that belongs to the Area with the given id as GET parameter "area"
-            $careers     = $area->getCareers();
+            $careers = $area->getCareers();
 
             // Serialize into an array the data that we need, in this case only number and id
             // Note: you can use a serializer as well, for explanation purposes, we'll do it manually
@@ -348,7 +347,7 @@ class AreaController extends Controller
                 )
             );
         }
+
+        return new Response('Petición Falleda', Response::HTTP_BAD_REQUEST);
     }
-
-
 }
