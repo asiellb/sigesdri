@@ -8,7 +8,7 @@
         <div class="lock-head"> Pantalla bloqueada </div>
         <div class="lock-body">
             <div class="pull-left lock-avatar-block">
-                <img src="{{ asset(vich_uploader_asset(app.user, 'fotoFile'))}}" class="lock-avatar"> </div>
+                <img src="{{ asset(vich_uploader_asset(app.user, 'fotoFile'))}}" class="lock-avatar" alt=""> </div>
 
             <form class="lock-form pull-left" action="{{ path("fos_user_security_lock_check") }}" method="post">
                 <h4>{{ app.user.nombres ~ ' ' ~ app.user.apellidos }}</h4>
