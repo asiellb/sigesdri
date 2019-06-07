@@ -3,7 +3,7 @@
 namespace DRI\UsefulBundle\Handler;
 
 use Doctrine\ORM\EntityManager;
-use Symfony\Component\Finder\Exception\AccessDeniedException;
+use Doctrine\ORM\Mapping\Entity;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
@@ -34,7 +34,7 @@ class RequestHandler
      * process current datatable server side operation.
      *
      * @param Request $request
-     * @param $entity Entity name
+     * @param Entity $entity Entity name
      * @param array $columns
      * @param array $joins
      *
@@ -54,7 +54,7 @@ class RequestHandler
         $columnsCounter = 1;
 
         $joinsAllias = 'j';
-        $joinsCount = count($joins);
+        //$joinsCount = count($joins);
         $joinsCounter = 1;
 
         foreach ($this->columns as $column) {

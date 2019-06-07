@@ -29,11 +29,11 @@ class DatatableServerSide
 
 	private $maxResult = 10;
 
-	/**
-	 * Class Constructor
-	 *
-	 * @param Doctrine $doctrine initiate doctrine service
-	 */
+    /**
+     * DatatableServerSide constructor.
+     *
+     * @param EntityManager $entityManager
+     */
 	public function __construct(EntityManager $entityManager)
 	{
 		$this->entityManager = $entityManager;
@@ -42,7 +42,7 @@ class DatatableServerSide
 	/**
 	 * Holds given entity
 	 *
-	 * @param $entity
+	 * @param $repository
 	 */
 	public function setRepository($repository)
 	{
