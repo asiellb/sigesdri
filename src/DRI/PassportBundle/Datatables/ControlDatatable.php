@@ -5,20 +5,11 @@ namespace DRI\PassportBundle\Datatables;
 use Sg\DatatablesBundle\Datatable\AbstractDatatable;
 use Sg\DatatablesBundle\Datatable\Style;
 use Sg\DatatablesBundle\Datatable\Column\Column;
-use Sg\DatatablesBundle\Datatable\Column\BooleanColumn;
 use Sg\DatatablesBundle\Datatable\Column\ActionColumn;
 use Sg\DatatablesBundle\Datatable\Column\MultiselectColumn;
-use Sg\DatatablesBundle\Datatable\Column\VirtualColumn;
 use Sg\DatatablesBundle\Datatable\Column\DateTimeColumn;
-use Sg\DatatablesBundle\Datatable\Column\ImageColumn;
-use Sg\DatatablesBundle\Datatable\Filter\TextFilter;
-use Sg\DatatablesBundle\Datatable\Filter\NumberFilter;
 use Sg\DatatablesBundle\Datatable\Filter\SelectFilter;
 use Sg\DatatablesBundle\Datatable\Filter\DateRangeFilter;
-use Sg\DatatablesBundle\Datatable\Editable\CombodateEditable;
-use Sg\DatatablesBundle\Datatable\Editable\SelectEditable;
-use Sg\DatatablesBundle\Datatable\Editable\TextareaEditable;
-use Sg\DatatablesBundle\Datatable\Editable\TextEditable;
 use Sg\DatatablesBundle\Datatable\Filter\Select2Filter;
 
 /**
@@ -49,6 +40,7 @@ class ControlDatatable extends AbstractDatatable
 
     /**
      * {@inheritdoc}
+     * @throws \Exception
      */
     public function buildDatatable(array $options = array())
     {
@@ -153,11 +145,8 @@ class ControlDatatable extends AbstractDatatable
             ),
         ));
 
-        $passports  = $this->em->getRepository('DRIPassportBundle:Passport')->findAll();
         $controls   = $this->em->getRepository('DRIPassportBundle:Control')->findAll();
-        $clients    = $this->em->getRepository('DRIClientBundle:Client')->findAll();
         $users      = $this->em->getRepository('DRIUserBundle:User')->findAll();
-        $area       = $this->em->getRepository('DRIUsefulBundle:Area')->findAll();
 
         $this->columnBuilder
             ->add(null,MultiselectColumn::class, array(

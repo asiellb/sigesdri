@@ -5,20 +5,12 @@ namespace DRI\PassportBundle\Datatables;
 use Sg\DatatablesBundle\Datatable\AbstractDatatable;
 use Sg\DatatablesBundle\Datatable\Style;
 use Sg\DatatablesBundle\Datatable\Column\Column;
-use Sg\DatatablesBundle\Datatable\Column\BooleanColumn;
 use Sg\DatatablesBundle\Datatable\Column\ActionColumn;
 use Sg\DatatablesBundle\Datatable\Column\MultiselectColumn;
 use Sg\DatatablesBundle\Datatable\Column\VirtualColumn;
 use Sg\DatatablesBundle\Datatable\Column\DateTimeColumn;
-use Sg\DatatablesBundle\Datatable\Column\ImageColumn;
-use Sg\DatatablesBundle\Datatable\Filter\TextFilter;
-use Sg\DatatablesBundle\Datatable\Filter\NumberFilter;
 use Sg\DatatablesBundle\Datatable\Filter\SelectFilter;
 use Sg\DatatablesBundle\Datatable\Filter\DateRangeFilter;
-use Sg\DatatablesBundle\Datatable\Editable\CombodateEditable;
-use Sg\DatatablesBundle\Datatable\Editable\SelectEditable;
-use Sg\DatatablesBundle\Datatable\Editable\TextareaEditable;
-use Sg\DatatablesBundle\Datatable\Editable\TextEditable;
 use Sg\DatatablesBundle\Datatable\Filter\Select2Filter;
 
 use DRI\PassportBundle\Entity\Passport;
@@ -51,6 +43,7 @@ class PassportDatatable extends AbstractDatatable
 
     /**
      * {@inheritdoc}
+     * @throws \Exception
      */
     public function buildDatatable(array $options = array())
     {
@@ -157,7 +150,6 @@ class PassportDatatable extends AbstractDatatable
 
         $passports = $this->em->getRepository('DRIPassportBundle:Passport')->findAll();
         $clients = $this->em->getRepository('DRIClientBundle:Client')->findAll();
-        $users = $this->em->getRepository('DRIUserBundle:User')->findAll();
         $area = $this->em->getRepository('DRIUsefulBundle:Area')->findAll();
 
         $this->columnBuilder
@@ -342,7 +334,7 @@ class PassportDatatable extends AbstractDatatable
      */
     private function formatState($numberSlug){
         $em = $this->getEntityManager();
-        $passport = $em->getRepository('DRIPassportBundle:Passport')->findOneByNumberSlug($numberSlug);
+        $passport = $em->getRepository('DRIPassportBundle:Passport')->findOneBy(['numberSlug'],$numberSlug);
         $state = '';
 
         if($passport){

@@ -5,20 +5,11 @@ namespace DRI\PassportBundle\Datatables;
 use Sg\DatatablesBundle\Datatable\AbstractDatatable;
 use Sg\DatatablesBundle\Datatable\Style;
 use Sg\DatatablesBundle\Datatable\Column\Column;
-use Sg\DatatablesBundle\Datatable\Column\BooleanColumn;
 use Sg\DatatablesBundle\Datatable\Column\ActionColumn;
 use Sg\DatatablesBundle\Datatable\Column\MultiselectColumn;
-use Sg\DatatablesBundle\Datatable\Column\VirtualColumn;
 use Sg\DatatablesBundle\Datatable\Column\DateTimeColumn;
-use Sg\DatatablesBundle\Datatable\Column\ImageColumn;
-use Sg\DatatablesBundle\Datatable\Filter\TextFilter;
-use Sg\DatatablesBundle\Datatable\Filter\NumberFilter;
 use Sg\DatatablesBundle\Datatable\Filter\SelectFilter;
 use Sg\DatatablesBundle\Datatable\Filter\DateRangeFilter;
-use Sg\DatatablesBundle\Datatable\Editable\CombodateEditable;
-use Sg\DatatablesBundle\Datatable\Editable\SelectEditable;
-use Sg\DatatablesBundle\Datatable\Editable\TextareaEditable;
-use Sg\DatatablesBundle\Datatable\Editable\TextEditable;
 use Sg\DatatablesBundle\Datatable\Filter\Select2Filter;
 
 /**
@@ -51,6 +42,7 @@ class ApplicationDatatable extends AbstractDatatable
 
     /**
      * {@inheritdoc}
+     * @throws \Exception
      */
     public function buildDatatable(array $options = array())
     {
@@ -317,49 +309,6 @@ class ApplicationDatatable extends AbstractDatatable
     }
 
     /**
-     * Determinate reason
-     *
-     * @param string $reason
-     *
-     * @return string
-     */
-    private function formatReason($reason){
-        if($reason == 'CON'){
-            return 'Confección';
-        }elseif ($reason == 'PRO'){
-            return 'Prórroga';
-        }else{
-            return '-';
-        }
-    }
-
-    /**
-     * Determinate passportType
-     *
-     * @param string $passportType
-     *
-     * @return string
-     */
-    private function formatPassportType($passportType){
-        $type = '';
-        switch ($passportType){
-            case 'COR':
-                $type = 'Corriente'; break;
-            case 'DIP':
-                $type = 'Diplomático'; break;
-            case 'OFI':
-                $type = 'Oficial'; break;
-            case 'SER':
-                $type = 'Servicio'; break;
-            case 'MAR':
-                $type = 'Marino'; break;
-            default:
-                $type = '-'; break;
-        }
-        return $type;
-    }
-
-    /**
      * Determinate state
      *
      * @param string $state
@@ -367,7 +316,6 @@ class ApplicationDatatable extends AbstractDatatable
      * @return string
      */
     private function formatState($state){
-        $type = '';
         switch ($state){
             case 'CON':
                 $type = '<div class="alert alert-info sbold"> Confeccionada </div>'; break;
@@ -391,7 +339,6 @@ class ApplicationDatatable extends AbstractDatatable
      * @return string
      */
     private function formatUsed($used){
-        $type = '';
         switch ($used){
             case false:
                 $type = '<span class="font-green sbold"> No </span>'; break;
