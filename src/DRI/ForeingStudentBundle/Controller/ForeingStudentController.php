@@ -3,12 +3,14 @@
 namespace DRI\ForeingStudentBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
-class DefaultController extends Controller
+class ForeingStudentController extends Controller
 {
     /**
-     * @Route("/index", name="foreingstudent_index")
+     * @Route("/", name="foreingstudent_index")
+     * @return Response
      */
     public function indexAction()
     {

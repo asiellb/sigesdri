@@ -6,35 +6,16 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Security\Acl\Exception\Exception;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
-use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
-use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Validator\Constraints\Date;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Finder\Exception\AccessDeniedException;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
-use Elastica\Exception\NotFoundException;
-use CMEN\GoogleChartsBundle\GoogleCharts\Charts\PieChart;
-use PhpParser\Node\Scalar\String_;
-use Pagerfanta\Pagerfanta;
-use Pagerfanta\Adapter\DoctrineORMAdapter;
-use Pagerfanta\View\TwitterBootstrap3View;
-use Sg\DatatablesBundle\Datatable\DatatableInterface;
-
+use Exception;
 
 use DRI\ForeingStudentBundle\Entity\Postgraduate;
-use DRI\ForeingStudentBundle\Form\PostgraduateType;
-use DRI\ForeingStudentBundle\Datatables\PostgraduateDatatable;
-use DRI\UsefulBundle\Useful\Useful;
 
 /**
  * Postgraduate controller.
@@ -43,50 +24,31 @@ use DRI\UsefulBundle\Useful\Useful;
  */
 class PostgraduateController extends Controller
 {
+
     /**
      * Lists all Postgraduate entities.
      *
-     * @Route("/", name="postgraduate_index")
-     * @Method("GET")
+     * @Route("/", name="postgraduate_index", methods={"GET"})
+     * @return Response
      */
-    public function indexAction(Request $request)
+    public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
-        $queryBuilder = $em->getRepository('DRIForeingStudentBundle:Postgraduate')->createQueryBuilder('e');
-
-        list($postgraduates, $pagerHtml) = $this->paginator($queryBuilder, $request);
-        
-        $totalOfRecordsString = $this->getTotalOfRecordsString($queryBuilder, $request);
-
-        return $this->render('DRIForeingStudentBundle:Postgraduate:index.html.twig', array(
-            'totalOfRecordsString' => $totalOfRecordsString,
-            'postgraduates' => $postgraduates,
-            'pagerHtml' => $pagerHtml,
-
-        ));
+        return new Response('Sin Implementar');
     }
 
-
     /**
      * Lists all Postgraduate entities.
+     *
      * @param Request $request
-     *
-     * @Route("/list", name="postgraduate_list")
-     * @Method("GET")
-     *
+     * @Route("/list", name="postgraduate_list", methods={"GET"})
      * @return Response
+     * @throws Exception
      */
     public function listAction(Request $request)
     {
         $isAjax = $request->isXmlHttpRequest();
 
-        // Get your Datatable ...
-        //$datatable = $this->get('app.datatable.client');
-        //$datatable->buildDatatable();
-
-        // or use the DatatableFactory
-        /** @var DatatableInterface $datatable */
-        $datatable = $this->get('sg_datatables.factory')->create(PostgraduateDatatable::class);
+        $datatable = $this->get('app.datatable.foreingstudents.posgraduate');
         $datatable->buildDatatable();
 
         if ($isAjax) {
@@ -102,76 +64,13 @@ class PostgraduateController extends Controller
         ));
     }
 
-
-    /**
-    * Get results from paginator and get paginator view.
-    *
-    */
-    protected function paginator($queryBuilder, Request $request)
-    {
-        //sorting
-        $sortCol = $queryBuilder->getRootAlias().'.'.$request->get('pcg_sort_col', 'id');
-        $queryBuilder->orderBy($sortCol, $request->get('pcg_sort_order', 'desc'));
-        // Paginator
-        $adapter = new DoctrineORMAdapter($queryBuilder);
-        $pagerfanta = new Pagerfanta($adapter);
-        $pagerfanta->setMaxPerPage($request->get('pcg_show' , 10));
-
-        try {
-            $pagerfanta->setCurrentPage($request->get('pcg_page', 1));
-        } catch (\Pagerfanta\Exception\OutOfRangeCurrentPageException $ex) {
-            $pagerfanta->setCurrentPage(1);
-        }
-        
-        $entities = $pagerfanta->getCurrentPageResults();
-
-        // Paginator - route generator
-        $me = $this;
-        $routeGenerator = function($page) use ($me, $request)
-        {
-            $requestParams = $request->query->all();
-            $requestParams['pcg_page'] = $page;
-            return $me->generateUrl('postgraduate', $requestParams);
-        };
-
-        // Paginator - view
-        $view = new TwitterBootstrap3View();
-        $pagerHtml = $view->render($pagerfanta, $routeGenerator, array(
-            'proximity' => 3,
-            'prev_message' => 'previous',
-            'next_message' => 'next',
-        ));
-
-        return array($entities, $pagerHtml);
-    }
-    
-    
-    
-    /*
-     * Calculates the total of records string
-     */
-    protected function getTotalOfRecordsString($queryBuilder, $request) {
-        $totalOfRecords = $queryBuilder->select('COUNT(e.id)')->getQuery()->getSingleScalarResult();
-        $show = $request->get('pcg_show', 10);
-        $page = $request->get('pcg_page', 1);
-
-        $startRecord = ($show * ($page - 1)) + 1;
-        $endRecord = $show * $page;
-
-        if ($endRecord > $totalOfRecords) {
-            $endRecord = $totalOfRecords;
-        }
-        return "Showing $startRecord - $endRecord of $totalOfRecords Records.";
-    }
-    
-    
-
     /**
      * Displays a form to create a new Postgraduate entity.
      *
-     * @Route("/new", name="postgraduate_new")
-     * @Method({"GET", "POST"})
+     * @param Request $request
+     * @Route("/new", name="postgraduate_new", methods={"GET", "POST"})
      * @Security("has_role('ROLE_FS_SPECIALIST')")
+     * @return Response
      */
     public function newAction(Request $request)
     {
@@ -215,8 +114,9 @@ class PostgraduateController extends Controller
     /**
      * Finds and displays a Postgraduate entity.
      *
-     * @Route("/profile/{fullNameSlug}", name="postgraduate_show", options = {"expose" = true})
-     * @Method("GET")
+     * @param Postgraduate $postgraduate
+     * @Route("/profile/{fullNameSlug}", name="postgraduate_show", options = {"expose" = true}, methods={"GET"})
+     * @return Response
      */
     public function showAction(Postgraduate $postgraduate)
     {
@@ -227,14 +127,14 @@ class PostgraduateController extends Controller
         ));
     }
     
-    
-
     /**
      * Displays a form to edit an existing Postgraduate entity.
      *
-     * @Route("/edit/{fullNameSlug}", name="postgraduate_edit", options = {"expose" = true})
-     * @Method({"GET", "POST"})
+     * @param Request $request
+     * @param Postgraduate $postgraduate
+     * @Route("/edit/{fullNameSlug}", name="postgraduate_edit", options = {"expose" = true}, methods={"GET", "POST"})
      * @Security("has_role('ROLE_FS_SPECIALIST')")
+     * @return Response
      */
     public function editAction(Request $request, Postgraduate $postgraduate)
     {
@@ -272,14 +172,14 @@ class PostgraduateController extends Controller
         ));
     }
     
-    
-
     /**
      * Deletes a Postgraduate entity.
      *
-     * @Route("/{id}", name="postgraduate_delete")
-     * @Method("DELETE")
+     * @param Request $request
+     * @param Postgraduate $postgraduate
+     * @Route("/{id}", name="postgraduate_delete", methods={"DELETE"})
      * @Security("has_role('ROLE_ADMIN')")
+     * @return Response
      */
     public function deleteAction(Request $request, Postgraduate $postgraduate)
     {
@@ -303,8 +203,7 @@ class PostgraduateController extends Controller
      * Creates a form to delete a Postgraduate entity.
      *
      * @param Postgraduate $postgraduate The Postgraduate entity
-     *
-     * @return \Symfony\Component\Form\Form The form
+     * @return FormInterface The form
      */
     private function createDeleteForm(Postgraduate $postgraduate)
     {
@@ -318,9 +217,10 @@ class PostgraduateController extends Controller
     /**
      * Delete Postgraduate by id
      *
-     * @Route("/delete/{id}", name="postgraduate_by_id_delete")
-     * @Method("GET")
+     * @param Postgraduate $postgraduate
+     * @Route("/delete/{id}", name="postgraduate_by_id_delete", methods={"GET"})
      * @Security("has_role('ROLE_ADMIN')")
+     * @return Response
      */
     public function deleteByIdAction(Postgraduate $postgraduate){
         $em = $this->getDoctrine()->getManager();
@@ -339,10 +239,12 @@ class PostgraduateController extends Controller
     
 
     /**
-    * Bulk Action
-    * @Route("/bulk-action/", name="postgraduate_bulk_delete")
-    * @Method("POST")
-    */
+     * Bulk Action
+     *
+     * @param Request $request
+     * @Route("/bulk-action/", name="postgraduate_bulk_delete", methods={"POST"})
+     * @return Response
+     */
     public function bulkAction(Request $request)
     {
         $isAjax = $request->isXmlHttpRequest();
@@ -375,15 +277,11 @@ class PostgraduateController extends Controller
         return new Response('Solicitud incorrecta', 400);
     }
 
-
     /**
      * Available CI.
      *
      * @param Request $request
-     *
-     * @Route("/ci-available", name="postgraduate_ci_is_available", options={"expose"=true})
-     * @Method({"GET", "POST"})
-     *
+     * @Route("/ci-available", name="postgraduate_ci_is_available", options={"expose"=true}, methods={"GET", "POST"})
      * @return JsonResponse|Response
      */
     public function isAvailableCIAction(Request $request){
@@ -393,7 +291,7 @@ class PostgraduateController extends Controller
             $ci = $request->request->get('ci');
 
             $em = $this->getDoctrine()->getManager();
-            $exist = $em->getRepository('DRIForeingStudentBundle:Postgraduate')->findOneByCi($ci);
+            $exist = $em->getRepository('DRIForeingStudentBundle:Postgraduate')->findOneBy(['ci'],$ci);
 
             if(!$exist){
                 return new JsonResponse(true);
@@ -403,16 +301,15 @@ class PostgraduateController extends Controller
             }
         }
 
+        return new Response('Solicitud Incorrecta', Response::HTTP_BAD_REQUEST);
+
     }
 
     /**
      * Available Email.
      *
      * @param Request $request
-     *
-     * @Route("/email-available", name="postgraduate_email_is_available", options={"expose"=true})
-     * @Method({"GET", "POST"})
-     *
+     * @Route("/email-available", name="postgraduate_email_is_available", options={"expose"=true}, methods={"GET", "POST"})
      * @return JsonResponse|Response
      */
     public function isAvailableEmailAction(Request $request){
@@ -422,7 +319,7 @@ class PostgraduateController extends Controller
             $email = $request->request->get('email');
 
             $em = $this->getDoctrine()->getManager();
-            $exist = $em->getRepository('DRIForeingStudentBundle:Postgraduate')->findOneByEmail($email);
+            $exist = $em->getRepository('DRIForeingStudentBundle:Postgraduate')->findOneBy(['email'],$email);
 
             if(!$exist){
                 return new JsonResponse(true);
@@ -432,17 +329,15 @@ class PostgraduateController extends Controller
             }
         }
 
-    }
+        return new Response('Solicitud Incorrecta', Response::HTTP_BAD_REQUEST);
 
+    }
 
     /**
      * Returns a JSON string with the dependencies of the CourseType.
      *
      * @param Request $request
-     *
-     * @Route("/list-postgraduate-courses-dependencies", name="list_postgraduate_courses_dependencies", options={"expose"=true})
-     * @Method({"POST"})
-     *
+     * @Route("/list-postgraduate-courses-dependencies", name="list_postgraduate_courses_dependencies", options={"expose"=true}, methods={"POST"})
      * @return JsonResponse|Response
      */
     public function listCourseDependenciesAction(Request $request)
@@ -454,11 +349,7 @@ class PostgraduateController extends Controller
         if ($isAjax) {
             $courseType = $request->request->get('type');
 
-            $courses = $courseRepo->createQueryBuilder("q")
-                ->where("q.type = :type")
-                ->setParameter("type", $courseType)
-                ->getQuery()
-                ->getResult();
+            $courses = $courseRepo->findBy(['type'],$courseType);
 
             // Serialize into an array the data that we need, in this case only number and id
             // Note: you can use a serializer as well, for explanation purposes, we'll do it manually
@@ -480,7 +371,7 @@ class PostgraduateController extends Controller
                 )
             );
         }
+
+        return new Response('Solicitud Incorrecta', Response::HTTP_BAD_REQUEST);
     }
-
-
 }

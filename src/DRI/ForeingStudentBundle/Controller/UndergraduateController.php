@@ -2,49 +2,32 @@
 
 namespace DRI\ForeingStudentBundle\Controller;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use PhpOffice\PhpWord\Exception\CopyFileException;
+use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Security\Acl\Exception\Exception;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
-use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
-use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Validator\Constraints\Date;
-
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-
-use Elastica\Exception\NotFoundException;
-use CMEN\GoogleChartsBundle\GoogleCharts\Charts\PieChart;
-use PhpParser\Node\Scalar\String_;
-use Pagerfanta\Pagerfanta;
-use Pagerfanta\Adapter\DoctrineORMAdapter;
-use Pagerfanta\View\TwitterBootstrap3View;
-use Sg\DatatablesBundle\Datatable\DatatableInterface;
-
-// Include the BinaryFileResponse and the ResponseHeaderBag
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-// Include the requires classes of Phpword
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+
 use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\Shared\Html;
 use PhpOffice\PhpWord\Shared\Converter;
 use PhpOffice\PhpWord\TemplateProcessor;
 
+use Exception;
+
 use DRI\ForeingStudentBundle\Entity\Undergraduate;
-use DRI\ForeingStudentBundle\Form\UndergraduateType;
-use DRI\ForeingStudentBundle\Datatables\UndergraduateDatatable;
-use DRI\UsefulBundle\Useful\Useful;
 
 /**
  * Undergraduate controller.
@@ -53,50 +36,31 @@ use DRI\UsefulBundle\Useful\Useful;
  */
 class UndergraduateController extends Controller
 {
+
     /**
-     * Lists all Undergraduate entities.
+     * Lists all Postgraduate entities.
      *
-     * @Route("/index", name="undergraduate_index")
-     * @Method("GET")
+     * @Route("/", name="undergraduate_index", methods={"GET"})
+     * @return Response
      */
-    public function indexAction(Request $request)
+    public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
-        $queryBuilder = $em->getRepository('DRIForeingStudentBundle:Undergraduate')->createQueryBuilder('e');
-
-        list($undergraduates, $pagerHtml) = $this->paginator($queryBuilder, $request);
-        
-        $totalOfRecordsString = $this->getTotalOfRecordsString($queryBuilder, $request);
-
-        return $this->render('DRIForeingStudentBundle:Undergraduate:index.html.twig', array(
-            'totalOfRecordsString' => $totalOfRecordsString,
-            'undergraduates' => $undergraduates,
-            'pagerHtml' => $pagerHtml,
-
-        ));
+        return new Response('Sin Implementar');
     }
 
-
     /**
      * Lists all Undergraduate entities.
+     *
      * @param Request $request
-     *
-     * @Route("/list", name="undergraduate_list")
-     * @Method("GET")
-     *
+     * @Route("/list", name="undergraduate_list", methods={"GET"})
      * @return Response
+     * @throws Exception
      */
     public function listAction(Request $request)
     {
         $isAjax = $request->isXmlHttpRequest();
 
-        // Get your Datatable ...
-        //$datatable = $this->get('app.datatable.client');
-        //$datatable->buildDatatable();
-
-        // or use the DatatableFactory
-        /** @var DatatableInterface $datatable */
-        $datatable = $this->get('sg_datatables.factory')->create(UndergraduateDatatable::class);
+        $datatable = $this->get('app.datatable.foreingstudents.undergraduate');
         $datatable->buildDatatable();
 
         if ($isAjax) {
@@ -112,76 +76,13 @@ class UndergraduateController extends Controller
         ));
     }
 
-
-    /**
-    * Get results from paginator and get paginator view.
-    *
-    */
-    protected function paginator($queryBuilder, Request $request)
-    {
-        //sorting
-        $sortCol = $queryBuilder->getRootAlias().'.'.$request->get('pcg_sort_col', 'id');
-        $queryBuilder->orderBy($sortCol, $request->get('pcg_sort_order', 'desc'));
-        // Paginator
-        $adapter = new DoctrineORMAdapter($queryBuilder);
-        $pagerfanta = new Pagerfanta($adapter);
-        $pagerfanta->setMaxPerPage($request->get('pcg_show' , 10));
-
-        try {
-            $pagerfanta->setCurrentPage($request->get('pcg_page', 1));
-        } catch (\Pagerfanta\Exception\OutOfRangeCurrentPageException $ex) {
-            $pagerfanta->setCurrentPage(1);
-        }
-        
-        $entities = $pagerfanta->getCurrentPageResults();
-
-        // Paginator - route generator
-        $me = $this;
-        $routeGenerator = function($page) use ($me, $request)
-        {
-            $requestParams = $request->query->all();
-            $requestParams['pcg_page'] = $page;
-            return $me->generateUrl('undergraduate_list', $requestParams);
-        };
-
-        // Paginator - view
-        $view = new TwitterBootstrap3View();
-        $pagerHtml = $view->render($pagerfanta, $routeGenerator, array(
-            'proximity' => 3,
-            'prev_message' => 'previous',
-            'next_message' => 'next',
-        ));
-
-        return array($entities, $pagerHtml);
-    }
-    
-    
-    
-    /*
-     * Calculates the total of records string
-     */
-    protected function getTotalOfRecordsString($queryBuilder, $request) {
-        $totalOfRecords = $queryBuilder->select('COUNT(e.id)')->getQuery()->getSingleScalarResult();
-        $show = $request->get('pcg_show', 10);
-        $page = $request->get('pcg_page', 1);
-
-        $startRecord = ($show * ($page - 1)) + 1;
-        $endRecord = $show * $page;
-
-        if ($endRecord > $totalOfRecords) {
-            $endRecord = $totalOfRecords;
-        }
-        return "Showing $startRecord - $endRecord of $totalOfRecords Records.";
-    }
-    
-    
-
     /**
      * Displays a form to create a new Undergraduate entity.
      *
-     * @Route("/new", name="undergraduate_new")
-     * @Method({"GET", "POST"})
+     * @param Request $request
+     * @Route("/new", name="undergraduate_new", methods={"GET", "POST"})
      * @Security("has_role('ROLE_FS_SPECIALIST')")
+     * @return Response
      */
     public function newAction(Request $request)
     {
@@ -225,8 +126,9 @@ class UndergraduateController extends Controller
     /**
      * Finds and displays a Undergraduate entity.
      *
-     * @Route("/profile/{fullNameSlug}", name="undergraduate_show", options = {"expose" = true})
-     * @Method("GET")
+     * @param Undergraduate $undergraduate
+     * @Route("/profile/{fullNameSlug}", name="undergraduate_show", options = {"expose" = true}, methods={"GET"})
+     * @return Response
      */
     public function showAction(Undergraduate $undergraduate)
     {
@@ -236,15 +138,15 @@ class UndergraduateController extends Controller
             'delete_form' => $deleteForm->createView(),
         ));
     }
-    
-    
 
     /**
      * Displays a form to edit an existing Undergraduate entity.
      *
-     * @Route("/edit/{fullNameSlug}", name="undergraduate_edit", options = {"expose" = true})
-     * @Method({"GET", "POST"})
+     * @param Request $request
+     * @param Undergraduate $undergraduate
+     * @Route("/edit/{fullNameSlug}", name="undergraduate_edit", options = {"expose" = true}, methods={"GET", "POST"})
      * @Security("has_role('ROLE_FS_SPECIALIST')")
+     * @return Response
      */
     public function editAction(Request $request, Undergraduate $undergraduate)
     {
@@ -281,19 +183,18 @@ class UndergraduateController extends Controller
             'delete_form' => $deleteForm->createView(),
         ));
     }
-    
-    
 
     /**
      * Deletes a Undergraduate entity.
      *
-     * @Route("/{id}", name="undergraduate_delete")
-     * @Method("DELETE")
+     * @param Request $request
+     * @param Undergraduate $undergraduate
+     * @Route("/{id}", name="undergraduate_delete", methods={"DELETE"})
      * @Security("has_role('ROLE_ADMIN')")
+     * @return Response
      */
     public function deleteAction(Request $request, Undergraduate $undergraduate)
     {
-    
         $form = $this->createDeleteForm($undergraduate);
         $form->handleRequest($request);
 
@@ -313,8 +214,7 @@ class UndergraduateController extends Controller
      * Creates a form to delete a Undergraduate entity.
      *
      * @param Undergraduate $undergraduate The Undergraduate entity
-     *
-     * @return \Symfony\Component\Form\Form The form
+     * @return FormInterface The form
      */
     private function createDeleteForm(Undergraduate $undergraduate)
     {
@@ -328,9 +228,10 @@ class UndergraduateController extends Controller
     /**
      * Delete Undergraduate by id
      *
-     * @Route("/delete/{id}", name="undergraduate_by_id_delete")
-     * @Method("GET")
+     * @param Undergraduate $undergraduate
+     * @Route("/delete/{id}", name="undergraduate_by_id_delete", methods={"GET"})
      * @Security("has_role('ROLE_ADMIN')")
+     * @return Response
      */
     public function deleteByIdAction(Undergraduate $undergraduate){
         $em = $this->getDoctrine()->getManager();
@@ -346,14 +247,15 @@ class UndergraduateController extends Controller
         return $this->redirect($this->generateUrl('undergraduate_list'));
 
     }
-    
 
     /**
-    * Bulk Action
-    * @Route("/bulk-action/", name="undergraduate_bulk_delete")
-    * @Method("POST")
+     * Bulk Action
+     *
+     * @param Request $request
+     * @Route("/bulk-action/", name="undergraduate_bulk_delete", methods={"POST"})
      * @Security("has_role('ROLE_ADMIN')")
-    */
+     * @return Response
+     */
     public function bulkAction(Request $request)
     {
         $isAjax = $request->isXmlHttpRequest();
@@ -386,15 +288,11 @@ class UndergraduateController extends Controller
         return new Response('Solicitud incorrecta', 400);
     }
 
-
     /**
      * Available CI.
      *
      * @param Request $request
-     *
-     * @Route("/ci-available", name="undergraduate_ci_is_available", options={"expose"=true})
-     * @Method({"GET", "POST"})
-     *
+     * @Route("/ci-available", name="undergraduate_ci_is_available", options={"expose"=true}, methods={"GET", "POST"})
      * @return JsonResponse|Response
      */
     public function isAvailableCIAction(Request $request){
@@ -404,7 +302,7 @@ class UndergraduateController extends Controller
             $ci = $request->request->get('ci');
 
             $em = $this->getDoctrine()->getManager();
-            $exist = $em->getRepository('DRIForeingStudentBundle:Undergraduate')->findOneByCi($ci);
+            $exist = $em->getRepository('DRIForeingStudentBundle:Undergraduate')->findOneBy(['ci'],$ci);
 
             if(!$exist){
                 return new JsonResponse(true);
@@ -414,16 +312,15 @@ class UndergraduateController extends Controller
             }
         }
 
+        return new Response('Peticion Indevida', Response::HTTP_BAD_REQUEST);
+
     }
 
     /**
      * Available Email.
      *
      * @param Request $request
-     *
-     * @Route("/email-available", name="undergraduate_email_is_available", options={"expose"=true})
-     * @Method({"GET", "POST"})
-     *
+     * @Route("/email-available", name="undergraduate_email_is_available", options={"expose"=true}, methods={"GET", "POST"})
      * @return JsonResponse|Response
      */
     public function isAvailableEmailAction(Request $request){
@@ -433,7 +330,7 @@ class UndergraduateController extends Controller
             $email = $request->request->get('email');
 
             $em = $this->getDoctrine()->getManager();
-            $exist = $em->getRepository('DRIForeingStudentBundle:Undergraduate')->findOneByEmail($email);
+            $exist = $em->getRepository('DRIForeingStudentBundle:Undergraduate')->findOneBy(['email'],$email);
 
             if(!$exist){
                 return new JsonResponse(true);
@@ -443,14 +340,17 @@ class UndergraduateController extends Controller
             }
         }
 
+        return new Response('Peticion Indevida', Response::HTTP_BAD_REQUEST);
+
     }
 
     /**
      * @Route("/word", name="undergraduate_word")
+     * @return Response
+     * @throws \PhpOffice\PhpWord\Exception\Exception
      */
-    public function wordAction(Request $request)
+    public function wordAction()
     {
-
         $phpWord = new PhpWord();
 
         // Define styles
@@ -518,6 +418,8 @@ class UndergraduateController extends Controller
 
     /**
      * @Route("/word-from-twig", name="undergraduate_word_from_twig")
+     * @return Response
+     * @throws \PhpOffice\PhpWord\Exception\Exception
      */
     public function wordFromTwigAction(){
 
@@ -544,8 +446,10 @@ class UndergraduateController extends Controller
 
     /**
      * @Route("/word-export", name="word_export")
+     * @return BinaryFileResponse
+     * @throws \PhpOffice\PhpWord\Exception\Exception
      */
-    public function wordExportAction(Request $request)
+    public function wordExportAction()
     {
         // Create a new Word document
         $phpWord = new PhpWord();
@@ -583,8 +487,12 @@ class UndergraduateController extends Controller
 
     /**
      * @Route("/word-tmpl", name="word_tmpl")
+     * @return BinaryFileResponse
+     * @throws CopyFileException
+     * @throws CreateTemporaryFileException
+     * @throws Exception
      */
-    public function wordTmplAction(Request $request)
+    public function wordTmplAction()
     {
         // Create a temporal file in the system
         $fileName = 'result.docx';
@@ -629,12 +537,13 @@ class UndergraduateController extends Controller
 
     /**
      * @Route("/word-tmpl1", name="word_tmpl1")
+     * @return StreamedResponse
      */
-    public function wordTmpl1Action(Request $request)
+    public function wordTmpl1Action()
     {
         $pregrado = $this->getDoctrine()
             ->getRepository(Undergraduate::class)
-            ->findOneById(1);
+            ->findOneBy(['id'],1);
 
         $fileName = "prueba.docx";
 
@@ -665,71 +574,86 @@ class UndergraduateController extends Controller
 
     /**
      * @Route("/annual-report", name="annual_report")
+     * @return BinaryFileResponse
+     * @throws \PhpOffice\PhpWord\Exception\Exception
      */
-    public function annualReportAction(Request $request)
+    public function annualReportAction()
     {
         $em = $this->getDoctrine()->getManager();
+        $underRepo = $em->getRepository(Undergraduate::class);
+        $undergraduates = $underRepo->findAll();
 
         $name = 'Reporte Anual de Pregrado';
         $filename = sprintf('%s - %s.docx', $name, date('Y'));
         //$temp_file = tempnam(sys_get_temp_dir(), $filename);
         $template = "report_templates/undergradutate_report_template_2.docx";
         $currentDate = sprintf('%s', date('d/m/Y'));
+
         $fullTotal      = 0;
         $femaleTotal    = 0;
         $maleTotal      = 0;
         $fcoTotal       = 0;
         $becTotal       = 0;
         $autTotal       = 0;
-        $countriesIncidence   = array();
-        $fcoCountriesIncidence   = array();
-        $becCountriesIncidence   = array();
-        $autCountriesIncidence   = array();
+
+        $fcos = new ArrayCollection();
+        $becs = new ArrayCollection();
+        $auts = new ArrayCollection();
+        $females = new ArrayCollection();
+        $males = new ArrayCollection();
+
+        foreach ($undergraduates as $undergraduate){
+            switch ($undergraduate->getType()){
+                case 'FCO': $fcos->add($undergraduate);break;
+                case 'BEC': $becs->add($undergraduate);break;
+                case 'AUT': $auts->add($undergraduate);break;
+                default:break;
+            }
+
+            switch ($undergraduate->getGender()){
+                case 'F': $females->add($undergraduate);break;
+                case 'M': $males->add($undergraduate);break;
+                default:break;
+            }
+
+        }
 
         $fcoSumary   = '';
         $becSumary   = '';
         $autSumary   = '';
 
+        $countriesIncidence   = array();
         $fcoList   = array();
         $becList   = array();
         $autList   = array();
 
-        $undergraduateRepo = $em->getRepository(Undergraduate::class);
-        $contryRepo = $em->getRepository(Undergraduate::class);
-
-        $undergraduates = $undergraduateRepo->findAll();
-        $fco = $undergraduateRepo->findByType('FCO');
-        $bec = $undergraduateRepo->findByType('BEC');
-        $aut = $undergraduateRepo->findByType('AUT');
-
         if($undergraduates){
             $fullTotal      = count($undergraduates);
-            $femaleTotal    = count($undergraduateRepo->findByGender('F'));
-            $maleTotal      = count($undergraduateRepo->findByGender('M'));
+            $femaleTotal    = $females->count();
+            $maleTotal      = $males->count();
 
             $countriesIncidence = $this->incidencePerCountries($undergraduates, null);
 
-            if($fco){
-                $fcoTotal = count($fco);
-                $fcoCountriesIncidence = $this->incidencePerCountries($fco, 'FCO');
+            if($fcos->count() > 0){
+                $fcoTotal = $fcos->count();
+                $fcoCountriesIncidence = $this->incidencePerCountries($fcos, 'FCO');
                 $fcoSumary = $this->genCountrySumaryPerType($fcoCountriesIncidence);
-                $fcoList = $this->genListPerType($fco, 'fco');
+                $fcoList = $this->genListPerType($fcos, 'fco');
             }
 
-            if($bec){
-                $becTotal = count($bec);
-                $becCountriesIncidence = $this->incidencePerCountries($bec, 'BEC');
+            if($becs->count() > 0){
+                $becTotal = $becs->count();
+                $becCountriesIncidence = $this->incidencePerCountries($becs, 'BEC');
                 $becSumary = $this->genCountrySumaryPerType($becCountriesIncidence);
-                $becList = $this->genListPerType($bec, 'bec');
+                $becList = $this->genListPerType($becs, 'bec');
             }
 
-            if($aut){
-                $autTotal = count($aut);
-                $autCountriesIncidence = $this->incidencePerCountries($aut, 'AUT');
+            if($auts->count() > 0){
+                $autTotal = $auts->count();
+                $autCountriesIncidence = $this->incidencePerCountries($auts, 'AUT');
                 $autSumary = $this->genCountrySumaryPerType($autCountriesIncidence);
-                $autList = $this->genListPerType($aut, 'aut');
+                $autList = $this->genListPerType($auts, 'aut');
             }
-
         }
 
         // ask the service for a Word2007
@@ -746,11 +670,11 @@ class UndergraduateController extends Controller
         $templateObj->setValue('becList', $becSumary);
         $templateObj->setValue('autList', $autSumary);
         $templateObj->cloneRowAndSetValues('country', $countriesIncidence);
-        if ($fco)
+        if ($fcos->count() > 0)
             $templateObj->cloneRowAndSetValues('fcoNo', $fcoList);
-        if ($bec)
+        if ($becs->count() > 0)
             $templateObj->cloneRowAndSetValues('becNo', $becList);
-        if ($aut)
+        if ($auts->count() > 0)
             $templateObj->cloneRowAndSetValues('autNo', $autList);
 
         $templateOut = $templateObj->save();
@@ -762,63 +686,58 @@ class UndergraduateController extends Controller
         );
 
         return $response;
-
-        /*$wordObj = $this->get('phpword')->getPhpWordObjFromTemplate($templateObj);
-
-        // create the writer
-        $writer = $this->get('phpword')->createWriter($wordObj, 'Word2007');
-        // create the response
-        $response = $this->get('phpword')->createStreamedResponse($writer);
-        // adding headers
-        $dispositionHeader = $response->headers->makeDisposition(
-            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            $filename
-        );
-        $response->headers->set('Content-Type', 'application/msword');
-        $response->headers->set('Pragma', 'public');
-        $response->headers->set('Cache-Control', 'maxage=1');
-        $response->headers->set('Content-Disposition', $dispositionHeader);
-
-        return $response;*/
     }
 
+    /**
+     * @param ArrayCollection|array $elements
+     * @param string $type
+     * @return array
+     */
     public function incidencePerCountries($elements, $type){
 
         $em = $this->getDoctrine()->getManager();
         $underRepo = $em->getRepository(Undergraduate::class);
 
-        $cList      = [];
-        $cIncidence = [];
+        $cList      = new ArrayCollection();
+        $cIncidence = array();
+
 
         foreach ($elements as $element) {
-            $cList[] = $element->getCountry();
+            if (!$cList->contains($element))
+                $cList->add($element->getCountry());
         }
 
-        $cList = array_unique($cList);
-        $fTotal     = 0;
-        $femaleCT   = 0;
-        $maleCT     = 0;
+        if ($cList->count() > 0) {
+            foreach ($cList as $c) {
+                $fTotal = count($underRepo->findCountryAndType($c, $type));
+                $femaleCT = count($underRepo->findCountryAndGenderAndType($c, 'F', $type));
+                $maleCT = count($underRepo->findCountryAndGenderAndType($c, 'M', $type));
 
-        foreach ($cList as $c) {
-            $fTotal     = count($underRepo->findCountryAndType($c, $type));
-            $femaleCT   = count($underRepo->findCountryAndGenderAndType($c, 'F', $type));
-            $maleCT     = count($underRepo->findCountryAndGenderAndType($c, 'M', $type));
-
-            $cIncidence[] = array(
-                'country'       => $c->getSpName(),
-                'countryCount'  => $fTotal,
-                'female'        => $femaleCT,
-                'male'          => $maleCT,
+                $cIncidence[] = array(
+                    'country' => $c->getSpName(),
+                    'countryCount' => $fTotal,
+                    'female' => $femaleCT,
+                    'male' => $maleCT,
+                );
+            }
+        }else{
+            $cIncidence = array(
+                'country' => '',
+                'countryCount' => '',
+                'female' => '',
+                'male' => '',
             );
         }
 
         return $cIncidence;
     }
 
+    /**
+     * @param ArrayCollection $undergraduates
+     * @param string $type
+     * @return array
+     */
     public function genListPerType($undergraduates, $type){
-        $em = $this->getDoctrine()->getManager();
-        $underRepo = $em->getRepository(Undergraduate::class);
-
         $underList = array();
         $count = 0;
 
@@ -842,6 +761,10 @@ class UndergraduateController extends Controller
         return $underList;
     }
 
+    /**
+     * @param array $elements
+     * @return string
+     */
     public function genCountrySumaryPerType($elements){
         $sumary = '';
 
