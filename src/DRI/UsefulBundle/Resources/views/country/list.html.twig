@@ -43,35 +43,35 @@
                         </a>
 
                         <div class="btn-group">
-                            <a class="btn red btn-outline btn-circle" href="javascript:;" data-toggle="dropdown" aria-expanded="false">
+                            <a class="btn red btn-outline btn-circle" href="javascript:" data-toggle="dropdown" aria-expanded="false">
                                 <i class="fa fa-share"></i>
                                 <span class="hidden-xs"> Herramientas </span>
                                 <i class="fa fa-angle-down"></i>
                             </a>
                             <ul class="dropdown-menu pull-right" id="pass_list_tools">
                                 <li>
-                                    <a href="javascript:;" data-action="0" class="tool-action">
+                                    <a href="javascript:" data-action="0" class="tool-action">
                                         <i class="icon-printer"></i> Imprimir</a>
                                 </li>
                                 <li>
-                                    <a href="javascript:;" data-action="1" class="tool-action">
+                                    <a href="javascript:" data-action="1" class="tool-action">
                                         <i class="icon-check"></i> Copiar</a>
                                 </li>
                                 <li>
-                                    <a href="javascript:;" data-action="2" class="tool-action">
+                                    <a href="javascript:" data-action="2" class="tool-action">
                                         <i class="icon-doc"></i> PDF</a>
                                 </li>
                                 <li>
-                                    <a href="javascript:;" data-action="3" class="tool-action">
+                                    <a href="javascript:" data-action="3" class="tool-action">
                                         <i class="icon-paper-clip"></i> Excel</a>
                                 </li>
                                 <li>
-                                    <a href="javascript:;" data-action="4" class="tool-action">
+                                    <a href="javascript:" data-action="4" class="tool-action">
                                         <i class="icon-cloud-upload"></i> CSV</a>
                                 </li>
                                 <li class="divider"> </li>
                                 <li>
-                                    <a href="javascript:;" data-action="5" class="tool-action">
+                                    <a href="javascript:" data-action="5" class="tool-action">
                                         <i class="icon-refresh"></i> Recargar</a>
                                 </li>
 
@@ -84,7 +84,7 @@
                         <ul>
                         {% for country in countries %}
                             <li>
-                                <img src="{{ vich_uploader_asset(country, 'flagFile') | imagine_filter('flag_28_x_14') }}">
+                                <img src="{{ vich_uploader_asset(country, 'flagFile') | imagine_filter('flag_28_x_14') }}" alt="">
                                 {{ country.spName }}
                             </li>
                         {% endfor %}

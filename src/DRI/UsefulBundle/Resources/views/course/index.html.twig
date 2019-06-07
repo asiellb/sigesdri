@@ -49,13 +49,15 @@
         
     <!-- PAGE SIZE -->
     <div class="pagination form-inline ">
-        <select class = "form-control"  onchange="window.location = this.value" >
-            <option value='{{ path('course', app.request.query.all|merge({'pcg_show': '10'})) }}' {% if app.request.get('pcg_show') == 10 %} selected {% endif %}>10</option>
-            <option value='{{ path('course', app.request.query.all|merge({'pcg_show': '20'})) }}' {% if app.request.get('pcg_show') == 20 %} selected {% endif %}>20</option>
-            <option value='{{ path('course', app.request.query.all|merge({'pcg_show': '50'})) }}' {% if app.request.get('pcg_show') == 50 %} selected {% endif %}>50</option>
-            <option value='{{ path('course', app.request.query.all|merge({'pcg_show': '100'})) }}' {% if app.request.get('pcg_show') == 100 %} selected {% endif %}>100</option>
-            <option value='{{ path('course', app.request.query.all|merge({'pcg_show': '500'})) }}' {% if app.request.get('pcg_show') == 500 %} selected {% endif %}>500</option>
-        </select>
+        <label>
+            <select class = "form-control"  onchange="window.location = this.value" >
+                <option value='{{ path('course', app.request.query.all|merge({'pcg_show': '10'})) }}' {% if app.request.get('pcg_show') == 10 %} selected {% endif %}>10</option>
+                <option value='{{ path('course', app.request.query.all|merge({'pcg_show': '20'})) }}' {% if app.request.get('pcg_show') == 20 %} selected {% endif %}>20</option>
+                <option value='{{ path('course', app.request.query.all|merge({'pcg_show': '50'})) }}' {% if app.request.get('pcg_show') == 50 %} selected {% endif %}>50</option>
+                <option value='{{ path('course', app.request.query.all|merge({'pcg_show': '100'})) }}' {% if app.request.get('pcg_show') == 100 %} selected {% endif %}>100</option>
+                <option value='{{ path('course', app.request.query.all|merge({'pcg_show': '500'})) }}' {% if app.request.get('pcg_show') == 500 %} selected {% endif %}>500</option>
+            </select>
+        </label>
     </div>
     <!-- END PAGE SIZE -->
 
@@ -114,7 +116,9 @@
             <table class="table table-striped table-hover table-bordered" cellspacing="0" cellpadding="0">
                 <thead>
                     <tr>
-                        <th width="20px"><input type="checkbox" class="check-all" onclick="toggleAll(this)"></th>
+                        <th width="20px"><label>
+                                <input type="checkbox" class="check-all" onclick="toggleAll(this)">
+                            </label></th>
 
                 {% import "PetkoparaCrudGeneratorBundle::macros/th_sortable.html.twig" as macros %}
                             <th>{{macros.th_sortable('id',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'course')}}</th>
@@ -128,7 +132,9 @@
                 <tbody>
                     {% for course in courses %}
                     <tr>
-                        <td><input type="checkbox" name="ids[]" onclick='bulkSubmitBtnManage();' class="check-all" value="{{course.id}}"/></td>
+                        <td><label>
+                                <input type="checkbox" name="ids[]" onclick='bulkSubmitBtnManage();' class="check-all" value="{{course.id}}"/>
+                            </label></td>
                         <td><a href="{{ path('course_edit', { 'id': course.id }) }}">{{ course.id }}</a></td>
                         <td>{{ course.name }}</td>
                         <td>{{ course.coordinator }}</td>
@@ -162,9 +168,11 @@
 <div class="row">
     <div class="col-md-4 pull-left">
             <div class="pagination form-inline ">
-                <select class = "form-control" name="bulk_action" >
-                    <option value="delete">DELETE</option>
-                </select>
+                <label>
+                    <select class = "form-control" name="bulk_action" >
+                        <option value="delete">DELETE</option>
+                    </select>
+                </label>
                 <input type="submit" id='bulkSubmitBtn' onclick="return confirm('Are you sure?')" form="bulk_form" class="form-control btn btn-danger btn-sm" disabled>
             </div>
     </div>
