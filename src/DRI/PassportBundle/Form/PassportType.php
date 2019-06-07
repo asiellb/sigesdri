@@ -2,24 +2,19 @@
 
 namespace DRI\PassportBundle\Form;
 
-use DRI\PassportBundle\Entity\Passport;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
-use DRI\UsefulBundle\Form\DatePickerType;
-use Vich\UploaderBundle\Form\Type\VichFileType;
-use Vich\UploaderBundle\Form\Type\VichImageType;
 use Presta\ImageBundle\Form\Type\ImageType;
 
-use DRI\ClientBundle\Entity\Client;
+use DRI\PassportBundle\Entity\Passport;
+use DRI\UsefulBundle\Form\DatePickerType;
 
 class PassportType extends AbstractType
 {
@@ -106,7 +101,7 @@ class PassportType extends AbstractType
                 'label_attr' => [
                     'class' => 'radio-inline'
                 ],
-                'choices'  => Passport::PASSPORT_TYPE_CHOICE,
+                'choices'  => Passport::$PASSPORT_TYPE_CHOICE,
                 'attr' => array(
                     'class'=>'radio-list',
                 ),
@@ -129,12 +124,6 @@ class PassportType extends AbstractType
                 'max_height' => '720',
                 'preview_width' => '150',
                 'preview_height' => '180',
-                'cropper_options' => [
-                    //'movable' => false,
-                    //'zoomable' => false,
-                    //'rotatable' => false,
-                    //'scalable' => false
-                ]
             ])
         ;
 

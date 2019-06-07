@@ -2,20 +2,16 @@
 
 namespace DRI\PassportBundle\Form;
 
-use DRI\ClientBundle\Entity\Client;
-use DRI\PassportBundle\Entity\Application;
-use DRI\PassportBundle\Entity\Passport;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
+use DRI\PassportBundle\Entity\Application;
+use DRI\PassportBundle\Entity\Passport;
 use DRI\UsefulBundle\Form\DatePickerType;
 
 class ApplicationType extends AbstractType
@@ -67,7 +63,7 @@ class ApplicationType extends AbstractType
                 'label_attr' => [
                     'class' => 'radio-inline'
                 ],
-                'choices'  => Application::PASSPORT_APPLICATION_REASON_CHOICE,
+                'choices'  => Application::$PASSPORT_APPLICATION_REASON_CHOICE,
                 'attr' => array(
                     'class'=>'radio-list',
                 ),
@@ -82,7 +78,7 @@ class ApplicationType extends AbstractType
                 'label_attr' => [
                     'class' => 'radio-inline'
                 ],
-                'choices'  => Application::PASSPORT_APPLICATION_TYPE_CHOICE,
+                'choices'  => Application::$PASSPORT_APPLICATION_TYPE_CHOICE,
                 'attr' => array(
                     'class'=>'radio-list',
                 ),
@@ -97,7 +93,7 @@ class ApplicationType extends AbstractType
                 'label_attr' => [
                     'class' => 'radio-inline'
                 ],
-                'choices'  => Passport::PASSPORT_TYPE_CHOICE,
+                'choices'  => Passport::$PASSPORT_TYPE_CHOICE,
                 'attr' => array(
                     'class'=>'radio-list',
                 ),
@@ -112,7 +108,7 @@ class ApplicationType extends AbstractType
                 'label_attr' => [
                     'class' => 'radio-inline'
                 ],
-                'choices'  => Application::PASSPORT_APPLICATION_STATE_CHOICE,
+                'choices'  => Application::$PASSPORT_APPLICATION_STATE_CHOICE,
                 'attr' => array(
                     'class'=>'radio-list',
                 ),
