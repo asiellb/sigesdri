@@ -9,10 +9,9 @@
 namespace DRI\UserBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\FormBuilderInterface;
-use FOS\UserBundle\Util\LegacyFormHelper;
 
-use Vich\UploaderBundle\Form\Type\VichFileType;
 use Vich\UploaderBundle\Form\Type\VichImageType;
 
 class RegistrationType extends AbstractType
@@ -27,8 +26,8 @@ class RegistrationType extends AbstractType
                     'allow_delete'  => true, // not mandatory, default is true
                     'download_link' => true, // not mandatory, default is true
                 ))
-                ->add('plainPassword', LegacyFormHelper::getType('Symfony\Component\Form\Extension\Core\Type\RepeatedType'), array(
-                    'type' => LegacyFormHelper::getType('Symfony\Component\Form\Extension\Core\Type\PasswordType'),
+                ->add('plainPassword', RepeatedType::class, array(
+                    'type' => RepeatedType::class,
                     'options' => array('translation_domain' => 'FOSUserBundle'),
                     'first_options' => array('label' => 'form.password'),
                     'second_options' => array('label' => 'form.password_confirmation'),
