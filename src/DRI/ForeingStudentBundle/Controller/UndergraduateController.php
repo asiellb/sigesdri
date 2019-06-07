@@ -2,9 +2,6 @@
 
 namespace DRI\ForeingStudentBundle\Controller;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use PhpOffice\PhpWord\Exception\CopyFileException;
-use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Symfony\Component\Form\FormInterface;
@@ -17,6 +14,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
 use PhpOffice\PhpWord\PhpWord;
@@ -24,6 +23,8 @@ use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\Shared\Html;
 use PhpOffice\PhpWord\Shared\Converter;
 use PhpOffice\PhpWord\TemplateProcessor;
+use PhpOffice\PhpWord\Exception\CopyFileException;
+use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
 
 use Exception;
 
@@ -422,13 +423,11 @@ class UndergraduateController extends Controller
      * @throws \PhpOffice\PhpWord\Exception\Exception
      */
     public function wordFromTwigAction(){
-
-        $pregrado = $this->getDoctrine()
-            ->getRepository(Undergraduate::class)
-            ->findAll();
+        $em = $this->getDoctrine()->getManager();
+        $undergraduates = $em->getRepository('DRIForeingStudentBundle:Undergraduate')->findAll();
 
         $myHtml = $this->renderView('DRIForeingStudentBundle:Undergraduate:word_report.html.twig', array(
-            'pregrado' => $pregrado,
+            'undergraduates' => $undergraduates,
         ));
         $phpWord = new PhpWord();
         $section = $phpWord->addSection();
@@ -541,8 +540,8 @@ class UndergraduateController extends Controller
      */
     public function wordTmpl1Action()
     {
-        $pregrado = $this->getDoctrine()
-            ->getRepository(Undergraduate::class)
+        $pregrado = $this->getDoctrine()->getManager()
+            ->getRepository('DRIForeingStudentBundle:Undergraduate')
             ->findOneBy(['id'],1);
 
         $fileName = "prueba.docx";
@@ -580,7 +579,7 @@ class UndergraduateController extends Controller
     public function annualReportAction()
     {
         $em = $this->getDoctrine()->getManager();
-        $underRepo = $em->getRepository(Undergraduate::class);
+        $underRepo = $em->getRepository('DRIForeingStudentBundle:Undergraduate');
         $undergraduates = $underRepo->findAll();
 
         $name = 'Reporte Anual de Pregrado';
@@ -696,7 +695,7 @@ class UndergraduateController extends Controller
     public function incidencePerCountries($elements, $type){
 
         $em = $this->getDoctrine()->getManager();
-        $underRepo = $em->getRepository(Undergraduate::class);
+        $underRepo = $em->getRepository('DRIForeingStudentBundle:Undergraduate');
 
         $cList      = new ArrayCollection();
         $cIncidence = array();
