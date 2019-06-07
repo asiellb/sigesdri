@@ -10,12 +10,19 @@ namespace DRI\UsefulBundle\Service;
 
 use Vich\UploaderBundle\Naming\NamerInterface;
 use Vich\UploaderBundle\Mapping\PropertyMapping;
+
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+
+use DRI\UsefulBundle\Entity\Country;
 use DRI\UsefulBundle\Useful\Useful;
 
 class CountriesFlagsNamer implements NamerInterface
 {
-
+    /**
+     * @param Country $country
+     * @param PropertyMapping $flagImage
+     * @return false|string|string[]|null
+     */
     public function name($country, PropertyMapping $flagImage)
     {
         $file = $flagImage->getFile($country);
@@ -28,6 +35,10 @@ class CountriesFlagsNamer implements NamerInterface
         return $name;
     }
 
+    /**
+     * @param UploadedFile $file
+     * @return mixed|string|null
+     */
     private function getExtension(UploadedFile $file)
     {
         $originalName = $file->getClientOriginalName();
