@@ -8,13 +8,20 @@
 
 namespace DRI\ForeingStudentBundle\Service;
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+
 use Vich\UploaderBundle\Naming\NamerInterface;
 use Vich\UploaderBundle\Mapping\PropertyMapping;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+
+use DRI\ForeingStudentBundle\Entity\Undergraduate;
 
 class UndergraduatePictureNamer implements NamerInterface
 {
-
+    /**
+     * @param Undergraduate $undergraduate
+     * @param PropertyMapping $picture
+     * @return string
+     */
     public function name($undergraduate, PropertyMapping $picture)
     {
         $file = $picture->getFile($undergraduate);
@@ -29,6 +36,10 @@ class UndergraduatePictureNamer implements NamerInterface
         return $name;
     }
 
+    /**
+     * @param UploadedFile $file
+     * @return mixed|string|null
+     */
     private function getExtension(UploadedFile $file)
     {
         $originalName = $file->getClientOriginalName();
